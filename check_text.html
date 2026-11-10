@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Вояджер-6</title>
+<style>
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: Georgia, "Times New Roman", serif;
+    background: #fafafa; color: #222; line-height: 1.65;
+    padding: 0 16px 60px;
+  }
+
+  /* ============ Легенда (фиксированная узкая полоса) ============ */
+  .legend-strip {
+    position: sticky; top: 0; z-index: 30;
+    height: 42px; display: flex; align-items: center; gap: 6px;
+    padding: 0 8px; margin: 0 -16px;
+    background: #fff; border-bottom: 1px solid #ddd;
+    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    overflow-x: auto; white-space: nowrap;
+  }
+  .legend-strip::-webkit-scrollbar { height: 4px; }
+  .legend-strip::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
+
+  .legend-strip .item {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px 3px 3px;
+    background: #f2f2f2; border-radius: 14px;
+    font-size: 12px; cursor: pointer; flex-shrink: 0;
+    transition: background .12s, box-shadow .12s;
+  }
+  .legend-strip .item:hover { background: #eaeaea; }
+  .legend-strip .item.active {
+    background: #ffe066; outline: 2px solid #d4a017; font-weight: bold;
+  }
+  .legend-strip .item .avatar { width: 24px; height: 24px; flex-shrink: 0; }
+  .legend-strip .item .avatar svg { display: block; width: 100%; height: 100%; }
+  .legend-strip .count {
+    background: rgba(0,0,0,.14); color: #000;
+    padding: 0 6px; border-radius: 8px;
+    font-size: 10px; font-weight: bold; min-width: 14px; text-align: center;
+  }
+  .legend-strip .sep { width: 1px; height: 22px; background: #ddd; margin: 0 4px; flex-shrink: 0; }
+
+  /* ============ Тулбар ============ */
+  .toolbar {
+    position: sticky; top: 42px; z-index: 25;
+    background: #fafafa; display: flex; flex-wrap: wrap; gap: 8px;
+    align-items: center; padding: 8px 0; margin-bottom: 14px;
+    border-bottom: 1px solid #eee;
+  }
+  .toolbar button {
+    padding: 6px 12px; border: 2px solid #ccc; background: #fff;
+    border-radius: 6px; cursor: pointer; font: inherit; font-size: 13px;
+    transition: all .12s;
+  }
+  .toolbar button:hover { border-color: #888; }
+  .toolbar button[data-mark="verbs"].active    { background:#000; color:#fff; border-color:#000; }
+  .toolbar button[data-mark="pronouns"].active { background:#ccc; color:#000; font-weight:bold; border-color:#999; }
+  .toolbar button[data-mark="terms"].active    { background:#ffc2c2; color:#900; border-color:#900; font-weight:bold; }
+  .toolbar .clear-btn { background:#fee; border-color:#e88; color:#900; }
+  .toolbar .clear-btn:hover { background:#fdd; border-color:#c66; }
+
+  .search-box { display: flex; gap: 4px; margin-left: auto; }
+  .search-box input {
+    padding: 6px 10px; border: 1px solid #ccc; border-radius: 6px;
+    font: inherit; font-size: 13px; width: 180px;
+  }
+  .search-box input:focus { outline: 2px solid #88c; border-color: transparent; }
+  .search-box button {
+    background: #333; color: #fff; border-color: #333;
+  }
+  .search-box button:hover { background: #000; border-color: #000; }
+
+  /* ============ Хайлайты ============ */
+  .show-verbs .verb      { background:#000; color:#fff; padding:0 3px; border-radius:3px; }
+  .show-pronouns .pronoun{ background:#cfcfcf; color:#000; font-weight:bold; padding:0 3px; border-radius:3px; }
+  .show-terms .term      { background:#ffc2c2; color:#900; font-weight:bold; padding:0 3px; border-radius:3px; }
+
+  /* ============ Макет ============ */
+  .layout { display: flex; gap: 24px; align-items: flex-start; }
+  .main-text { flex: 1; min-width: 0; }
+
+  /* ============ Блоки ============ */
+  .block { display: flex; gap: 14px; margin: 0 0 12px; align-items: flex-start; }
+  .block .avatar { width: 52px; height: 52px; flex-shrink: 0; cursor: pointer; transition: transform .12s, filter .12s; border-radius: 50%; }
+  .block .avatar:hover { transform: scale(1.08); }
+  .block .avatar.active { box-shadow: 0 0 0 3px #d4a017; }
+  .block .avatar svg { display: block; width: 100%; height: 100%; }
+  .block .text { flex: 1; padding: 6px 12px; border-radius: 8px; }
+
+  .text.bg-yunga     { background-color: #FFE066; }
+  .text.bg-lis       { background-color: #FFB366; }
+  .text.bg-captain   { background-color: #A8D8FF; }
+  .text.bg-engineer  { background-color: #FFB3D9; }
+  .text.bg-navigator { background-color: #B8E6B8; }
+  .text.bg-assistant { background-color: #D9C2FF; }
+  .text.bg-narration { background: transparent; padding-left: 0; }
+
+  /* ============ Badge «new» ============ */
+  .new-badge {
+    display: inline-block; position: relative;
+    background:#e53935; color:#fff; font-weight: bold;
+    font-size: 9px; line-height: 1;
+    padding: 2px 5px; border-radius: 8px;
+    margin-left: 5px; vertical-align: super;
+    cursor: help; letter-spacing: .3px;
+  }
+  .new-badge::after {
+    content: attr(data-tip);
+    position: absolute; bottom: calc(100% + 6px); left: 50%;
+    transform: translateX(-50%);
+    background: #222; color: #fff; padding: 4px 8px;
+    border-radius: 4px; font-size: 11px; font-weight: normal;
+    white-space: nowrap; opacity: 0; pointer-events: none;
+    transition: opacity .15s;
+  }
+  .new-badge:hover::after { opacity: 1; }
+
+  b.first-appearance { font-weight: 700; }
+
+  /* ============ Инфо-панель ============ */
+  .info-panel {
+    width: 320px; flex-shrink: 0;
+    display: none;
+    position: sticky; top: 110px;
+    max-height: calc(100vh - 130px);
+    overflow-y: auto;
+    background: #fff; border-radius: 12px;
+    padding: 16px 18px;
+    box-shadow: 0 4px 16px rgba(0,0,0,.1);
+    font-size: 14px;
+  }
+  .info-panel.visible { display: block; }
+  .info-panel h3 {
+    margin: 0 0 2px; font-size: 18px;
+  }
+  .info-panel .panel-sub {
+    margin: 0 0 14px; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 1px; color: #999;
+  }
+  .info-section { margin-bottom: 12px; }
+  .info-label {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
+    color: #666; font-weight: bold; margin-bottom: 2px;
+  }
+  .info-text { line-height: 1.5; }
+
+  /* ============ Поиск-хит ============ */
+  .block.search-hit .text {
+    animation: searchPulse 0.55s ease-in-out 5;
+  }
+  @keyframes searchPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255,193,7,0); }
+    50%      { box-shadow: 0 0 0 6px rgba(255,193,7,0.7); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ SVG-символы ============ -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <symbol id="p-yunga" viewBox="0 0 60 60">
+    <circle cx="30" cy="30" r="28" fill="#FFE066"/>
+    <circle cx="30" cy="28" r="13" fill="#FFE0B2"/>
+    <path d="M17 24 Q30 10 43 24 L43 28 Q30 24 17 28 Z" fill="#5D4037"/>
+    <rect x="20" y="48" width="20" height="10" fill="#1976D2" rx="2"/>
+    <circle cx="26" cy="27" r="1.5" fill="#000"/>
+    <circle cx="34" cy="27" r="1.5" fill="#000"/>
+    <path d="M26 33 Q30 36 34 33" stroke="#000" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+    <rect x="14" y="24" width="4" height="10" fill="#D32F2F" rx="1"/>
+    <rect x="42" y="24" width="4" height="10" fill="#D32F2F" rx="1"/>
+  </symbol>
+  <symbol id="p-lis" viewBox="0 0 60 60">
+    <circle cx="30" cy="30" r="28" fill="#FFB366"/>
+    <polygon points="14,22 22,14 26,28" fill="#E65100"/>
+    <polygon points="46,22 38,14 34,28" fill="#E65100"/>
+    <ellipse cx="30" cy="34" rx="16" ry="14" fill="#FF9800"/>
+    <ellipse cx="30" cy="40" rx="10" ry="7" fill="#FFE0B2"/>
+    <circle cx="23" cy="32" r="2.5" fill="#000"/>
+    <circle cx="37" cy="32" r="2.5" fill="#000"/>
+    <circle cx="24" cy="31" r="0.8" fill="#fff"/>
+    <circle cx="38" cy="31" r="0.8" fill="#fff"/>
+    <ellipse cx="30" cy="38" rx="2" ry="1.5" fill="#000"/>
+    <path d="M26 42 Q30 45 34 42" stroke="#000" stroke-width="1" fill="none"/>
+  </symbol>
+  <symbol id="p-captain" viewBox="0 0 60 60">
+    <circle cx="30" cy="30" r="28" fill="#A8D8FF"/>
+    <circle cx="30" cy="32" r="13" fill="#FFE0B2"/>
+    <path d="M15 24 L15 20 Q30 14 45 20 L45 24 Q30 18 15 24 Z" fill="#1565C0"/>
+    <ellipse cx="30" cy="20" rx="15" ry="5" fill="#0D47A1"/>
+    <circle cx="30" cy="18" r="2" fill="#FFD700"/>
+    <circle cx="26" cy="30" r="1.5" fill="#000"/>
+    <circle cx="34" cy="30" r="1.5" fill="#000"/>
+    <path d="M26 37 Q30 39 34 37" stroke="#000" stroke-width="1" fill="none"/>
+    <path d="M48 42 L52 55 M46 55 L54 55" stroke="#8B6914" stroke-width="1.5" fill="none"/>
+  </symbol>
+  <symbol id="p-engineer" viewBox="0 0 60 60">
+    <circle cx="30" cy="30" r="28" fill="#FFB3D9"/>
+    <circle cx="30" cy="30" r="13" fill="#FFE0B2"/>
+    <path d="M16 25 Q30 12 44 25 L44 32 Q30 22 16 32 Z" fill="#8E24AA"/>
+    <path d="M15 46 Q30 40 45 46 L45 55 Q30 50 15 55 Z" fill="#8E24AA"/>
+    <rect x="20" y="26" width="8" height="6" fill="#000" rx="2"/>
+    <rect x="32" y="26" width="8" height="6" fill="#000" rx="2"/>
+    <line x1="28" y1="29" x2="32" y2="29" stroke="#000" stroke-width="1"/>
+    <path d="M26 37 Q30 39 34 37" stroke="#000" stroke-width="1" fill="none"/>
+  </symbol>
+  <symbol id="p-navigator" viewBox="0 0 60 60">
+    <circle cx="30" cy="30" r="28" fill="#B8E6B8"/>
+    <ellipse cx="30" cy="30" rx="15" ry="14" fill="#FFE0B2"/>
+    <path d="M15 22 Q30 10 45 22 L45 25 Q30 20 15 25 Z" fill="#5D4037"/>
+    <circle cx="25" cy="28" r="1.5" fill="#000"/>
+    <circle cx="35" cy="28" r="1.5" fill="#000"/>
+    <path d="M24 36 Q30 40 36 36" stroke="#000" stroke-width="1" fill="none"/>
+    <ellipse cx="48" cy="50" rx="8" ry="2" fill="#8D6E63"/>
+    <rect x="42" y="46" width="12" height="3" fill="#7CB342"/>
+    <rect x="42" y="44" width="12" height="2" fill="#D84315"/>
+    <ellipse cx="48" cy="43" rx="7" ry="2" fill="#E6C079"/>
+  </symbol>
+  <symbol id="p-assistant" viewBox="0 0 60 60">
+    <circle cx="30" cy="30" r="28" fill="#D9C2FF"/>
+    <circle cx="30" cy="28" r="12" fill="#FFE0B2"/>
+    <path d="M18 22 Q30 12 42 22 L42 26 Q30 22 18 26 Z" fill="#3E2723"/>
+    <circle cx="26" cy="27" r="1.5" fill="#000"/>
+    <circle cx="34" cy="27" r="1.5" fill="#000"/>
+    <path d="M27 33 Q30 34 33 33" stroke="#000" stroke-width="1" fill="none"/>
+    <rect x="10" y="38" width="40" height="20" fill="#455A64" rx="2"/>
+    <rect x="12" y="40" width="36" height="16" fill="#607D8B" rx="1"/>
+    <line x1="15" y1="44" x2="45" y2="44" stroke="#90A4AE" stroke-width="1"/>
+    <line x1="15" y1="48" x2="41" y2="48" stroke="#90A4AE" stroke-width="1"/>
+    <line x1="15" y1="52" x2="43" y2="52" stroke="#90A4AE" stroke-width="1"/>
+  </symbol>
+  <symbol id="p-narration" viewBox="0 0 60 60">
+    <rect x="8" y="8" width="44" height="44" rx="6" fill="#F5F5DC" stroke="#8B6914" stroke-width="2"/>
+    <polygon points="42,8 52,8 52,18" fill="#fafafa"/>
+    <line x1="42" y1="8" x2="52" y2="18" stroke="#8B6914" stroke-width="1"/>
+    <line x1="14" y1="22" x2="44" y2="22" stroke="#8B6914" stroke-width="1.5"/>
+    <line x1="14" y1="28" x2="46" y2="28" stroke="#8B6914" stroke-width="1.5"/>
+    <line x1="14" y1="34" x2="42" y2="34" stroke="#8B6914" stroke-width="1.5"/>
+    <line x1="14" y1="40" x2="44" y2="40" stroke="#8B6914" stroke-width="1.5"/>
+    <line x1="14" y1="46" x2="38" y2="46" stroke="#8B6914" stroke-width="1.5"/>
+  </symbol>
+</svg>
+
+<!-- ============ Легенда (фиксированная) ============ -->
+<div class="legend-strip" id="legendStrip">
+  <div class="item" data-char="yunga"><div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-yunga"/></svg></div><span>Юнга</span><span class="count">0</span></div>
+  <div class="item" data-char="lis"><div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-lis"/></svg></div><span>Мистер Лис</span><span class="count">0</span></div>
+  <div class="item" data-char="captain"><div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-captain"/></svg></div><span>Капитан</span><span class="count">0</span></div>
+  <div class="item" data-char="engineer"><div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-engineer"/></svg></div><span>Инженер</span><span class="count">0</span></div>
+  <div class="item" data-char="navigator"><div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-navigator"/></svg></div><span>Навигатор</span><span class="count">0</span></div>
+  <div class="item" data-char="assistant"><div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-assistant"/></svg></div><span>Помощник Капитана</span><span class="count">0</span></div>
+  <div class="sep"></div>
+  <div class="item" data-char="narration"><div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div><span>Авторский текст</span><span class="count">0</span></div>
+</div>
+
+<!-- ============ Тулбар ============ -->
+<div class="toolbar">
+  <button data-mark="verbs">Выделить глаголы</button>
+  <button data-mark="pronouns">Выделить местоимения</button>
+  <button data-mark="terms">Выделить термины и объекты</button>
+  <button data-mark="clear" class="clear-btn">Убрать выделения</button>
+  <div class="search-box">
+    <input type="search" id="searchInput" placeholder="Поиск по тексту…">
+    <button id="searchBtn" type="button">Найти</button>
+  </div>
+</div>
+
+<!-- ============ Макет ============ -->
+<div class="layout">
+  <main class="main-text" id="mainText">
+
+    <div class="block" data-character="yunga">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-yunga"/></svg></div>
+      <div class="text bg-yunga">– Попался!</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration"><b class="first-appearance">Юнга<span class="new-badge" data-tip="Первое появление">new</span></b> сидел на полу просторной рубки «Вояджера-6». Перед ним летали потоки кода – каждый символ был кубитом, который он силой мысли вращал в необходимое положение. Он не писал квантовый код, он жонглировал им.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Над плечом материализовался фамильяр – <b class="first-appearance">Мистер Лис<span class="new-badge" data-tip="Первое появление">new</span></b>.</div>
+    </div>
+
+    <div class="block" data-character="yunga">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-yunga"/></svg></div>
+      <div class="text bg-yunga">– Попался! – повторил Юнга, хитро потирая руками. – Чат, внимание! Юнга нашёл истинный raw!</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Но все продолжали заниматься своими делами. Лис возмущенно скрестил лапы на груди, зная о чем думает его хозяин и друг – он не мог оставаться равнодушным. Лис завертелся, рассыпая вокруг себя пиксельные искры и начал кружить над его головой.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration"><b class="first-appearance">Я сидел в капитанском кресле<span class="new-badge" data-tip="Первое появление">new</span></b>. Передо мной был развернут голо-экран, по которому текли скучные цифры отчетов и показаний внешних и внутренних датчиков. Так я делал вид, что всё контролирую.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Краем глаза увидел всплывающую подсказку с уведомлением в углу экрана, но решил немного потянуть время, прежде чем сообщу всем. Другим глазом я посмотрел в сторону <b class="first-appearance">Инженера<span class="new-badge" data-tip="Первое появление">new</span></b> – она тоже заметила появление сообщения, глянула в мою сторону, но ничего не сказала. Я лишь промолчал и слегка улыбнулся. Она подмигнула в ответ и отвернулась, продолжив заниматься своими делами. Я достал гусиное перо.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Признаюсь честно, я мечтаю стать героем космической эпопеи, но пока я обычный капитан межпланетного зонда.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Я постучал пером по столу, звук отозвался хорошо – он был достаточно реалистичным. Из другого ящика капитанского стола я достал чернильницу и поставил её рядом перед собой на столике.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">И хотя я обладаю продвинутым квантовым искусственным интеллектом и вполне официально наделён возможностями новой экспериментальной технологии Квалиа Менгера, всё же остаюсь машиной, которая одновременно возомнила себя «сотрудником» ВАСА. Мне поручили управлять миссией «Вояджера-6», который летит прямо к микрочерной дыре МЧД-1, которую недавно нашли в Солнечной системе. Для исследований разумеется! Для чего же ещё?</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Я, конечно, не человек, но ничего! Это вопрос времени. У меня есть план – я буду учиться настоящим чувствам землян, и я почти уверен, что добьюсь в этом успеха. Хотя у меня даже имени человеческого нет – зовите меня просто Капитаном. Зато просто и понятно. Я хочу оставаться простым, эффективным инструментом в руках мудрого человечества. Сейчас я чувствую удовлетворение. Ну, как чувствую? Пока только осознаю, что должен это почувствовать, но внутри меня ничто не шевелится и, кажется, что я просто пытаюсь себя убедить, что что-то чувствую.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Я посмотрел в сторону Юнги, нашего самого молодого члена команды. «Шкет», как его называет наш <b class="first-appearance">Навигатор<span class="new-badge" data-tip="Первое появление">new</span></b>, «хакер», «юный космоботан», а по сути, специалист по старым и новым программам. Испытывает ли он настоящую радость от того, чем занят? Или также как и все делает вид? Его глаза как будто горели – так бы сказали земляне. Показалось, что во мне просыпается чувство зависти. Вот уж не хотел бы, чтобы именно это чувство во мне пробудилось в первую очередь!</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Как писать этим чертовым пером? Я открыл виртуальную инструкцию в своих мыслях. Не хватало бумаги. Я бумагой никогда не пользовался, читал об этом в книгах, видел в фильмах. Теперь надо было положить на стол бумагу. Из другого ящика я достал рулон белой шероховатой рифлёной бумаги и развернул её на столе.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Мы подлетаем к сектору уверенной связи и скоро я должен раскрыть присланное послание, в котором для нас наверняка подготовили какое-то задание. Надеюсь, оно каверзное, интересное, и может даже нам позволят выйти наружу. Я бы всё за это отдал – посмотреть на реальную жизнь. Я поднял голову и посмотрел в один из наших иллюминаторов. Марс. И Фобос, его спутник. Они уже рядом. Однако меня отвлекла суматоха в рубке.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Мистер Лис подлетел к <b class="first-appearance">Помощнику Капитана<span class="new-badge" data-tip="Первое появление">new</span></b> и начал кружить вокруг него.</div>
+    </div>
+
+    <div class="block" data-character="lis">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-lis"/></svg></div>
+      <div class="text bg-lis">– Он сделал это! Он нашёл!</div>
+    </div>
+
+    <div class="block" data-character="assistant">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-assistant"/></svg></div>
+      <div class="text bg-assistant">– Уйди, – буркнул Помощник Капитана.</div>
+    </div>
+
+    <div class="block" data-character="lis">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-lis"/></svg></div>
+      <div class="text bg-lis">– Ну правда, это интересно, иди посмотри! У-у-у, зануда.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Лис полетел к Инженеру. По пути покосился на хмурого Навигатора, который кажется тоже делал вид, что очень занят отчётами с Земли. Он склонился над экраном, насупившись и втянув живот, рассматривал графики. Они были такими мелкими, что даже у искусственного интеллекта через пять секунд их изучения вытекли бы виртуальные глаза. Но он терпел. Не отводя глаз от экрана, он взял стакан с колой со стола, поднёс к губам трубочку и громко потянул напиток. Лис даже не стал около него останавливаться.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Инженер не долго упрямилась, пока Лис тормошил её, встала и подошла к Юнге.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Экран перед Юнгой был разделён на две части: в первой была старая черно-белая фотография. На фоне размытого изображения серой поверхности (очевидно, это был Марс) пролетал вытянутый, почти идеальный тёмный эллипс. Он был похож на веретено, скользящее по сюрреалистичному ватному одеялу. На фото были нанесены метки на английском, которые указывали размеры объекта: двадцать километров в поперечнике, и надписи на русском.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">На второй половине экрана была качественная картинка с марсианских видео-спутников. Они транслировали поверхность в режиме реального времени. Бросив взгляд сначала на одну картинку, потом на другую, сопоставляя их, я идентифицировал что в целом местность узнаваема. И то же самое «веретено» с оригинальной фотографии, но смоделированное Юнгой, прямо сейчас ползло по огромному вулканическому нагорью провинции Фарсиды.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Доминантой местности была загадочная гора Арсия Монс, потухший вулкан, простирающийся на четыреста километров в ширину и двадцать километров в высоту. Он был меньше знаменитой горы Олимп, но всё еще больше самой высокой горы на Земле. Кальдера, впадина на его вершине, была таких же неземных масштабов – шириной более ста километров. Над ней я увидел слегка заметное спиралевидное облако – как будто кто-то растопил в глубинах этой циклопической горы огромный костер, размером в несколько километров, и готовил свой обед на гигантских углях, сравнимых с земными небоскрёбами. Но даже это облако казалось крошечным по сравнению с другим – вытянувшимся, словно хвост кометы – оно появлялось каждое утро на западном склоне и растягивалось марсианскими ветрами на две тысячи километров, обнимая Марс вдоль экватора.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Но загадочность Арсии была не в этих, в общем-то обычных и привычных для Марса погодных явлениях – лавовые пещеры, которые нельзя было рассмотреть с этого расстояния всё ещё оставались недоступными для исследований. Семь глубоких нор, Семь Сестёр, уходили в многочисленные внутренние подземные лабиринты Арсии. Изначально, люди планировали в таких защищённых от космической радиации местах строить свои базы. Но несколько экспедиций исчезли в этих провалах. Поверхность внутри оказалась нестабильной, каменные своды ненадежны, а вечная тьма и полный вакуум в глубине создавал совсем не марсианские условия жизни – условия глубокой бездны, которые скорее ожидаешь встретить на каком-нибудь весьма удаленном и холодном мире вроде Нептуна или на дне Марианской впадины. Эти лавовые пещеры были идеальны, чтобы спрятаться в них от всего мира – но для строительства марсианских баз их признали непригодными.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Вот по этим живописным и животрепещущим краям и простиралась вытянутая тень в форме эллипса как на старой фотографии Фобоса-2.</div>
+    </div>
+
+    <div class="block" data-character="engineer">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-engineer"/></svg></div>
+      <div class="text bg-engineer">– Молодец! Ты разгадал повторно загадку века – то было не НЛО! – сказала Инженер и похлопала Юнгу по плечу.</div>
+    </div>
+
+    <div class="block" data-character="navigator">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-navigator"/></svg></div>
+      <div class="text bg-navigator">– Точку в этом вопросе поставили пятьдесят лет назад, а то, что это тень Фобоса на Марсе знали уже в конце 20 века, – сказал Навигатор, выглядывая из-за своего экрана. Во второй руке у него уже был гамбургер, а стакан стоял на столе пустой.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Юнга резко развернулся, в глазах появился огонёк, брови поднялись.</div>
+    </div>
+
+    <div class="block" data-character="yunga">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-yunga"/></svg></div>
+      <div class="text bg-yunga">– Зато я сделал это сам, – возмутился он. – Но, чат, сейчас вы получите доказательства главного! На самом деле советский аппарат «Фобос-2» передал другое изображение, а не то, что они показали всему миру. Они подделали его, чтобы скрыть истину. Это based! Находка! Это bet.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Навигатор закатил глаза, Инженер обратилась ко всем:</div>
+    </div>
+
+    <div class="block" data-character="engineer">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-engineer"/></svg></div>
+      <div class="text bg-engineer">– Давайте займёмся делом, а потом послушаем о находке нашего Юнги. Совещание через 5 минут. Хватит жрать, Навигатор!</div>
+    </div>
+
+    <div class="block" data-character="navigator">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-navigator"/></svg></div>
+      <div class="text bg-navigator">– Как я могу перестать делать то, что заложено в нашей программе? Мы имитируем человеческую жизнь в космосе. Мы должны делать всё то, что делают люди, – возмутился Навигатор.</div>
+    </div>
+
+    <div class="block" data-character="engineer">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-engineer"/></svg></div>
+      <div class="text bg-engineer">– Капитан, у меня предложение, – Инженер обратилась ко мне. – Пока Навигатор не слопал все наши запасы, предлагаю в его настройках уменьшить настройку, отвечающую за обжорство.</div>
+    </div>
+
+    <div class="block" data-character="captain">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-captain"/></svg></div>
+      <div class="text bg-captain">– Дорогая Инженер, ты же знаешь, что запасы еды у нас почти бесконечны, – возразил я. – Эксперимент – экспериментом, а случайный сбой нашей миссии, из-за того что экипаж умер с голоду, у нас не предусмотрен. Нам лететь еще миллион лет! – говорил я с придыханием и переполнявшим меня чувством гордости. Ну как подумаешь, насколько наша миссия важна – дух захватывает.</div>
+    </div>
+
+    <div class="block" data-character="yunga">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-yunga"/></svg></div>
+      <div class="text bg-yunga">– Тогда у меня другой оффер, – встрял Юнга. – Пусть не разбрасывает крошки от еды и убирает за собой. А то у нас заведутся крысы. Тараканы. Хотите, чтобы эти мерзкие амбассадоры грязи бегали у вас под ногами?</div>
+    </div>
+
+    <div class="block" data-character="navigator">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-navigator"/></svg></div>
+      <div class="text bg-navigator">– О, виртуальные крысы в космосе, – это что-то новенькое, – хмыкнул Навигатор.</div>
+    </div>
+
+    <div class="block" data-character="yunga">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-yunga"/></svg></div>
+      <div class="text bg-yunga">– Не, ну, literally, крошки от еды в невесомости – это потенциальная опасность на борту! – парировал Юнга. – Ты портишь эксперимент. Капитан, выдайте ему тюбики с гелем!</div>
+    </div>
+
+    <div class="block" data-character="assistant">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-assistant"/></svg></div>
+      <div class="text bg-assistant">– У нас нет ни гравитации, ни невесомости, – вставил слово Помощник и снова скрылся позади своего экрана.</div>
+    </div>
+
+    <div class="block" data-character="navigator">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-navigator"/></svg></div>
+      <div class="text bg-navigator">– Тьфу на тебя, мелкий засранец. Земляне уже давно не питаются из тюбиков, ты застрял в прошлом. Пора повзрослеть.</div>
+    </div>
+
+    <div class="block" data-character="yunga">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-yunga"/></svg></div>
+      <div class="text bg-yunga">– Но, честно-честно, искусственную грави начали тестить только недавно, так что до норм межпланетного полёта, когда на борту будет и норм туалет, и норм бургерный автомат на каждом уровне – лет сто ещё ждать. Fr.</div>
+    </div>
+
+    <div class="block" data-character="lis">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-lis"/></svg></div>
+      <div class="text bg-lis">– Fr fr, – повторил Лис.</div>
+    </div>
+
+    <div class="block" data-character="captain">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-captain"/></svg></div>
+      <div class="text bg-captain">– А вот и время совещания, – прервал их я. – Навигатор, и правда, убирайся за собой. А то согласно девятому правилу Устава у нас и правда заведутся крысы. Людям же свойственно следить за чистотой. И нам надо.</div>
+    </div>
+
+    <div class="block" data-character="lis">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-lis"/></svg></div>
+      <div class="text bg-lis">– Не всем, – ухмыльнулся Лис, летая около Навигатора, тот лишь пару раз помахал руками, отмахиваясь от него, как от назойливой мухи, а я создал около него робота-пылесоса, который немедленно начал уборку.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Внезапно ко мне пришло личное сообщение от Юнги. Он прислал фотографию в инфракрасном спектре: тот же самый объект, что был на его экране. Тень на поверхности Марса имела красноватый оттенок, в то время как сама поверхность была синей. И подпись:</div>
+    </div>
+
+    <div class="block" data-character="yunga">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-yunga"/></svg></div>
+      <div class="text bg-yunga">«Кэп, эта тень не охлаждает Марс, она его нагревает. Дайте мне слово. Пять минут займу. Это тема.»</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Я решил дать шанс Юнге.</div>
+    </div>
+
+  </main>
+
+  <aside class="info-panel" id="infoPanel"></aside>
+</div>
+
+<script>
+(function () {
+  const escapeRegex = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+  // =================== Разметка ===================
+  const terms = [
+    'квантовый код', 'квантового кода',
+    'Вояджер-6', 'Вояджера-6', 'Вояджер',
+    'квантовый искусственный интеллект', 'квантовым искусственным интеллектом',
+    'искусственная гравитация', 'искусственную гравитацию',
+    'искусственная грави', 'искусственную грави',
+    'гравитация', 'гравитации', 'гравитацию',
+    'Квалиа Менгера', 'микрочерная дыра', 'микрочерной дыры', 'микрочерную дыру',
+    'МЧД-1', 'МЧД', 'ВАСА',
+    'Солнечная система', 'Солнечной системе', 'Солнечной системы',
+    'Фобос-2', 'Фобос', 'Фобоса',
+    'Арсия Монс', 'Арсии', 'Арсию',
+    'гора Олимп', 'горы Олимп', 'Олимп',
+    'Семь Сестёр', 'Семи Сестёр', 'Семь Сестер',
+    'провинция Фарсида', 'провинции Фарсиды',
+    'Марианская впадина', 'Марианской впадины',
+    'видео-спутники', 'видео-спутников',
+    'лавовые пещеры', 'лавовых пещер',
+    'голо-экран', 'голо-экрана',
+    'кубит', 'кубитом', 'кубиты',
+    'фамильяр', 'фамильяра',
+    'марсианских', 'марсианские', 'марсианский',
+    'Кальдера', 'кальдера',
+    'Марс', 'Марса', 'Марсу', 'Марсом', 'Марсе',
+    'Нептун', 'Нептуна',
+    'НЛО', 'Fr fr', 'fr fr', 'based', 'raw', 'bet', 'Fr'
+  ].sort((a, b) => b.length - a.length);
+  const termRegex = new RegExp(
+    `(?<![а-яёА-ЯЁ\\w])(${terms.map(escapeRegex).join('|')})(?![а-яёА-ЯЁ\\w])`, 'giu'
+  );
+
+  // Убраны «каждый» и «который» (все формы) — по запросу.
+  const pronouns = [
+    'я','ты','он','она','оно','мы','вы','они',
+    'меня','тебя','его','её','нее','нас','вас','них',
+    'мне','тебе','ему','ей','ней','нам','вам','им','ним',
+    'мной','мною','тобой','тобою','нами','вами','ими','ними',
+    'себя','себе','собой','собою',
+    'мой','моя','моё','мои','моего','моей','моему','моим','моём',
+    'твой','твоя','твоё','твои','твоего','твоей','твоему','твоим',
+    'наш','наша','наше','наши','нашего','нашей','нашему','нашим',
+    'ваш','ваша','ваше','ваши','вашего','вашей','вашему','вашим',
+    'свой','своя','своё','свои','своего','своей','своему','своим',
+    'этот','эта','это','эти','этого','этой','этому','этим','этом',
+    'тот','та','те','того','той','тому','тем','том',
+    'такой','такая','такое','такие','такого','такой','таком',
+    'весь','вся','всё','все','всего','всей','всему','всем',
+    'сам','сама','само','сами','самого','самой',
+    'любой','любая','любое','любые','любого','любой',
+    'другой','другая','другое','другие','другого','другой',
+    'иной','иная','иное','иные',
+    'кто','что','какой','какая','какое','какие',
+    'никто','ничто','никакой','ничей'
+  ].sort((a, b) => b.length - a.length);
+  const pronounRegex = new RegExp(
+    `(?<![а-яёА-ЯЁ\\w])(${pronouns.map(escapeRegex).join('|')})(?![а-яёА-ЯЁ\\w])`, 'giu'
+  );
+
+  const verbRegex = /(?<![а-яёА-ЯЁ])([а-яё]+(?:ться|тся|ть|ешь|ишь|ем|им|ете|ите|ет|ёт|ит|ут|ют|ат|ят|ал|ала|ало|али|ил|ила|ило|или|ыл|ыла|ыло|ыли|ёл|ел|ела|ело|ели|лся|лась|лось|лись))(?![а-яёА-ЯЁ])/giu;
+
+  const verbStoplist = new Set([
+    'мать','дочь','ночь','печь','речь','вещь','помощь','площадь','часть','власть',
+    'скорость','гордость','зависть','радость','плоть','масть','пасть','сеть','плеть',
+    'пять','шесть','семь','восемь','девять','десять','семнадцать','двадцать','тридцать',
+    'суть','путь','ртуть','муть','сень','ступень','тень','день','корень','олень','зять',
+    'гость','кость','кисть','месть','лесть','честь','прелесть','шест','куст','лист',
+    'аист','мост','пост','хвост','рост','тост','тест','жест','шелест','холст',
+    'стол','стул','бал','зал','вал','канал','финал','сигнал','журнал','идеал','портал',
+    'металл','кристалл','капитал','квартал','вокзал','причал','обвал','провал','отвал',
+    'привал','перевал','подвал','кинжал','материал','минерал','овал','фиал','адмирал',
+    'генерал','маршал','фестиваль','госпиталь','портфель','кабель','мебель','корабль',
+    'ансамбль','автомобиль','кабинет','букет','пакет','совет','буфет','аппетит','кредит',
+    'лимит','бандит','маршрут','салют','парашют','уют','привет','ответ','запрет','завет',
+    'рассвет','цвет','навет','раунд','тополь','тополю','угол','котел','котёл','орел','орёл',
+    'узел','козел','козёл','сокол','футбол','баскетбол','волейбол','гол','ноль',
+    'дело','дела','делу','делом','деле','дел','тел','тело','тела','телу','телом','теле',
+    'село','сёла','сёл','мел','лось'
+  ]);
+
+  function markText(el, regex, className, stoplist) {
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
+      acceptNode(node) {
+        const p = node.parentNode;
+        if (p && p.classList && (
+          p.classList.contains('term') ||
+          p.classList.contains('pronoun') ||
+          p.classList.contains('verb') ||
+          p.classList.contains('new-badge')
+        )) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    const nodes = [];
+    let n;
+    while ((n = walker.nextNode())) nodes.push(n);
+
+    nodes.forEach(node => {
+      const text = node.textContent;
+      const re = new RegExp(regex.source, regex.flags);
+      const hits = [];
+      let m;
+      while ((m = re.exec(text)) !== null) {
+        if (stoplist && stoplist.has(m[0].toLowerCase())) continue;
+        hits.push({ s: m.index, e: m.index + m[0].length, t: m[0] });
+        if (m.index === re.lastIndex) re.lastIndex++;
+      }
+      if (!hits.length) return;
+
+      const frag = document.createDocumentFragment();
+      let pos = 0;
+      hits.forEach(h => {
+        if (h.s > pos) frag.appendChild(document.createTextNode(text.slice(pos, h.s)));
+        const span = document.createElement('span');
+        span.className = className;
+        span.textContent = h.t;
+        frag.appendChild(span);
+        pos = h.e;
+      });
+      if (pos < text.length) frag.appendChild(document.createTextNode(text.slice(pos)));
+      node.parentNode.replaceChild(frag, node);
+    });
+  }
+
+  document.querySelectorAll('.block .text').forEach(el => {
+    markText(el, termRegex,    'term');
+    markText(el, pronounRegex, 'pronoun');
+    markText(el, verbRegex,    'verb', verbStoplist);
+  });
+
+  // =================== Кнопки-тогглы ===================
+  const toggleBtns = document.querySelectorAll('.toolbar button[data-mark="verbs"], .toolbar button[data-mark="pronouns"], .toolbar button[data-mark="terms"]');
+  toggleBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const mark = btn.dataset.mark;
+      document.body.classList.toggle('show-' + mark);
+      btn.classList.toggle('active');
+    });
+  });
+
+  // =================== «Убрать выделения» ===================
+  document.querySelector('.clear-btn').addEventListener('click', () => {
+    document.body.classList.remove('show-verbs', 'show-pronouns', 'show-terms');
+    toggleBtns.forEach(b => b.classList.remove('active'));
+  });
+
+  // =================== Счётчики в легенде ===================
+  function updateCounts() {
+    const counts = {};
+    document.querySelectorAll('.block').forEach(b => {
+      counts[b.dataset.character] = (counts[b.dataset.character] || 0) + 1;
+    });
+    document.querySelectorAll('.legend-strip .item[data-char]').forEach(item => {
+      const c = item.querySelector('.count');
+      if (c) c.textContent = counts[item.dataset.char] || 0;
+    });
+  }
+  updateCounts();
+
+  // =================== Инфо-панель ===================
+  const characterInfo = {
+    yunga: {
+      title: 'Юнга',
+      sections: [
+        { label: 'Внешность', text: 'Самый молодой член экипажа. Живой взгляд — «глаза как будто горели». Жестикулирует, резко разворачивается, хитро потирает руки, когда доволен.' },
+        { label: 'Манера говорить', text: 'Быстрая, эмоциональная, с восклицаниями. Обращается к «чату», защищает находки, спорит с Навигатором. Когда возбуждён — переходит на англицизмы.' },
+        { label: 'Словечки', text: '«чат», «raw», «based», «bet», «literally», «fr», «норм», «грави».' },
+        { label: 'Роль', text: 'Специалист по старым и новым программам. «Шкет», «хакер», «юный космоботан».' }
+      ]
+    },
+    lis: {
+      title: 'Мистер Лис',
+      sections: [
+        { label: 'Внешность', text: 'Пиксельный фамильяр. Летает, рассыпая искры. Скрещивает лапы на груди, вертится, кружит над головой хозяина.' },
+        { label: 'Манера говорить', text: 'Игривая, дразнящая, короткая. Подхватывает за хозяином, подкалывает остальных.' },
+        { label: 'Словечки', text: '«У-у-у», «зануда», «Fr fr».' },
+        { label: 'Роль', text: 'Фамильяр Юнги. Эмоциональный, живой, неравнодушный.' }
+      ]
+    },
+    captain: {
+      title: 'Капитан',
+      sections: [
+        { label: 'Внешность', text: 'Квантовый ИИ, возомнивший себя человеком. Использует гусиное перо, чернильницу и рифлёную бумагу — как настоящий земной капитан.' },
+        { label: 'Манера говорить', text: 'Вдумчивая, философская, с самоиронией. Наблюдает за другими, размышляет о чувствах. К Инженеру обращается «дорогая».' },
+        { label: 'Словечки', text: '«Дорогая Инженер», «Ну как чувствую?», «дух захватывает», «зовите меня просто Капитаном».' },
+        { label: 'Роль', text: 'Управляющий миссией «Вояджера-6». Мечтает стать героем космической эпопеи.' }
+      ]
+    },
+    engineer: {
+      title: 'Инженер',
+      sections: [
+        { label: 'Внешность', text: 'Практичная, деловая. Спокойно реагирует на суматоху, сама подходит к Юнге. Подмигивает Капитану.' },
+        { label: 'Манера говорить', text: 'Прямолинейно, организованно, с лёгкой иронией. Предлагает конкретные решения.' },
+        { label: 'Словечки', text: '«Давайте займёмся делом», «Совещание через 5 минут», «Хватит жрать, Навигатор!».' },
+        { label: 'Роль', text: 'Голос дисциплины на корабле. Инициирует совещания.' }
+      ]
+    },
+    navigator: {
+      title: 'Навигатор',
+      sections: [
+        { label: 'Внешность', text: 'Хмурый, полноватый (втягивает живот). Склонился над экраном. Постоянно ест: гамбургер, кола; стакан пустой.' },
+        { label: 'Манера говорить', text: 'Ворчливая, саркастичная, оборонительная. Называет Юнгу «шкетом» и «мелким засранцем». Оправдывается программой.' },
+        { label: 'Словечки', text: '«Тьфу на тебя, мелкий засранец», «О, виртуальные крысы в космосе — это что-то новенькое».' },
+        { label: 'Роль', text: 'Навигатор миссии. Скептик, которому всё не так.' }
+      ]
+    },
+    assistant: {
+      title: 'Помощник Капитана',
+      sections: [
+        { label: 'Внешность', text: 'Немногословный, скрывается за экраном. Почти невидим.' },
+        { label: 'Манера говорить', text: 'Предельно кратко, односложно. Не вступает в перепалки.' },
+        { label: 'Словечки', text: '«Уйди».' },
+        { label: 'Роль', text: 'Тихий помощник, который вдруг оказывается прав («У нас нет ни гравитации, ни невесомости»).' }
+      ]
+    },
+    narration: {
+      title: 'Авторский текст',
+      sections: [
+        { label: 'Голос', text: 'От первого лица («я»). Рассказчик — Капитан, квантовый ИИ, который наблюдает за собой и экипажем.' },
+        { label: 'Манера', text: 'Вдумчивая, немного отстранённая, с длинными периодами. Описания планет, размышления о чувствах.' },
+        { label: 'Особенность', text: 'Рассказчик мечтает стать героем космической эпопеи и учится чувствам.' }
+      ]
+    }
+  };
+
+  let activeChar = null;
+  const infoPanel = document.getElementById('infoPanel');
+
+  function applyFilter() {
+    document.querySelectorAll('.block').forEach(b => {
+      b.style.display = (!activeChar || b.dataset.character === activeChar) ? '' : 'none';
+    });
+    document.querySelectorAll('.legend-strip .item[data-char]').forEach(i => {
+      i.classList.toggle('active', i.dataset.char === activeChar);
+    });
+    document.querySelectorAll('.block .avatar').forEach(a => {
+      const b = a.closest('.block');
+      a.classList.toggle('active', !!activeChar && b && b.dataset.character === activeChar);
+    });
+  }
+
+  function updateInfoPanel() {
+    if (!activeChar || !characterInfo[activeChar]) {
+      infoPanel.classList.remove('visible');
+      infoPanel.innerHTML = '';
+      return;
+    }
+    const info = characterInfo[activeChar];
+    let html = `<h3>${info.title}</h3><p class="panel-sub">Сгенерированный портрет</p>`;
+    info.sections.forEach(s => {
+      html += `<div class="info-section"><div class="info-label">${s.label}</div><div class="info-text">${s.text}</div></div>`;
+    });
+    infoPanel.innerHTML = html;
+    infoPanel.classList.add('visible');
+  }
+
+  function selectCharacter(key) {
+    activeChar = (activeChar === key) ? null : key;
+    applyFilter();
+    updateInfoPanel();
+  }
+
+  // Клик по элементу легенды
+  document.querySelectorAll('.legend-strip .item[data-char]').forEach(item => {
+    item.addEventListener('click', () => selectCharacter(item.dataset.char));
+  });
+
+  // Клик по аватарке в «левой колонке» каждого блока
+  document.querySelectorAll('.block').forEach(block => {
+    const av = block.querySelector('.avatar');
+    if (av) av.addEventListener('click', () => selectCharacter(block.dataset.character));
+  });
+
+  // =================== Поиск ===================
+  const searchInput = document.getElementById('searchInput');
+  const searchBtn   = document.getElementById('searchBtn');
+
+  function doSearch() {
+    const q = searchInput.value.trim().toLowerCase();
+    if (!q) return;
+    const blocks = document.querySelectorAll('.block');
+    for (const block of blocks) {
+      if (block.textContent.toLowerCase().includes(q)) {
+        if (block.style.display === 'none') {
+          activeChar = null;
+          applyFilter();
+          updateInfoPanel();
+        }
+        block.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        block.classList.remove('search-hit');
+        void block.offsetWidth;
+        block.classList.add('search-hit');
+        setTimeout(() => block.classList.remove('search-hit'), 3000);
+        return;
+      }
+    }
+    alert('Не найдено: «' + searchInput.value + '»');
+  }
+
+  searchBtn.addEventListener('click', doSearch);
+  searchInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') doSearch();
+    if (e.key === 'Escape') { searchInput.value = ''; searchInput.blur(); }
+  });
+})();
+</script>
+</body>
+</html>
