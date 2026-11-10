@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Разбор рассказа про беса</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    background: radial-gradient(ellipse at top, #1e293b 0%, #0f172a 60%);
+    color: #e2e8f0; min-height: 100vh;
+  }
+
+  /* ==================== ФИКСИРОВАННОЕ МЕНЮ ==================== */
+  .topnav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100; height: 54px;
+    display: flex; align-items: center; gap: 4px;
+    padding: 0 16px;
+    background: rgba(15,23,42,0.94);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 2px 14px rgba(0,0,0,0.45);
+    overflow-x: auto;
+  }
+  .topnav::-webkit-scrollbar { height: 3px; }
+  .topnav::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
+  .topnav button {
+    flex-shrink: 0;
+    padding: 8px 14px;
+    background: transparent;
+    color: #94a3b8;
+    border: none; border-radius: 8px;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: inherit;
+    transition: all .15s;
+    white-space: nowrap;
+  }
+  .topnav button:hover { background: rgba(255,255,255,0.06); color: #cbd5e1; }
+  .topnav button.active {
+    background: linear-gradient(135deg, rgba(96,165,250,0.22), rgba(94,234,212,0.16));
+    color: #f1f5f9;
+    box-shadow: 0 0 0 1px rgba(96,165,250,0.45);
+  }
+
+  /* ==================== ОСНОВНАЯ ЗОНА ==================== */
+  main {
+    max-width: 1080px; margin: 0 auto;
+    padding: 76px 20px 80px;
+  }
+  .view { display: none; }
+  .view.active { display: block; animation: fadeView .22s ease-out; }
+  @keyframes fadeView {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  header { margin-bottom: 24px; }
+  h1 {
+    font-size: 30px; font-weight: 800; margin: 0 0 6px;
+    letter-spacing: -0.5px;
+    background: linear-gradient(90deg, #60a5fa 0%, #5eead4 60%, #a78bfa 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .subtitle { color: #94a3b8; font-size: 15px; margin: 0; }
+  h2 {
+    font-size: 21px; margin: 0 0 18px; color: #f1f5f9;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    display: flex; align-items: center; gap: 10px;
+  }
+  h2 .h2-icon { font-size: 20px; }
+
+  /* ==================== ТАЙМБАР ==================== */
+  .top-timeline { margin: 26px 0 30px; padding: 0 4px; }
+  .tl-track {
+    display: flex; height: 36px; border-radius: 8px; overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+  .tl-segment {
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; letter-spacing: 1.2px;
+    text-transform: uppercase; color: #cbd5e1;
+    border-right: 1px solid rgba(0,0,0,0.3);
+  }
+  .tl-segment:last-child { border-right: none; }
+  .tl-markers {
+    display: flex; justify-content: space-between;
+    margin-top: 6px; font-size: 11px;
+    color: #64748b; font-weight: 600; letter-spacing: 0.5px;
+  }
+
+  /* ==================== ЛЕГЕНДА ==================== */
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 10px 22px;
+    padding: 14px 18px; background: rgba(255,255,255,0.03);
+    border-radius: 10px; margin-bottom: 30px;
+    border: 1px solid rgba(255,255,255,0.08);
+    font-size: 12px; color: #cbd5e1;
+  }
+  .legend .grp { display: flex; flex-wrap: wrap; gap: 10px 16px; flex: 1 1 100%; }
+  .legend .grp + .grp { padding-top: 10px; border-top: 1px dashed rgba(255,255,255,0.06); }
+  .legend .lbl {
+    font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px;
+    color: #64748b; font-weight: 800; flex: 1 1 100%; margin-bottom: 2px;
+  }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend i {
+    width: 9px; height: 9px; border-radius: 50%; display: inline-block;
+  }
+  .legend .ico {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 15px; height: 15px; border-radius: 50%;
+    font-size: 9px; font-weight: 900; color: #fff;
+  }
+  .ico.logic { background: #EF4444; }
+  .ico.style { background: #F59E0B; }
+  .ico.fact  { background: #3B82F6; }
+  .ico.minor { background: #64748b; }
+
+  /* ==================== ДИАГРАММА ==================== */
+  .diagram-wrap {
+    overflow-x: auto; margin: 0 -10px 40px;
+    padding: 20px 10px 10px;
+  }
+  .canvas {
+    position: relative; min-width: 720px;
+    padding: 10px 20px 20px;
+  }
+  .lines {
+    position: absolute; top: 0; left: 0;
+    pointer-events: none; z-index: 1; overflow: visible;
+  }
+  .row {
+    display: flex; justify-content: center; align-items: stretch;
+    gap: 60px; margin: 64px 0;
+    position: relative; z-index: 2;
+  }
+  .row:first-child { margin-top: 0; }
+  .row:last-child  { margin-bottom: 0; }
+  .row-duo { gap: 90px; }
+
+  .node {
+    background: linear-gradient(135deg, rgba(30,41,59,0.92), rgba(15,23,42,0.92));
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 12px 16px 12px 12px;
+    display: flex; gap: 12px; align-items: flex-start;
+    position: relative; min-width: 240px; max-width: 320px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.35);
+    backdrop-filter: blur(6px);
+    transition: transform .15s, box-shadow .15s;
+  }
+  .node:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.45); }
+  .node[data-type="fact"]        { border-color: rgba(59,130,246,0.55); }
+  .node[data-type="lost"]        { border-color: rgba(139,92,246,0.55); }
+  .node[data-type="evidence"]    { border-color: rgba(20,184,166,0.55); }
+  .node[data-type="speculation"] { border-color: rgba(245,158,11,0.55); }
+  .node[data-type="science"]     { border-color: rgba(16,185,129,0.55); }
+  .node[data-type="silence"]     { border-color: rgba(100,116,139,0.55); }
+  .node[data-type="classified"]  { border-color: rgba(239,68,68,0.55); }
+  .node[data-type="hero"]        { border-color: rgba(20,184,166,0.55); }
+  .node.dead-end {
+    opacity: 0.65;
+    background: linear-gradient(135deg, rgba(30,20,40,0.92), rgba(20,15,30,0.92));
+  }
+  .node.dead-end::after {
+    content: '';
+    position: absolute; inset: 0; border-radius: 12px;
+    background: repeating-linear-gradient(45deg, transparent, transparent 8px,
+      rgba(255,255,255,0.02) 8px, rgba(255,255,255,0.02) 10px);
+    pointer-events: none;
+  }
+  .node-icon {
+    font-size: 26px; line-height: 1; flex-shrink: 0;
+    width: 42px; height: 42px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255,255,255,0.05); border-radius: 10px;
+  }
+  .node-body { flex: 1; min-width: 0; }
+  .node-year {
+    font-size: 10px; font-weight: 800; letter-spacing: 1.2px;
+    text-transform: uppercase; color: #94a3b8; margin-bottom: 3px;
+  }
+  .node-title {
+    font-size: 15px; font-weight: 700; color: #f1f5f9;
+    margin-bottom: 3px; line-height: 1.25;
+  }
+  .node-desc { font-size: 12.5px; color: #94a3b8; line-height: 1.45; }
+
+  /* ==================== БЕЙДЖИ ==================== */
+  .err-badge {
+    position: absolute; top: -8px; right: -8px;
+    width: 26px; height: 26px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 900; color: #fff;
+    cursor: pointer; border: 2px solid #0f172a;
+    z-index: 3; transition: transform .15s;
+  }
+  .err-badge:hover { transform: scale(1.15); }
+  .err-badge.logic { background: #dc2626; animation: pulseRed 2s ease-in-out infinite; }
+  .err-badge.style { background: #d97706; animation: pulseAmber 2.5s ease-in-out infinite; }
+  .err-badge.fact  { background: #2563eb; animation: pulseBlue 2.5s ease-in-out infinite; }
+  .err-badge.minor { background: #475569; }
+  @keyframes pulseRed {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(220,38,38,0.7); }
+    50%      { box-shadow: 0 0 0 8px rgba(220,38,38,0); }
+  }
+  @keyframes pulseAmber {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(217,119,6,0.7); }
+    50%      { box-shadow: 0 0 0 8px rgba(217,119,6,0); }
+  }
+  @keyframes pulseBlue {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(37,99,235,0.7); }
+    50%      { box-shadow: 0 0 0 8px rgba(37,99,235,0); }
+  }
+  .dead-end-label {
+    position: absolute; bottom: -28px; left: 50%; transform: translateX(-50%);
+    font-size: 10px; font-weight: 700; color: #a78bfa;
+    text-transform: uppercase; letter-spacing: 1px; white-space: nowrap;
+  }
+
+  /* ==================== МОДАЛКА ==================== */
+  .modal-backdrop {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(2,6,23,0.85);
+    backdrop-filter: blur(4px);
+    display: none; align-items: center; justify-content: center;
+    padding: 20px; animation: fadeIn .2s;
+  }
+  .modal-backdrop.open { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal {
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 16px;
+    max-width: 560px; width: 100%;
+    max-height: 90vh; overflow-y: auto;
+    padding: 24px 26px; position: relative;
+    animation: slideUp .25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px) scale(0.98); }
+    to   { opacity: 1; transform: none; }
+  }
+  .modal-close {
+    position: absolute; top: 12px; right: 12px;
+    width: 32px; height: 32px; border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    border: none; color: #cbd5e1;
+    font-size: 18px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .15s;
+  }
+  .modal-close:hover { background: rgba(255,255,255,0.18); }
+  .modal-type {
+    display: inline-block; padding: 3px 10px; border-radius: 12px;
+    font-size: 10px; font-weight: 800; letter-spacing: 1.2px;
+    text-transform: uppercase; color: #fff; margin-bottom: 10px;
+  }
+  .modal-type.logic { background: #dc2626; }
+  .modal-type.style { background: #d97706; }
+  .modal-type.fact  { background: #2563eb; }
+  .modal-type.minor { background: #475569; }
+  .modal h3 { margin: 0 0 4px; font-size: 20px; color: #f1f5f9; }
+  .modal .modal-node { font-size: 12px; color: #64748b; margin-bottom: 18px; }
+  .modal .m-section { margin-bottom: 16px; }
+  .modal .m-section:last-child { margin-bottom: 0; }
+  .modal .m-label {
+    font-size: 10px; font-weight: 800; letter-spacing: 1.5px;
+    text-transform: uppercase; color: #94a3b8; margin-bottom: 6px;
+  }
+  .modal .m-problem { color: #fca5a5; line-height: 1.6; font-size: 14px; }
+  .modal .m-fix     { color: #86efac; line-height: 1.6; font-size: 14px; }
+  .modal code {
+    background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size: 12px; color: #fbbf24;
+  }
+
+  /* ==================== ТЕКСТ РАССКАЗА ==================== */
+  .story-text {
+    background: rgba(30,41,59,0.5);
+    border-radius: 12px;
+    padding: 22px 26px;
+    border: 1px solid rgba(255,255,255,0.08);
+    font-size: 15px;
+    line-height: 1.75;
+    color: #cbd5e1;
+  }
+  .story-text p { margin: 0 0 14px; }
+  .story-text p:last-child { margin-bottom: 0; }
+  .story-text em { color: #94a3b8; font-style: italic; }
+
+  .hint {
+    color: #94a3b8; font-size: 14px;
+    margin: 0 0 16px; padding: 10px 14px;
+    background: rgba(96,165,250,0.08);
+    border-left: 3px solid #60a5fa;
+    border-radius: 0 6px 6px 0;
+  }
+  .analysis-legend {
+    display: flex; flex-wrap: wrap; gap: 10px 18px;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.06);
+    margin-bottom: 18px;
+    font-size: 12px; color: #cbd5e1;
+  }
+  .analysis-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .analysis-legend i {
+    width: 10px; height: 14px; border-radius: 3px;
+    display: inline-block; border-bottom: 2px solid;
+  }
+  .analysis-legend i.logic { background: rgba(239,68,68,0.25); border-color: #EF4444; }
+  .analysis-legend i.style { background: rgba(245,158,11,0.25); border-color: #F59E0B; }
+  .analysis-legend i.fact  { background: rgba(59,130,246,0.25); border-color: #3B82F6; }
+  .analysis-legend i.minor { background: rgba(100,116,139,0.3); border-color: #64748b; }
+
+  .mark {
+    cursor: pointer;
+    border-bottom: 2px solid;
+    padding: 1px 3px;
+    border-radius: 3px;
+    transition: filter .12s, box-shadow .12s;
+    position: relative;
+  }
+  .mark:hover { filter: brightness(1.25); }
+  .mark.logic { background: rgba(239,68,68,0.18); border-color: #EF4444; color: #fca5a5; }
+  .mark.style { background: rgba(245,158,11,0.18); border-color: #F59E0B; color: #fbbf24; }
+  .mark.fact  { background: rgba(59,130,246,0.18); border-color: #3B82F6; color: #93c5fd; }
+  .mark.minor { background: rgba(100,116,139,0.22); border-color: #64748b; color: #cbd5e1; }
+
+  /* ==================== ПРОФИЛЬ ==================== */
+  .profile-header {
+    display: flex; gap: 20px; align-items: center;
+    padding: 20px 22px; margin-bottom: 18px;
+    background: linear-gradient(135deg, rgba(30,41,59,0.8), rgba(15,23,42,0.8));
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+  }
+  .profile-avatar {
+    width: 84px; height: 84px; flex-shrink: 0;
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px rgba(139,92,246,0.4), 0 8px 24px rgba(0,0,0,0.4);
+    overflow: hidden;
+  }
+  .profile-avatar svg { width: 100%; height: 100%; display: block; }
+  .profile-header h3 { margin: 0 0 4px; font-size: 18px; color: #f1f5f9; }
+  .profile-header p { margin: 0; font-size: 13.5px; color: #94a3b8; line-height: 1.5; }
+  .profile-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .profile-tags span {
+    padding: 3px 9px; border-radius: 10px;
+    background: rgba(139,92,246,0.15); color: #c4b5fd;
+    font-size: 11px; font-weight: 600;
+  }
+  .profile-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 14px;
+  }
+  .p-card {
+    background: rgba(30,41,59,0.65);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px; padding: 16px 18px;
+  }
+  .p-card h4 {
+    margin: 0 0 10px; font-size: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .p-card h4 .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .p-card ul { margin: 0; padding-left: 18px; font-size: 13px; color: #cbd5e1; line-height: 1.6; }
+  .p-card li { margin-bottom: 5px; }
+  .p-card li:last-child { margin-bottom: 0; }
+  .p-card em { color: #fbbf24; font-style: normal; }
+
+  /* ==================== ДО/ПОСЛЕ ==================== */
+  .ba-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .ba-card {
+    background: rgba(30,41,59,0.65);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px; padding: 16px 18px;
+  }
+  .ba-card.before { border-left: 3px solid #EF4444; }
+  .ba-card.after  { border-left: 3px solid #10B981; }
+  .ba-card h5 {
+    margin: 0 0 8px; font-size: 10px; font-weight: 800;
+    letter-spacing: 1.5px; text-transform: uppercase; color: #94a3b8;
+  }
+  .ba-card.before h5 { color: #fca5a5; }
+  .ba-card.after h5  { color: #86efac; }
+  .ba-card p { margin: 0 0 8px; font-size: 13.5px; line-height: 1.55; color: #cbd5e1; }
+  .ba-card p:last-child { margin-bottom: 0; }
+  .ba-card em { color: #fbbf24; font-style: normal; }
+  .ba-card .why { font-size: 12px; color: #94a3b8; font-style: italic; }
+
+  /* ==================== ЧТО НЕ ТРОГАТЬ ==================== */
+  .dont-touch {
+    background: rgba(16,185,129,0.06);
+    border: 1px solid rgba(16,185,129,0.3);
+    border-radius: 12px; padding: 18px 22px;
+  }
+  .dont-touch h3 { margin: 0 0 12px; font-size: 16px; color: #34d399; }
+  .dont-touch ul { margin: 0; padding-left: 20px; font-size: 13.5px; color: #cbd5e1; line-height: 1.7; }
+  .dont-touch code {
+    background: rgba(0,0,0,0.35); padding: 2px 6px; border-radius: 4px;
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size: 12px; color: #fbbf24;
+  }
+
+  @media (max-width: 680px) {
+    main { padding: 72px 12px 60px; }
+    h1 { font-size: 22px; }
+    .row, .row-duo { gap: 30px; }
+    .ba-grid { grid-template-columns: 1fr; }
+    .profile-header { flex-direction: column; text-align: center; }
+    .profile-tags { justify-content: center; }
+    .topnav { padding: 0 8px; }
+    .topnav button { padding: 8px 10px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== МЕНЮ ==================== -->
+<nav class="topnav" id="topnav">
+  <button class="active" data-view="schema">Схема</button>
+  <button data-view="source">Исходный текст</button>
+  <button data-view="analysis">Анализ текста</button>
+  <button data-view="profile">Профиль героя</button>
+  <button data-view="edits">Ключевые правки</button>
+  <button data-view="keep">Что не трогать</button>
+</nav>
+
+<main>
+
+  <!-- ==================== VIEW: СХЕМА ==================== -->
+  <section class="view active" id="view-schema">
+    <header>
+      <h1>Логика рассказа про беса</h1>
+      <p class="subtitle">От кражи кости до встречи с человеком в зимнем лесу</p>
+    </header>
+
+    <div class="top-timeline">
+      <div class="tl-track">
+        <div class="tl-segment" style="flex:30; background: linear-gradient(90deg, rgba(59,130,246,0.45), rgba(139,92,246,0.45));">Пир и падение</div>
+        <div class="tl-segment" style="flex:30; background: linear-gradient(90deg, rgba(239,68,68,0.4), rgba(100,116,139,0.3));">Кара и пустота</div>
+        <div class="tl-segment" style="flex:40; background: linear-gradient(90deg, rgba(20,184,166,0.3), rgba(16,185,129,0.55));">Лес и новая жизнь</div>
+      </div>
+      <div class="tl-markers">
+        <span>Пир</span><span>Кража</span><span>Кара</span><span>Лес</span><span>Человек</span>
+      </div>
+    </div>
+
+    <div class="legend">
+      <div class="grp">
+        <span class="lbl">Типы узлов</span>
+        <span><i style="background:#3B82F6"></i>Факт</span>
+        <span><i style="background:#8B5CF6"></i>Потеря / кража</span>
+        <span><i style="background:#14B8A6"></i>Улика / шанс</span>
+        <span><i style="background:#F59E0B"></i>Слух / версия</span>
+        <span><i style="background:#10B981"></i>Наука / объяснение</span>
+        <span><i style="background:#64748b"></i>Забвение / пустота</span>
+        <span><i style="background:#EF4444"></i>Кара / засекречено</span>
+      </div>
+      <div class="grp">
+        <span class="lbl">Маркеры правок (кликните)</span>
+        <span><span class="ico logic">!</span>Логическая дыра</span>
+        <span><span class="ico style">~</span>Стиль</span>
+        <span><span class="ico fact">i</span>Факт / грамматика</span>
+        <span><span class="ico minor">·</span>Мелкое</span>
+      </div>
+    </div>
+
+    <div class="diagram-wrap">
+      <div class="canvas" id="canvas">
+        <svg class="lines" id="lines"></svg>
+
+        <div class="row">
+          <div class="node" data-id="feast" data-type="fact">
+            <div class="node-icon">🍖</div>
+            <div class="node-body">
+              <div class="node-year">Ночь</div>
+              <div class="node-title">Пир демона</div>
+              <div class="node-desc">Высший демон ужинает на поляне. Бес наблюдает.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="node" data-id="theft" data-type="lost">
+            <div class="node-icon">🦴</div>
+            <div class="node-body">
+              <div class="node-year">После пира</div>
+              <div class="node-title">Кража кости</div>
+              <div class="node-desc">Бес крадёт бедренную кость. Объедки никто не охраняет.</div>
+            </div>
+            <span class="err-badge logic" data-err="e1" title="Логическая дыра">!</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="node" data-id="gluttony" data-type="speculation">
+            <div class="node-icon">🐷</div>
+            <div class="node-body">
+              <div class="node-year">Той же ночью</div>
+              <div class="node-title">Обжорство</div>
+              <div class="node-desc">Бес теряет разум от сырого мяса и опустошает горшок.</div>
+            </div>
+            <span class="err-badge style" data-err="e2" title="Стиль">~</span>
+            <span class="err-badge style" data-err="e3" style="top:24px;" title="Стиль">~</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="node" data-id="punishment" data-type="classified">
+            <div class="node-icon">⚡</div>
+            <div class="node-body">
+              <div class="node-year">Кара</div>
+              <div class="node-title">Демон отправляет беса в портал</div>
+              <div class="node-desc">«Отправлю туда, где обычная пища недоступна».</div>
+            </div>
+            <span class="err-badge fact" data-err="e4" title="Опечатка">i</span>
+            <span class="err-badge fact" data-err="e5" style="top:24px;" title="Опечатка">i</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="node" data-id="void" data-type="silence">
+            <div class="node-icon">🌀</div>
+            <div class="node-body">
+              <div class="node-year">Межмирье</div>
+              <div class="node-title">Пустота</div>
+              <div class="node-desc">Тело распадается. Бес становится бестелесным духом.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="node" data-id="forest" data-type="evidence">
+            <div class="node-icon">❄️</div>
+            <div class="node-body">
+              <div class="node-year">Зимний лес</div>
+              <div class="node-title">Новые правила</div>
+              <div class="node-desc">Голод можно утолить страданием. Или вселиться в умирающего.</div>
+            </div>
+            <span class="err-badge logic" data-err="e6" title="Логическая дыра">!</span>
+            <span class="err-badge logic" data-err="e7" style="top:24px;" title="Логическая дыра">!</span>
+            <span class="err-badge fact" data-err="e8" style="top:56px;" title="Опечатки">i</span>
+          </div>
+        </div>
+
+        <div class="row row-duo">
+          <div class="node dead-end" data-id="suffer" data-type="lost">
+            <div class="node-icon">😢</div>
+            <div class="node-body">
+              <div class="node-year">Путь А</div>
+              <div class="node-title">Испить страданий</div>
+              <div class="node-desc">Нет страдальца поблизости.</div>
+            </div>
+            <div class="dead-end-label">обрывается</div>
+          </div>
+          <div class="node" data-id="possess" data-type="hero">
+            <div class="node-icon">👻</div>
+            <div class="node-body">
+              <div class="node-year">Путь Б</div>
+              <div class="node-title">Вселиться в умирающего</div>
+              <div class="node-desc">Шанс обрести физическое тело.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="node" data-id="squirrel" data-type="hero">
+            <div class="node-icon">🐿️</div>
+            <div class="node-body">
+              <div class="node-year">Сугроб</div>
+              <div class="node-title">Бельчонок</div>
+              <div class="node-desc">Бес вселяется в умирающего зверька.</div>
+            </div>
+            <span class="err-badge logic" data-err="e9" title="Логическая дыра">!</span>
+            <span class="err-badge fact" data-err="e10" style="top:24px;" title="Грамматика">i</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="node" data-id="human" data-type="fact">
+            <div class="node-icon">🧔</div>
+            <div class="node-body">
+              <div class="node-year">Финал</div>
+              <div class="node-title">Человек</div>
+              <div class="node-desc">«Накормлю тебя тушенкой!» — ирония судьбы.</div>
+            </div>
+            <span class="err-badge style" data-err="e11" title="Стиль / факт">~</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== VIEW: ИСХОДНЫЙ ТЕКСТ ==================== -->
+  <section class="view" id="view-source">
+    <h2><span class="h2-icon">📄</span>Исходный текст</h2>
+    <div class="story-text">
+      <p>Мелкий, облезлый, покрытый струпьями бес всю ночь наблюдал как высший демон, с комфортом расположившись на поляне, неспешно ужинает. К великой скорби беса, набрел он на место пира уже когда жертву замучили и убили, оставалось надеяться только на объедки со стола.</p>
+      <p>Насытившись, демон направился к реке, а его слуги аккуратно сложили кости с остатками мяса в горшок, чтоб накормить ими темных гончих.</p>
+      <p>Охранять объедки в голову никому не приходило, поэтому бес без труда украл самую большую бедренную кость, отволок её в кусты. Обглодав мясо, он почувствовал приятную тяжесть в животе. Казалось, что даже, что его раны и язвы стали меньше болеть и свербить. Тем не менее он вновь посмотрел на стоящий на краю поляны горшок, там было еще очень много еды. Бес слышал, что слуги, которые наводили порядок на поляне, заканчивают свою работу. Только вот сырое мясо всегда ударяло ему в голову. Солидно потяжелевший, он, переваливаясь с боку на бок, на гнущихся под тяжестью пуза ножках подошел к заветному горшку и вытащил еще одну косточку. Не иначе как какой-то светлый упомянул беса лихом в своих молитвах, обжора окончательно лишился разума. Он опрокинул горшок и начал жадно обгладывать кости, раскусывая хрящики и высасывая оттуда мозг, давясь и громко чавкая. Он метался от одной кости к другой, пока не набил пузо настолько, что передвигаться уже не мог. Оставалось только валяться на траве и размышлять о коварности судьбы. “О, тьма, — думал бес, — если ты спасешь меня сегодня, я обещаю, что впредь буду питаться исключительно духовной пищей!”</p>
+      <p>Неожиданно звездное небо заслонила широкая фигура. Бес увидел ни кого-то, а высшего демона собственной персоной, склонившегося над ним. Брови сдвинулись, а губы скривились так, что казалось, его сейчас стошнит.</p>
+      <p>— Кто это у нас тут? Мерзкий, паршивый паразит! Да как ты смел покусится на кости для моих собачек! Они ведь теперь останутся голодными! Знаешь, что ты за это заслужил?</p>
+      <p>— Простите, господин. Я не нарочно! Оно само!</p>
+      <p>— Кто само?— рявкнул демон.</p>
+      <p>— Ч-чревоугодие одолело, претемнейший.</p>
+      <p>— Ну что же, придется тебе понести заслуженное наказание. Я отправлю тебя туда, где обычная пища будет недоступна.</p>
+      <p>С этими словами демон вытянул руку, и беса поглотил портал. Он летел сквозь пространства, ощущая невыносимую боль. Его тело распадалось на частички и поглощалось пустотой.</p>
+      <p>Казалось, прошла вечность, когда он вдруг обнаружил себя среди зимнего леса. Пушистый снег искрился под деревьями, на толстых лапах огромных елей, он был совершенно белый и пушистый, какой бывает там, где не ступала нога разумного существа.</p>
+      <p>Боли бес уже не ощущал, ведь тело его проглотила пустота межьмирья. Но голод был совершенно зверский, и утолить его он мог теперь лишь одним способом — испить страданий несчастного светлого. Осознав своё положение, бес взывыл. Разве в глухом зимнем лесу он сможет найти кого-то? А если и найдет — не факт, что это окажется страдалец. Был еще один призрачный шанс обрести физическое тело — вселиться в умирающего, но и таких поблизости не наблюдалась.</p>
+      <p>И тут бес уловил боль какого-то маленького существа. Он огляделся, эманации шли откуда-то из сугроба. Заметив место, где идеальный снежный покров был нарушен, он нырнул в снег и увидел маленькое рыжее тельце. Бельчонок умирал, как раз сейчас его дух покидал тело.</p>
+      <p>Это был шанс. Бес собрал последние силы и занял место души бельчонка. Ему вновь захотелось стать бестелесым призраком. Холод и боль в раненых, отмороженных лапках была невыносимой. Теперь придется ждать, пока зверек умрет. Тогда у него есть шансы перенестись с темные миры.</p>
+      <p>Боль постепенно стихала, он уже почти забылся смертельным сном, когда услышал подозрительный скрип. Над ним склонилось лицо, заросшее рыжеватой щетиной. Глаза смотрели с такой умильной жалостью, что бесу стало тошно.</p>
+      <p>— Маленький, ну как же ты так! Замерз! Мы тебя согреем, полезай-ка в рукавицу. Вот так! Держись, сейчас дойдем до дома, накормлю тебя тушенкой!</p>
+    </div>
+  </section>
+
+  <!-- ==================== VIEW: АНАЛИЗ ТЕКСТА ==================== -->
+  <section class="view" id="view-analysis">
+    <h2><span class="h2-icon">🔍</span>Анализ текста</h2>
+    <p class="hint">Те же маркеры, что и на схеме. Кликните по подсвеченному фрагменту, чтобы увидеть проблему и предложение по правке.</p>
+
+    <div class="analysis-legend">
+      <span><i class="logic"></i>Логика</span>
+      <span><i class="style"></i>Стиль</span>
+      <span><i class="fact"></i>Факт / грамматика</span>
+      <span><i class="minor"></i>Мелкое</span>
+    </div>
+
+    <div class="story-text">
+      <p>Мелкий, облезлый, покрытый струпьями бес всю ночь наблюдал как высший демон, с комфортом расположившись на поляне, неспешно ужинает. К великой скорби беса, набрел он на место пира уже когда жертву замучили и убили, оставалось надеяться только на объедки со стола.</p>
+      <p>Насытившись, демон направился к реке, а его слуги аккуратно сложили кости с остатками мяса в горшок, чтоб накормить ими темных гончих.</p>
+      <p><span class="mark logic" data-err="e1">Охранять объедки в голову никому не приходило</span>, поэтому бес без труда украл самую большую бедренную кость, отволок её в кусты. Обглодав мясо, он почувствовал приятную тяжесть в животе. Казалось, что даже, что его раны и язвы стали меньше болеть и свербить. Тем не менее он вновь посмотрел на стоящий на краю поляны горшок, там было еще очень много еды. Бес слышал, что слуги, которые наводили порядок на поляне, заканчивают свою работу. <span class="mark style" data-err="e2">Только вот сырое мясо всегда ударяло ему в голову.</span> <span class="mark style" data-err="e3">Солидно потяжелевший</span>, он, переваливаясь с боку на бок, на гнущихся под тяжестью пуза ножках подошел к заветному горшку и вытащил еще одну косточку. Не иначе как какой-то светлый упомянул беса лихом в своих молитвах, обжора окончательно лишился разума. Он опрокинул горшок и начал жадно обгладывать кости, раскусывая хрящики и высасывая оттуда мозг, давясь и громко чавкая. Он метался от одной кости к другой, пока не набил пузо настолько, что передвигаться уже не мог. Оставалось только валяться на траве и размышлять о коварности судьбы. “О, тьма, — думал бес, — если ты спасешь меня сегодня, я обещаю, что впредь буду питаться исключительно духовной пищей!”</p>
+      <p>Неожиданно звездное небо заслонила широкая фигура. Бес увидел <span class="mark fact" data-err="e5">ни кого-то</span>, а высшего демона собственной персоной, склонившегося над ним. Брови сдвинулись, а губы скривились так, что казалось, его сейчас стошнит.</p>
+      <p>— Кто это у нас тут? Мерзкий, паршивый паразит! Да как ты смел <span class="mark fact" data-err="e4">покусится</span> на кости для моих собачек! Они ведь теперь останутся голодными! Знаешь, что ты за это заслужил?</p>
+      <p>— Простите, господин. Я не нарочно! Оно само!</p>
+      <p>— Кто само?— рявкнул демон.</p>
+      <p>— Ч-чревоугодие одолело, претемнейший.</p>
+      <p>— Ну что же, придется тебе понести заслуженное наказание. Я отправлю тебя туда, где обычная пища будет недоступна.</p>
+      <p>С этими словами демон вытянул руку, и беса поглотил портал. Он летел сквозь пространства, ощущая невыносимую боль. Его тело распадалось на частички и поглощалось пустотой.</p>
+      <p>Казалось, прошла вечность, когда он вдруг обнаружил себя среди зимнего леса. Пушистый снег искрился под деревьями, на толстых лапах огромных елей, он был совершенно белый и пушистый, какой бывает там, где не ступала нога разумного существа.</p>
+      <p>Боли бес уже не ощущал, ведь тело его проглотила пустота <span class="mark fact" data-err="e10">межьмирья</span>. Но голод был совершенно зверский, и утолить его он мог теперь лишь одним способом — испить страданий несчастного светлого. Осознав своё положение, бес <span class="mark fact" data-err="e8">взывыл</span>. Разве в глухом зимнем лесу он сможет найти кого-то? А если и найдет — не факт, что это окажется страдалец. Был еще один призрачный шанс обрести физическое тело — вселиться в умирающего, но и таких поблизости <span class="mark fact" data-err="e8">не наблюдалась</span>.</p>
+      <p>И тут бес уловил боль какого-то маленького существа. Он огляделся, эманации шли откуда-то из сугроба. Заметив место, где идеальный снежный покров был нарушен, он нырнул в снег и увидел маленькое рыжее тельце. Бельчонок умирал, как раз сейчас его дух покидал тело.</p>
+      <p>Это был шанс. Бес собрал последние силы и занял место души бельчонка. <span class="mark logic" data-err="e6">Ему вновь захотелось стать бестелесым призраком.</span> <span class="mark fact" data-err="e10">Холод и боль в раненых, отмороженных лапках была невыносимой.</span> <span class="mark logic" data-err="e7">Теперь придется ждать, пока зверек умрет. Тогда у него есть шансы перенестись в темные миры.</span></p>
+      <p>Боль постепенно стихала, он уже почти забылся смертельным сном, когда услышал подозрительный скрип. Над ним склонилось лицо, заросшее рыжеватой щетиной. Глаза смотрели с такой умильной жалостью, что бесу стало тошно.</p>
+      <p>— Маленький, ну как же ты так! Замерз! Мы тебя согреем, полезай-ка в рукавицу. Вот так! Держись, сейчас дойдем до дома, <span class="mark style" data-err="e11">накормлю тебя тушенкой</span>!</p>
+    </div>
+  </section>
+
+  <!-- ==================== VIEW: ПРОФИЛЬ ГЕРОЯ ==================== -->
+  <section class="view" id="view-profile">
+    <h2><span class="h2-icon">👤</span>Профиль героя — Бес</h2>
+
+    <div class="profile-header">
+      <div class="profile-avatar">
+        <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="30" cy="30" r="30" fill="#4C1D95"/>
+          <ellipse cx="30" cy="38" rx="18" ry="16" fill="#6D28D9"/>
+          <ellipse cx="30" cy="42" rx="12" ry="10" fill="#7C3AED"/>
+          <circle cx="30" cy="24" r="12" fill="#5B21B6"/>
+          <polygon points="18,18 22,10 26,18" fill="#3B0764"/>
+          <polygon points="42,18 38,10 34,18" fill="#3B0764"/>
+          <circle cx="25" cy="24" r="2" fill="#FCD34D"/>
+          <circle cx="35" cy="24" r="2" fill="#FCD34D"/>
+          <circle cx="25" cy="23.5" r="0.8" fill="#000"/>
+          <circle cx="35" cy="23.5" r="0.8" fill="#000"/>
+          <path d="M26 30 Q30 32 34 30" stroke="#1F2937" stroke-width="1.2" fill="none"/>
+          <ellipse cx="18" cy="34" rx="3" ry="2" fill="#4C1D95" opacity="0.7"/>
+          <ellipse cx="42" cy="36" rx="2.5" ry="2" fill="#4C1D95" opacity="0.7"/>
+          <ellipse cx="30" cy="50" rx="4" ry="2" fill="#4C1D95" opacity="0.6"/>
+          <path d="M14 44 Q8 48 10 54" stroke="#6D28D9" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div>
+        <h3>Мелкий, облезлый, покрытый струпьями бес</h3>
+        <p>Обжора и трус. Всю ночь мечтал об объедках, украл кость, потерял разум от сырого мяса — и получил наказание, которое сам себе не мог представить. Теперь у него нет тела, есть голод и один шанс: бельчонок в зимнем лесу.</p>
+        <div class="profile-tags">
+          <span>обжора</span><span>трус</span><span>падальщик</span><span>приспособленец</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-grid">
+      <div class="p-card">
+        <h4><span class="dot" style="background:#a78bfa"></span>Внешность</h4>
+        <ul>
+          <li>Мелкий, облезлый, покрытый струпьями.</li>
+          <li>Раздутое пузо, гнущиеся под тяжестью ножки.</li>
+          <li>Раны и язвы, которые меньше болят после еды.</li>
+          <li>Переваливается с боку на бок, когда наелся.</li>
+        </ul>
+      </div>
+      <div class="p-card">
+        <h4><span class="dot" style="background:#f472b6"></span>Манера говорить</h4>
+        <ul>
+          <li>С демоном — заискивающе, с запинками: <em>«Ч-чревоугодие одолело, претемнейший»</em>.</li>
+          <li>В отчаянии — патетично, с мольбой: <em>«О, тьма, если ты спасешь меня сегодня…»</em>.</li>
+          <li>Сам с собой — жалостливо, философски: <em>«Оставалось только валяться на траве и размышлять о коварности судьбы»</em>.</li>
+        </ul>
+      </div>
+      <div class="p-card">
+        <h4><span class="dot" style="background:#34d399"></span>Характер</h4>
+        <ul>
+          <li><strong>Обжорство</strong> — главный двигатель сюжета. Сырое мясо «ударяет в голову».</li>
+          <li><strong>Трусость</strong> — перед демоном сразу сдаётся, винит «чревоугодие».</li>
+          <li><strong>Приспособленец</strong> — крадёт, вселяется в умирающего, ищет шанс выжить.</li>
+          <li><strong>Самообман</strong> — обещает «духовную пищу», но голод остаётся зверским.</li>
+        </ul>
+      </div>
+      <div class="p-card">
+        <h4><span class="dot" style="background:#fbbf24"></span>Ирония судьбы</h4>
+        <ul>
+          <li>Молился тьме — демон тьмы его покарал.</li>
+          <li>Обещал «духовную пищу» — получил голод, который утоляется только страданием.</li>
+          <li>Вселился в умирающего — и человек предлагает ему тушенку, которую он, возможно, не сможет есть.</li>
+          <li>Финал — на грани комедии и ужаса: добрый человек не знает, кого пригрел.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== VIEW: КЛЮЧЕВЫЕ ПРАВКИ ==================== -->
+  <section class="view" id="view-edits">
+    <h2><span class="h2-icon">🔧</span>Ключевые правки</h2>
+
+    <div class="ba-grid">
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>Охранять объедки в голову никому не приходило, поэтому бес без труда украл самую большую бедренную кость.</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>Охранять объедки в голову никому не приходило — слуги как раз заканчивали работу, а демон ушёл к реке. <em>Бес без труда украл самую большую бедренную кость.</em></p>
+        <p class="why">+ Закрывает вопрос: почему кости не охранялись, если демон так разозлился.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>Только вот сырое мясо всегда ударяло ему в голову. Солидно потяжелевший, он…</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>Только вот сырое мясо всегда било ему в голову, как хмель. <em>Отяжелевший, он…</em></p>
+        <p class="why">+ Проясняет метафору («как хмель») и убирает неуклюжее «солидно».</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>Ему вновь захотелось стать бестелесым призраком. Холод и боль в раненых, отмороженных лапках была невыносимой. Теперь придется ждать, пока зверек умрет. Тогда у него есть шансы перенестись с темные миры.</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p><em>Он с тоской подумал, что лучше бы остался бестелесным призраком.</em> Холод и боль в раненых, отмороженных лапках <em>были</em> невыносимыми. Теперь придётся ждать, пока зверёк умрёт, — только тогда у него есть шанс перенестись <em>в тёмные миры</em>.</p>
+        <p class="why">+ Убирает «вновь» (он только что был призраком), чинит грамматику, проясняет логику перехода.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>Я отправлю тебя туда, где обычная пища будет недоступна.</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>Я отправлю тебя туда, где <em>никакая</em> пища тебе не поможет. Голод останется, а утолить его ты сможешь только <em>чужим страданием</em>.</p>
+        <p class="why">+ Убирает дыру: в лесу есть еда (бельчонок, тушенка), но она не утоляет его голод. Теперь правило чёткое.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>— Маленький, ну как же ты так! Замерз! Мы тебя согреем, полезай-ка в рукавицу. Вот так! Держись, сейчас дойдем до дома, накормлю тебя тушенкой!</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>— Маленький, ну как же ты так! Замёрз! Мы тебя согреем, полезай-ка в рукавицу. Вот так! Держись, сейчас дойдём до дома, накормлю тебя <em>орешками</em>!</p>
+        <p class="why">+ Белка не ест тушёнку. Но если хочется сохранить иронию — оставить «тушёнкой» как character detail: человек добрый, но глупый. Тогда добавить: <em>«Бес с тоской подумал, что даже это не поможет»</em>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== VIEW: ЧТО НЕ ТРОГАТЬ ==================== -->
+  <section class="view" id="view-keep">
+    <h2><span class="h2-icon">✓</span>Что не трогать</h2>
+    <div class="dont-touch">
+      <h3>Работает как есть</h3>
+      <ul>
+        <li><strong>Сцена обжорства</strong> — «раскусывая хрящики и высасывая оттуда мозг, давясь и громко чавкая» — отлично, живо, мерзко.</li>
+        <li><strong>Молитва тьме</strong> — «если ты спасешь меня сегодня, я обещаю, что впредь буду питаться исключительно духовной пищей!» — идеальная ирония, которая сбывается буквально.</li>
+        <li><strong>Демон и его брезгливость</strong> — «губы скривились так, что казалось, его сейчас стошнит» — характер без лишних слов.</li>
+        <li><strong>«Оно само!»</strong> — трусость и самооправдание в двух словах.</li>
+        <li><strong>Финал с человеком</strong> — «Глаза смотрели с такой умильной жалостью, что бесу стало тошно» — контраст доброты и демонической сущности.</li>
+        <li><strong>Ирония с тушёнкой</strong> — если оставить, то как character detail: человек добрый, но не понимает, кого кормит. Тогда это не ошибка, а фича.</li>
+      </ul>
+    </div>
+  </section>
+
+</main>
+
+<!-- ==================== МОДАЛКА ==================== -->
+<div class="modal-backdrop" id="modal">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<script>
+(function () {
+  // ===================== Данные ошибок =====================
+  const errors = {
+    e1: {
+      type: 'logic', label: 'Логическая дыра',
+      node: 'Кража кости — объедки не охраняются',
+      problem: 'Демон приходит в ярость, узнав о пропаже костей. Но если кости так важны (для собак), почему их никто не охранял? Слуги «заканчивали работу» — но это не объясняет отсутствие охраны.',
+      fix: 'Добавить причину: <code>«слуги как раз заканчивали работу, а демон ушёл к реке — поэтому объедки остались без присмотра»</code>. Или: <code>«демон был так уверен в своей власти, что не допускал и мысли о краже»</code>.'
+    },
+    e2: {
+      type: 'style', label: 'Стиль / формулировка',
+      node: 'Обжорство — сырое мясо',
+      problem: '«Сырое мясо всегда ударяло ему в голову» — метафора «ударять в голову» обычно про алкоголь. Здесь она работает, но не сразу понятна.',
+      fix: '<code>«Сырое мясо всегда било ему в голову, как хмель»</code> — проясняет метафору.'
+    },
+    e3: {
+      type: 'style', label: 'Стиль / формулировка',
+      node: 'Обжорство — солидно потяжелевший',
+      problem: '«Солидно потяжелевший» — неуклюжее наречие. «Солидно» обычно значит «внушительно» или «уважительно», а здесь — «значительно».',
+      fix: '<code>«Отяжелевший»</code> или <code>«Заметно потяжелевший»</code>.'
+    },
+    e4: {
+      type: 'fact', label: 'Опечатка',
+      node: 'Кара — покусится',
+      problem: '«Да как ты смел покусится» — должно быть «покуситься» (инфинитив после «смел»).',
+      fix: '<code>«покуситься»</code>.'
+    },
+    e5: {
+      type: 'fact', label: 'Опечатка',
+      node: 'Кара — ни кого-то',
+      problem: '«Бес увидел ни кого-то» — должно быть «не кого-то» (отрицание).',
+      fix: '<code>«не кого-то»</code>.'
+    },
+    e6: {
+      type: 'logic', label: 'Логическая дыра',
+      node: 'Бельчонок — вновь захотелось',
+      problem: '«Ему вновь захотелось стать бестелесым призраком» — но он ТОЛЬКО ЧТО был бестелесным призраком, секунду назад. «Вновь» сбивает: он не «вновь» хочет, он сожалеет о том, что получил тело.',
+      fix: '<code>«Он с тоской подумал, что лучше бы остался бестелесным призраком»</code>.'
+    },
+    e7: {
+      type: 'logic', label: 'Логическая дыра',
+      node: 'Бельчонок — зачем вселяться',
+      problem: 'Логика possession: он вселяется в УМИРАЮЩЕГО бельчонка, чтобы получить тело. Но потом говорится: «придётся ждать, пока зверёк умрёт, — тогда есть шанс перенестись в тёмные миры». Зачем вселяться, если тело всё равно умрёт? Что даёт possession?',
+      fix: 'Прояснить: <code>«Тело давало ему якорь в мире живых. Когда оно умрёт, дух сможет уйти в тёмные миры — но пока он был привязан к умирающему зверьку, он чувствовал то, что чувствует он»</code>.'
+    },
+    e8: {
+      type: 'fact', label: 'Опечатки',
+      node: 'Зимний лес — взывыл, не наблюдалась',
+      problem: '«Бес взывыл» → «взвыл». «И таких поблизости не наблюдалась» → «не наблюдалось» (согласование).',
+      fix: '<code>«взвыл»</code>, <code>«не наблюдалось»</code>.'
+    },
+    e9: {
+      type: 'logic', label: 'Логическая дыра',
+      node: 'Бельчонок — обычная пища',
+      problem: 'Демон говорит: «Я отправлю тебя туда, где обычная пища будет недоступна». Но в зимнем лесу есть бельчонок (мясо), а человек предлагает тушёнку. То есть еда есть — но бес не может её есть, потому что он дух. Это не проговорено чётко.',
+      fix: '<code>«Я отправлю тебя туда, где никакая пища тебе не поможет. Голод останется, а утолить его ты сможешь только чужим страданием»</code> — правило становится явным.'
+    },
+    e10: {
+      type: 'fact', label: 'Грамматика',
+      node: 'Бельчонок — межьмирья, была',
+      problem: '«Межьмирья» → «межмирья» (или «междумирья»). «Холод и боль… была» → «были» (согласование с двумя подлежащими).',
+      fix: '<code>«межмирья»</code>, <code>«были невыносимыми»</code>.'
+    },
+    e11: {
+      type: 'style', label: 'Стиль / факт',
+      node: 'Человек — тушёнка',
+      problem: 'Белки не едят тушёнку. Это либо фактическая ошибка, либо character detail (человек добрый, но глупый).',
+      fix: 'Если factual: <code>«накормлю тебя орешками»</code>. Если character: оставить и добавить <code>«Бес с тоской подумал, что даже это не поможет»</code>.'
+    }
+  };
+
+  // ===================== Переключение видов =====================
+  const views = document.querySelectorAll('.view');
+  const navBtns = document.querySelectorAll('.topnav button');
+
+  function switchView(name) {
+    views.forEach(v => v.classList.toggle('active', v.id === 'view-' + name));
+    navBtns.forEach(b => b.classList.toggle('active', b.dataset.view === name));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (name === 'schema') requestAnimationFrame(draw);
+  }
+  navBtns.forEach(b => b.addEventListener('click', () => switchView(b.dataset.view)));
+
+  // ===================== Модалка =====================
+  const modal = document.getElementById('modal');
+  const modalContent = document.getElementById('modalContent');
+
+  function openModal(id) {
+    const e = errors[id];
+    if (!e) return;
+    modalContent.innerHTML = `
+      <button class="modal-close" aria-label="Закрыть">✕</button>
+      <span class="modal-type ${e.type}">${e.label}</span>
+      <h3>${e.node}</h3>
+      <div class="modal-node">Ошибка ${id.toUpperCase()}</div>
+      <div class="m-section">
+        <div class="m-label">Проблема</div>
+        <div class="m-problem">${e.problem}</div>
+      </div>
+      <div class="m-section">
+        <div class="m-label">Решение</div>
+        <div class="m-fix">${e.fix}</div>
+      </div>
+    `;
+    modal.classList.add('open');
+    modalContent.querySelector('.modal-close').addEventListener('click', closeModal);
+  }
+  function closeModal() { modal.classList.remove('open'); }
+  modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  // ===================== Клики по ошибкам =====================
+  document.querySelectorAll('[data-err]').forEach(el => {
+    el.addEventListener('click', e => {
+      e.stopPropagation();
+      openModal(el.dataset.err);
+    });
+  });
+
+  // ===================== Рисование линий =====================
+  const canvas = document.getElementById('canvas');
+  const svg = document.getElementById('lines');
+
+  const connections = [
+    { from: 'feast', to: 'theft', type: 'fact' },
+    { from: 'theft', to: 'gluttony', type: 'lost' },
+    { from: 'gluttony', to: 'punishment', type: 'speculation' },
+    { from: 'punishment', to: 'void', type: 'classified' },
+    { from: 'void', to: 'forest', type: 'silence' },
+    { from: 'forest', to: 'suffer', type: 'lost', dashed: true },
+    { from: 'forest', to: 'possess', type: 'hero' },
+    { from: 'possess', to: 'squirrel', type: 'hero' },
+    { from: 'squirrel', to: 'human', type: 'fact' }
+  ];
+
+  const strokeColors = {
+    fact: '#3B82F6', lost: '#8B5CF6', evidence: '#14B8A6',
+    speculation: '#F59E0B', science: '#10B981', silence: '#64748b',
+    classified: '#EF4444', hero: '#14B8A6'
+  };
+
+  function svgEl(name, attrs) {
+    const el = document.createElementNS('http://www.w3.org/2000/svg', name);
+    for (const k in attrs) el.setAttribute(k, attrs[k]);
+    return el;
+  }
+
+  function nodeRect(id) {
+    const el = document.querySelector(`[data-id="${id}"]`);
+    if (!el) return null;
+    const r = el.getBoundingClientRect();
+    const c = canvas.getBoundingClientRect();
+    return {
+      x: r.left - c.left + canvas.scrollLeft,
+      y: r.top - c.top + canvas.scrollTop,
+      w: r.width, h: r.height,
+      cx: r.left - c.left + canvas.scrollLeft + r.width / 2,
+      bottom: r.top - c.top + canvas.scrollTop + r.height,
+      top: r.top - c.top + canvas.scrollTop
+    };
+  }
+
+  function draw() {
+    if (!canvas || !canvas.offsetParent) return;
+    svg.setAttribute('width', canvas.scrollWidth);
+    svg.setAttribute('height', canvas.scrollHeight);
+    svg.innerHTML = '';
+
+    const bySource = {};
+    const byTarget = {};
+    connections.forEach(c => {
+      (bySource[c.from] = bySource[c.from] || []).push(c);
+      (byTarget[c.to] = byTarget[c.to] || []).push(c);
+    });
+
+    connections.forEach(conn => {
+      const from = nodeRect(conn.from);
+      const to = nodeRect(conn.to);
+      if (!from || !to) return;
+
+      const sx = from.cx, sy = from.bottom;
+      const tx = to.cx, ty = to.top;
+      const color = strokeColors[conn.type] || '#475569';
+
+      let d;
+      if (Math.abs(sx - tx) < 2) {
+        d = `M ${sx} ${sy} L ${tx} ${ty}`;
+      } else {
+        const isFork = bySource[conn.from].length > 1;
+        const isMerge = byTarget[conn.to].length > 1;
+        let midY;
+        if (isFork) midY = sy + 22;
+        else if (isMerge) midY = ty - 22;
+        else midY = (sy + ty) / 2;
+        d = `M ${sx} ${sy} L ${sx} ${midY} L ${tx} ${midY} L ${tx} ${ty}`;
+      }
+
+      const path = svgEl('path', {
+        d, fill: 'none', stroke: color,
+        'stroke-width': '2',
+        'stroke-linecap': 'round', 'stroke-linejoin': 'round',
+        opacity: 0.85
+      });
+      if (conn.dashed) path.setAttribute('stroke-dasharray', '6 5');
+      svg.appendChild(path);
+    });
+
+    // Dead-end: «Испить страданий»
+    const dead = nodeRect('suffer');
+    if (dead) {
+      const x = dead.cx, y = dead.bottom, endY = y + 34;
+      const color = '#8B5CF6';
+      svg.appendChild(svgEl('path', {
+        d: `M ${x} ${y} L ${x} ${endY}`,
+        stroke: color, 'stroke-width': 2, 'stroke-dasharray': '4 4',
+        fill: 'none', opacity: 0.6
+      }));
+      const s = 6;
+      svg.appendChild(svgEl('path', {
+        d: `M ${x - s} ${endY - s} L ${x + s} ${endY + s}`,
+        stroke: color, 'stroke-width': 2, fill: 'none', 'stroke-linecap': 'round'
+      }));
+      svg.appendChild(svgEl('path', {
+        d: `M ${x + s} ${endY - s} L ${x - s} ${endY + s}`,
+        stroke: color, 'stroke-width': 2, fill: 'none', 'stroke-linecap': 'round'
+      }));
+    }
+  }
+
+  function redraw() { requestAnimationFrame(draw); }
+  window.addEventListener('load', redraw);
+  window.addEventListener('resize', redraw);
+  redraw();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(redraw);
+})();
+</script>
+</body>
+</html>
