@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Бес и демон — разбор текста</title>
+<style>
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: Georgia, "Times New Roman", serif;
+    background: #fafafa; color: #222; line-height: 1.65;
+    padding: 0 16px 60px;
+  }
+
+  /* ============ Легенда (фиксированная узкая полоса) ============ */
+  .legend-strip {
+    position: sticky; top: 0; z-index: 30;
+    height: 42px; display: flex; align-items: center; gap: 6px;
+    padding: 0 8px; margin: 0 -16px;
+    background: #fff; border-bottom: 1px solid #ddd;
+    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    overflow-x: auto; white-space: nowrap;
+  }
+  .legend-strip::-webkit-scrollbar { height: 4px; }
+  .legend-strip::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
+
+  .legend-strip .item {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px 3px 3px;
+    background: #f2f2f2; border-radius: 14px;
+    font-size: 12px; cursor: pointer; flex-shrink: 0;
+    transition: background .12s, box-shadow .12s;
+  }
+  .legend-strip .item:hover { background: #eaeaea; }
+  .legend-strip .item.active {
+    background: #ffe066; outline: 2px solid #d4a017; font-weight: bold;
+  }
+  .legend-strip .item .avatar { width: 24px; height: 24px; flex-shrink: 0; }
+  .legend-strip .item .avatar svg { display: block; width: 100%; height: 100%; }
+  .legend-strip .count {
+    background: rgba(0,0,0,.14); color: #000;
+    padding: 0 6px; border-radius: 8px;
+    font-size: 10px; font-weight: bold; min-width: 14px; text-align: center;
+  }
+  .legend-strip .sep { width: 1px; height: 22px; background: #ddd; margin: 0 4px; flex-shrink: 0; }
+
+  /* ============ Тулбар ============ */
+  .toolbar {
+    position: sticky; top: 42px; z-index: 25;
+    background: #fafafa; display: flex; flex-wrap: wrap; gap: 8px;
+    align-items: center; padding: 8px 0; margin-bottom: 14px;
+    border-bottom: 1px solid #eee;
+  }
+  .toolbar button {
+    padding: 6px 12px; border: 2px solid #ccc; background: #fff;
+    border-radius: 6px; cursor: pointer; font: inherit; font-size: 13px;
+    transition: all .12s;
+  }
+  .toolbar button:hover { border-color: #888; }
+  .toolbar button[data-mark="verbs"].active    { background:#000; color:#fff; border-color:#000; }
+  .toolbar button[data-mark="pronouns"].active { background:#ccc; color:#000; font-weight:bold; border-color:#999; }
+  .toolbar button[data-mark="terms"].active    { background:#ffc2c2; color:#900; border-color:#900; font-weight:bold; }
+  .toolbar .clear-btn { background:#fee; border-color:#e88; color:#900; }
+  .toolbar .clear-btn:hover { background:#fdd; border-color:#c66; }
+
+  .search-box { display: flex; gap: 4px; margin-left: auto; }
+  .search-box input {
+    padding: 6px 10px; border: 1px solid #ccc; border-radius: 6px;
+    font: inherit; font-size: 13px; width: 180px;
+  }
+  .search-box input:focus { outline: 2px solid #88c; border-color: transparent; }
+  .search-box button {
+    background: #333; color: #fff; border-color: #333;
+  }
+  .search-box button:hover { background: #000; border-color: #000; }
+
+  /* ============ Хайлайты ============ */
+  .show-verbs .verb      { background:#000; color:#fff; padding:0 3px; border-radius:3px; }
+  .show-pronouns .pronoun{ background:#cfcfcf; color:#000; font-weight:bold; padding:0 3px; border-radius:3px; }
+  .show-terms .term      { background:#ffc2c2; color:#900; font-weight:bold; padding:0 3px; border-radius:3px; }
+
+  /* ============ Макет ============ */
+  .layout { display: flex; gap: 24px; align-items: flex-start; }
+  .main-text { flex: 1; min-width: 0; }
+
+  /* ============ Блоки ============ */
+  .block { display: flex; gap: 14px; margin: 0 0 12px; align-items: flex-start; }
+  .block .avatar { width: 52px; height: 52px; flex-shrink: 0; cursor: pointer; transition: transform .12s, filter .12s; border-radius: 50%; }
+  .block .avatar:hover { transform: scale(1.08); }
+  .block .avatar.active { box-shadow: 0 0 0 3px #d4a017; }
+  .block .avatar svg { display: block; width: 100%; height: 100%; }
+  .block .text { flex: 1; padding: 6px 12px; border-radius: 8px; }
+
+  .text.bg-bes      { background-color: #C4B5FD; }
+  .text.bg-demon    { background-color: #FCA5A5; }
+  .text.bg-human    { background-color: #FCD34D; }
+  .text.bg-narration { background: transparent; padding-left: 0; }
+
+  /* ============ Badge «new» ============ */
+  .new-badge {
+    display: inline-block; position: relative;
+    background:#e53935; color:#fff; font-weight: bold;
+    font-size: 9px; line-height: 1;
+    padding: 2px 5px; border-radius: 8px;
+    margin-left: 5px; vertical-align: super;
+    cursor: help; letter-spacing: .3px;
+  }
+  .new-badge::after {
+    content: attr(data-tip);
+    position: absolute; bottom: calc(100% + 6px); left: 50%;
+    transform: translateX(-50%);
+    background: #222; color: #fff; padding: 4px 8px;
+    border-radius: 4px; font-size: 11px; font-weight: normal;
+    white-space: nowrap; opacity: 0; pointer-events: none;
+    transition: opacity .15s;
+  }
+  .new-badge:hover::after { opacity: 1; }
+
+  b.first-appearance { font-weight: 700; }
+
+  /* ============ Инфо-панель ============ */
+  .info-panel {
+    width: 320px; flex-shrink: 0;
+    display: none;
+    position: sticky; top: 110px;
+    max-height: calc(100vh - 130px);
+    overflow-y: auto;
+    background: #fff; border-radius: 12px;
+    padding: 16px 18px;
+    box-shadow: 0 4px 16px rgba(0,0,0,.1);
+    font-size: 14px;
+  }
+  .info-panel.visible { display: block; }
+  .info-panel h3 {
+    margin: 0 0 2px; font-size: 18px;
+  }
+  .info-panel .panel-sub {
+    margin: 0 0 14px; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 1px; color: #999;
+  }
+  .info-section { margin-bottom: 12px; }
+  .info-label {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
+    color: #666; font-weight: bold; margin-bottom: 2px;
+  }
+  .info-text { line-height: 1.5; }
+
+  /* ============ Поиск-хит ============ */
+  .block.search-hit .text {
+    animation: searchPulse 0.55s ease-in-out 5;
+  }
+  @keyframes searchPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255,193,7,0); }
+    50%      { box-shadow: 0 0 0 6px rgba(255,193,7,0.7); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ SVG-символы ============ -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+
+  <!-- Бес: мелкий, облезлый, с пузом -->
+  <symbol id="p-bes" viewBox="0 0 60 60">
+    <circle cx="30" cy="30" r="28" fill="#C4B5FD"/>
+    <!-- рожки -->
+    <polygon points="20,16 23,9 26,17" fill="#3B0764"/>
+    <polygon points="40,16 37,9 34,17" fill="#3B0764"/>
+    <!-- голова -->
+    <circle cx="30" cy="24" r="12" fill="#7C3AED"/>
+    <!-- тело / пузо -->
+    <ellipse cx="30" cy="44" rx="17" ry="12" fill="#6D28D9"/>
+    <ellipse cx="30" cy="46" rx="11" ry="7" fill="#A78BFA"/>
+    <!-- глаза -->
+    <circle cx="26" cy="23" r="2" fill="#FCD34D"/>
+    <circle cx="34" cy="23" r="2" fill="#FCD34D"/>
+    <circle cx="26" cy="23" r="0.8" fill="#000"/>
+    <circle cx="34" cy="23" r="0.8" fill="#000"/>
+    <!-- ухмылка -->
+    <path d="M25 30 Q30 33 35 30" stroke="#1F2937" stroke-width="1.2" fill="none"/>
+    <!-- струпья / пятна -->
+    <ellipse cx="17" cy="38" rx="2.5" ry="1.5" fill="#4C1D95" opacity="0.7"/>
+    <ellipse cx="43" cy="40" rx="2" ry="1.5" fill="#4C1D95" opacity="0.7"/>
+    <circle cx="35" cy="44" r="1.2" fill="#4C1D95" opacity="0.7"/>
+    <circle cx="22" cy="42" r="1" fill="#4C1D95" opacity="0.6"/>
+    <circle cx="40" cy="48" r="1.2" fill="#4C1D95" opacity="0.6"/>
+  </symbol>
+
+  <!-- Высший демон: большой, рогатый, злой -->
+  <symbol id="p-demon" viewBox="0 0 60 60">
+    <circle cx="30" cy="30" r="28" fill="#FCA5A5"/>
+    <!-- тело -->
+    <ellipse cx="30" cy="44" rx="19" ry="13" fill="#B91C1C"/>
+    <!-- голова -->
+    <ellipse cx="30" cy="22" rx="14" ry="13" fill="#DC2626"/>
+    <!-- большие рога -->
+    <polygon points="15,14 17,1 24,14" fill="#450A0A"/>
+    <polygon points="45,14 43,1 36,14" fill="#450A0A"/>
+    <!-- злые брови -->
+    <path d="M20 17 L26 20" stroke="#000" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M40 17 L34 20" stroke="#000" stroke-width="2.2" stroke-linecap="round"/>
+    <!-- глаза -->
+    <circle cx="24" cy="22" r="2.2" fill="#FCD34D"/>
+    <circle cx="36" cy="22" r="2.2" fill="#FCD34D"/>
+    <circle cx="24" cy="22" r="1" fill="#000"/>
+    <circle cx="36" cy="22" r="1" fill="#000"/>
+    <!-- оскал / клыки -->
+    <path d="M24 30 Q30 27 36 30" stroke="#1F2937" stroke-width="1.5" fill="none"/>
+    <polygon points="26,30 27,33 28,30" fill="#fff"/>
+    <polygon points="32,30 33,33 34,30" fill="#fff"/>
+  </symbol>
+
+  <!-- Человек: бородатый, добрый -->
+  <symbol id="p-human" viewBox="0 0 60 60">
+    <circle cx="30" cy="30" r="28" fill="#FCD34D"/>
+    <!-- тулуп/куртка -->
+    <path d="M10 56 Q30 42 50 56 L50 58 L10 58 Z" fill="#78350F"/>
+    <!-- голова -->
+    <circle cx="30" cy="24" r="12" fill="#FED7AA"/>
+    <!-- шапка/волосы -->
+    <path d="M18 18 Q30 10 42 18 L42 15 Q30 6 18 15 Z" fill="#451A03"/>
+    <!-- борода -->
+    <path d="M20 30 Q30 42 40 30 Q38 39 30 41 Q22 39 20 30 Z" fill="#B45309"/>
+    <!-- глаза добрые -->
+    <circle cx="26" cy="24" r="1.5" fill="#000"/>
+    <circle cx="34" cy="24" r="1.5" fill="#000"/>
+    <!-- улыбка под усами -->
+    <path d="M27 32 Q30 34 33 32" stroke="#000" stroke-width="1" fill="none"/>
+  </symbol>
+
+  <!-- Авторский текст: пергамент -->
+  <symbol id="p-narration" viewBox="0 0 60 60">
+    <rect x="8" y="8" width="44" height="44" rx="6" fill="#F5F5DC" stroke="#8B6914" stroke-width="2"/>
+    <polygon points="42,8 52,8 52,18" fill="#fafafa"/>
+    <line x1="42" y1="8" x2="52" y2="18" stroke="#8B6914" stroke-width="1"/>
+    <line x1="14" y1="22" x2="44" y2="22" stroke="#8B6914" stroke-width="1.5"/>
+    <line x1="14" y1="28" x2="46" y2="28" stroke="#8B6914" stroke-width="1.5"/>
+    <line x1="14" y1="34" x2="42" y2="34" stroke="#8B6914" stroke-width="1.5"/>
+    <line x1="14" y1="40" x2="44" y2="40" stroke="#8B6914" stroke-width="1.5"/>
+    <line x1="14" y1="46" x2="38" y2="46" stroke="#8B6914" stroke-width="1.5"/>
+  </symbol>
+</svg>
+
+<!-- ============ Легенда ============ -->
+<div class="legend-strip" id="legendStrip">
+  <div class="item" data-char="bes"><div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-bes"/></svg></div><span>Бес</span><span class="count">0</span></div>
+  <div class="item" data-char="demon"><div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-demon"/></svg></div><span>Высший демон</span><span class="count">0</span></div>
+  <div class="item" data-char="human"><div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-human"/></svg></div><span>Человек</span><span class="count">0</span></div>
+  <div class="sep"></div>
+  <div class="item" data-char="narration"><div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div><span>Авторский текст</span><span class="count">0</span></div>
+</div>
+
+<!-- ============ Тулбар ============ -->
+<div class="toolbar">
+  <button data-mark="verbs">Выделить глаголы</button>
+  <button data-mark="pronouns">Выделить местоимения</button>
+  <button data-mark="terms">Выделить термины и объекты</button>
+  <button data-mark="clear" class="clear-btn">Убрать выделения</button>
+  <div class="search-box">
+    <input type="search" id="searchInput" placeholder="Поиск по тексту…">
+    <button id="searchBtn" type="button">Найти</button>
+  </div>
+</div>
+
+<!-- ============ Макет ============ -->
+<div class="layout">
+  <main class="main-text" id="mainText">
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Мелкий, облезлый, покрытый струпьями <b class="first-appearance">бес<span class="new-badge" data-tip="Первое появление">new</span></b> всю ночь наблюдал как <b class="first-appearance">высший демон<span class="new-badge" data-tip="Первое появление">new</span></b>, с комфортом расположившись на поляне, неспешно ужинает. К великой скорби беса, набрел он на место пира уже когда жертву замучили и убили, оставалось надеяться только на объедки со стола.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Насытившись, демон направился к реке, а его слуги аккуратно сложили кости с остатками мяса в горшок, чтоб накормить ими темных гончих.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Охранять объедки в голову никому не приходило, поэтому бес без труда украл самую большую бедренную кость, отволок её в кусты. Обглодав мясо, он почувствовал приятную тяжесть в животе. Казалось, что даже, что его раны и язвы стали меньше болеть и свербить. Тем не менее он вновь посмотрел на стоящий на краю поляны горшок, там было еще очень много еды. Бес слышал, что слуги, которые наводили порядок на поляне, заканчивают свою работу. Только вот сырое мясо всегда ударяло ему в голову. Солидно потяжелевший, он, переваливаясь с боку на бок, на гнущихся под тяжестью пуза ножках подошел к заветному горшку и вытащил еще одну косточку. Не иначе как какой-то светлый упомянул беса лихом в своих молитвах, обжора окончательно лишился разума. Он опрокинул горшок и начал жадно обгладывать кости, раскусывая хрящики и высасывая оттуда мозг, давясь и громко чавкая. Он метался от одной кости к другой, пока не набил пузо настолько, что передвигаться уже не мог. Оставалось только валяться на траве и размышлять о коварности судьбы. "О, тьма, — думал бес, — если ты спасешь меня сегодня, я обещаю, что впредь буду питаться исключительно духовной пищей!"</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Неожиданно звездное небо заслонила широкая фигура. Бес увидел ни кого-то, а высшего демона собственной персоной, склонившегося над ним. Брови сдвинулись, а губы скривились так, что казалось, его сейчас стошнит.</div>
+    </div>
+
+    <div class="block" data-character="demon">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-demon"/></svg></div>
+      <div class="text bg-demon">— Кто это у нас тут? Мерзкий, паршивый паразит! Да как ты смел покусится на кости для моих собачек! Они ведь теперь останутся голодными! Знаешь, что ты за это заслужил?</div>
+    </div>
+
+    <div class="block" data-character="bes">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-bes"/></svg></div>
+      <div class="text bg-bes">— Простите, господин. Я не нарочно! Оно само!</div>
+    </div>
+
+    <div class="block" data-character="demon">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-demon"/></svg></div>
+      <div class="text bg-demon">— Кто само?— рявкнул демон.</div>
+    </div>
+
+    <div class="block" data-character="bes">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-bes"/></svg></div>
+      <div class="text bg-bes">— Ч-чревоугодие одолело, претемнейший.</div>
+    </div>
+
+    <div class="block" data-character="demon">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-demon"/></svg></div>
+      <div class="text bg-demon">— Ну что же, придется тебе понести заслуженное наказание. Я отправлю тебя туда, где обычная пища будет недоступна.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">С этими словами демон вытянул руку, и беса поглотил портал. Он летел сквозь пространства, ощущая невыносимую боль. Его тело распадалось на частички и поглощалось пустотой.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Казалось, прошла вечность, когда он вдруг обнаружил себя среди зимнего леса. Пушистый снег искрился под деревьями, на толстых лапах огромных елей, он был совершенно белый и пушистый, какой бывает там, где не ступала нога разумного существа.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Боли бес уже не ощущал, ведь тело его проглотила пустота межьмирья. Но голод был совершенно зверский, и утолить его он мог теперь лишь одним способом — испить страданий несчастного светлого. Осознав своё положение, бес взывыл. Разве в глухом зимнем лесу он сможет найти кого-то? А если и найдет — не факт, что это окажется страдалец. Был еще один призрачный шанс обрести физическое тело — вселиться в умирающего, но и таких поблизости не наблюдалась.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">И тут бес уловил боль какого-то маленького существа. Он огляделся, эманации шли откуда-то из сугроба. Заметив место, где идеальный снежный покров был нарушен, он нырнул в снег и увидел маленькое рыжее тельце. Бельчонок умирал, как раз сейчас его дух покидал тело.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Это был шанс. Бес собрал последние силы и занял место души бельчонка. Ему вновь захотелось стать бестелесым призраком. Холод и боль в раненых, отмороженных лапках была невыносимой. Теперь придется ждать, пока зверек умрет. Тогда у него есть шансы перенестись с темные миры.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Боль постепенно стихала, он уже почти забылся смертельным сном, когда услышал подозрительный скрип. Над ним склонилось <b class="first-appearance">лицо, заросшее рыжеватой щетиной<span class="new-badge" data-tip="Первое появление">new</span></b>. Глаза смотрели с такой умильной жалостью, что бесу стало тошно.</div>
+    </div>
+
+    <div class="block" data-character="human">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-human"/></svg></div>
+      <div class="text bg-human">— Маленький, ну как же ты так! Замерз! Мы тебя согреем, полезай-ка в рукавицу. Вот так! Держись, сейчас дойдем до дома, накормлю тебя тушенкой!</div>
+    </div>
+
+  </main>
+
+  <aside class="info-panel" id="infoPanel"></aside>
+</div>
+
+<script>
+(function () {
+  const escapeRegex = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+  // =================== Термины ===================
+  const terms = [
+    'высший демон', 'высшего демона', 'высшему демону', 'высшим демоном',
+    'темные гончие', 'темных гончих', 'темным гончим', 'темными гончими',
+    'бедренная кость', 'бедренную кость', 'бедренной кости',
+    'духовная пища', 'духовной пищей', 'духовную пищу',
+    'чревоугодие', 'претемнейший', 'претемнейшему',
+    'портал', 'портала', 'порталом', 'портале',
+    'межмирье', 'межмирья', 'межьмирья', 'межмирью',
+    'пустота', 'пустотой', 'пустоту', 'пустоты', 'пустоте',
+    'эманации', 'эманаций', 'эманациями',
+    'бельчонок', 'бельчонка', 'бельчонку', 'бельчонком',
+    'вселиться', 'вселение', 'вселился', 'вселилась',
+    'руппа', 'рукавица', 'рукавицу', 'рукавицы', 'рукавицей',
+    'тушенка', 'тушенкой', 'тушенки', 'тушёнка', 'тушёнкой',
+    'светлый', 'светлого', 'светлому', 'светлым',
+    'струпья', 'струпьями', 'струпьев',
+    'гончие', 'гончих', 'гончим', 'гончими',
+    'горшок', 'горшка', 'горшку', 'горшком', 'горшке',
+    'хрящики', 'хрящиков', 'хрящиками',
+    'сугроб', 'сугроба', 'сугробу', 'сугробом', 'сугробе',
+    'тельце', 'тельца', 'тельцем',
+    'лапки', 'лапок', 'лапках', 'лапками',
+    'межьмирья'
+  ].sort((a, b) => b.length - a.length);
+  const termRegex = new RegExp(
+    `(?<![а-яёА-ЯЁ\\w])(${terms.map(escapeRegex).join('|')})(?![а-яёА-ЯЁ\\w])`, 'giu'
+  );
+
+  // =================== Местоимения (без «каждый», «который») ===================
+  const pronouns = [
+    'я','ты','он','она','оно','мы','вы','они',
+    'меня','тебя','его','её','нее','нас','вас','них',
+    'мне','тебе','ему','ей','ней','нам','вам','им','ним',
+    'мной','мною','тобой','тобою','нами','вами','ими','ними',
+    'себя','себе','собой','собою',
+    'мой','моя','моё','мои','моего','моей','моему','моим','моём',
+    'твой','твоя','твоё','твои','твоего','твоей','твоему','твоим',
+    'наш','наша','наше','наши','нашего','нашей','нашему','нашим',
+    'ваш','ваша','ваше','ваши','вашего','вашей','вашему','вашим',
+    'свой','своя','своё','свои','своего','своей','своему','своим',
+    'этот','эта','это','эти','этого','этой','этому','этим','этом',
+    'тот','та','те','того','той','тому','тем','том',
+    'такой','такая','такое','такие','такого','такой','таком',
+    'весь','вся','всё','все','всего','всей','всему','всем',
+    'сам','сама','само','сами','самого','самой',
+    'любой','любая','любое','любые','любого','любой',
+    'другой','другая','другое','другие','другого','другой',
+    'иной','иная','иное','иные',
+    'кто','что','какой','какая','какое','какие',
+    'никто','ничто','никакой','ничей'
+  ].sort((a, b) => b.length - a.length);
+  const pronounRegex = new RegExp(
+    `(?<![а-яёА-ЯЁ\\w])(${pronouns.map(escapeRegex).join('|')})(?![а-яёА-ЯЁ\\w])`, 'giu'
+  );
+
+  // =================== Глаголы ===================
+  const verbRegex = /(?<![а-яёА-ЯЁ])([а-яё]+(?:ться|тся|ть|ешь|ишь|ем|им|ете|ите|ет|ёт|ит|ут|ют|ат|ят|ал|ала|ало|али|ил|ила|ило|или|ыл|ыла|ыло|ыли|ёл|ел|ела|ело|ели|лся|лась|лось|лись))(?![а-яёА-ЯЁ])/giu;
+
+  const verbStoplist = new Set([
+    'мать','дочь','ночь','печь','речь','вещь','помощь','площадь','часть','власть',
+    'скорость','гордость','зависть','радость','плоть','масть','пасть','сеть','плеть',
+    'пять','шесть','семь','восемь','девять','десять','семнадцать','двадцать','тридцать',
+    'суть','путь','ртуть','муть','сень','ступень','тень','день','корень','олень','зять',
+    'гость','кость','кисть','месть','лесть','честь','прелесть','шест','куст','лист',
+    'аист','мост','пост','хвост','рост','тост','тест','жест','шелест','холст',
+    'стол','стул','бал','зал','вал','канал','финал','сигнал','журнал','идеал','портал',
+    'металл','кристалл','капитал','квартал','вокзал','причал','обвал','провал','отвал',
+    'привал','перевал','подвал','кинжал','материал','минерал','овал','фиал','адмирал',
+    'генерал','маршал','фестиваль','госпиталь','портфель','кабель','мебель','корабль',
+    'ансамбль','автомобиль','кабинет','букет','пакет','совет','буфет','аппетит','кредит',
+    'лимит','бандит','маршрут','салют','парашют','уют','привет','ответ','запрет','завет',
+    'рассвет','цвет','навет','раунд','тополь','тополю','угол','котел','котёл','орел','орёл',
+    'узел','козел','козёл','сокол','футбол','баскетбол','волейбол','гол','ноль',
+    'дело','дела','делу','делом','деле','дел','тел','тело','тела','телу','телом','теле',
+    'село','сёла','сёл','мел','лось'
+  ]);
+
+  function markText(el, regex, className, stoplist) {
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
+      acceptNode(node) {
+        const p = node.parentNode;
+        if (p && p.classList && (
+          p.classList.contains('term') ||
+          p.classList.contains('pronoun') ||
+          p.classList.contains('verb') ||
+          p.classList.contains('new-badge')
+        )) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    const nodes = [];
+    let n;
+    while ((n = walker.nextNode())) nodes.push(n);
+
+    nodes.forEach(node => {
+      const text = node.textContent;
+      const re = new RegExp(regex.source, regex.flags);
+      const hits = [];
+      let m;
+      while ((m = re.exec(text)) !== null) {
+        if (stoplist && stoplist.has(m[0].toLowerCase())) continue;
+        hits.push({ s: m.index, e: m.index + m[0].length, t: m[0] });
+        if (m.index === re.lastIndex) re.lastIndex++;
+      }
+      if (!hits.length) return;
+
+      const frag = document.createDocumentFragment();
+      let pos = 0;
+      hits.forEach(h => {
+        if (h.s > pos) frag.appendChild(document.createTextNode(text.slice(pos, h.s)));
+        const span = document.createElement('span');
+        span.className = className;
+        span.textContent = h.t;
+        frag.appendChild(span);
+        pos = h.e;
+      });
+      if (pos < text.length) frag.appendChild(document.createTextNode(text.slice(pos)));
+      node.parentNode.replaceChild(frag, node);
+    });
+  }
+
+  document.querySelectorAll('.block .text').forEach(el => {
+    markText(el, termRegex,    'term');
+    markText(el, pronounRegex, 'pronoun');
+    markText(el, verbRegex,    'verb', verbStoplist);
+  });
+
+  // =================== Кнопки-тогглы ===================
+  const toggleBtns = document.querySelectorAll('.toolbar button[data-mark="verbs"], .toolbar button[data-mark="pronouns"], .toolbar button[data-mark="terms"]');
+  toggleBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const mark = btn.dataset.mark;
+      document.body.classList.toggle('show-' + mark);
+      btn.classList.toggle('active');
+    });
+  });
+
+  // =================== «Убрать выделения» ===================
+  document.querySelector('.clear-btn').addEventListener('click', () => {
+    document.body.classList.remove('show-verbs', 'show-pronouns', 'show-terms');
+    toggleBtns.forEach(b => b.classList.remove('active'));
+  });
+
+  // =================== Счётчики ===================
+  function updateCounts() {
+    const counts = {};
+    document.querySelectorAll('.block').forEach(b => {
+      counts[b.dataset.character] = (counts[b.dataset.character] || 0) + 1;
+    });
+    document.querySelectorAll('.legend-strip .item[data-char]').forEach(item => {
+      const c = item.querySelector('.count');
+      if (c) c.textContent = counts[item.dataset.char] || 0;
+    });
+  }
+  updateCounts();
+
+  // =================== Инфо-панель ===================
+  const characterInfo = {
+    bes: {
+      title: 'Бес',
+      sections: [
+        { label: 'Внешность', text: 'Мелкий, облезлый, покрытый струпьями. Раздутое пузо, гнущиеся под тяжестью ножки. Раны и язвы, которые меньше болят после еды. Переваливается с боку на бок, когда наелся.' },
+        { label: 'Манера говорить', text: 'С демоном — заискивающе, с запинками. В отчаянии — патетично, с мольбой. Сам с собой — жалостливо, философски («о коварности судьбы»).' },
+        { label: 'Словечки', text: '«Господин», «претемнейший», «о, тьма», «оно само», «духовная пища».' },
+        { label: 'Роль', text: 'Обжора и падальщик. Главный герой. Его главный двигатель — чревоугодие: сырое мясо «ударяет в голову».' }
+      ]
+    },
+    demon: {
+      title: 'Высший демон',
+      sections: [
+        { label: 'Внешность', text: 'Широкая фигура, заслоняет звёздное небо. Брови сдвинуты, губы скривлены так, что кажется, его стошнит. Брезгливое выражение.' },
+        { label: 'Манера говорить', text: 'Гневная, презрительная, повелительная. Сразу переходит к угрозе наказания. Не слушает оправданий.' },
+        { label: 'Словечки', text: '«Мерзкий, паршивый паразит», «моих собачек», «заслуженное наказание», «обычная пища будет недоступна».' },
+        { label: 'Роль', text: 'Каратель, хозяин тёмных гончих. Источник сюжетного конфликта: отправляет беса в межмирье.' }
+      ]
+    },
+    human: {
+      title: 'Человек',
+      sections: [
+        { label: 'Внешность', text: 'Лицо, заросшее рыжеватой щетиной. Глаза смотрят с умильной жалостью. Добрый, но не понимает, кого спасает.' },
+        { label: 'Манера говорить', text: 'Ласковая, заботливая, с уменьшительно-ласкательными формами. Суетится, хочет согреть и накормить.' },
+        { label: 'Словечки', text: '«Маленький», «замёрз», «рукавица», «тушёнка», «пойдём до дома».' },
+        { label: 'Роль', text: 'Спаситель в финале. Ирония: кормит тушёнкой того, кто теперь, возможно, не может есть обычную пищу.' }
+      ]
+    },
+    narration: {
+      title: 'Авторский текст',
+      sections: [
+        { label: 'Голос', text: 'От третьего лица, всеведущий. Следит за бесом и комментирует его состояние.' },
+        { label: 'Манера', text: 'Литературная, с иронией и грубоватой конкретикой («давясь и громко чавкая», «раскусывая хрящики»). Периоды длинные, с деталями.' },
+        { label: 'Особенность', text: 'Внутренние мысли беса переданы в кавычках внутри повествования. Контраст высокой лексики («коварность судьбы») и низкой («пузо», «жрать») — основа иронии.' }
+      ]
+    }
+  };
+
+  let activeChar = null;
+  const infoPanel = document.getElementById('infoPanel');
+
+  function applyFilter() {
+    document.querySelectorAll('.block').forEach(b => {
+      b.style.display = (!activeChar || b.dataset.character === activeChar) ? '' : 'none';
+    });
+    document.querySelectorAll('.legend-strip .item[data-char]').forEach(i => {
+      i.classList.toggle('active', i.dataset.char === activeChar);
+    });
+    document.querySelectorAll('.block .avatar').forEach(a => {
+      const b = a.closest('.block');
+      a.classList.toggle('active', !!activeChar && b && b.dataset.character === activeChar);
+    });
+  }
+
+  function updateInfoPanel() {
+    if (!activeChar || !characterInfo[activeChar]) {
+      infoPanel.classList.remove('visible');
+      infoPanel.innerHTML = '';
+      return;
+    }
+    const info = characterInfo[activeChar];
+    let html = `<h3>${info.title}</h3><p class="panel-sub">Сгенерированный портрет</p>`;
+    info.sections.forEach(s => {
+      html += `<div class="info-section"><div class="info-label">${s.label}</div><div class="info-text">${s.text}</div></div>`;
+    });
+    infoPanel.innerHTML = html;
+    infoPanel.classList.add('visible');
+  }
+
+  function selectCharacter(key) {
+    activeChar = (activeChar === key) ? null : key;
+    applyFilter();
+    updateInfoPanel();
+  }
+
+  document.querySelectorAll('.legend-strip .item[data-char]').forEach(item => {
+    item.addEventListener('click', () => selectCharacter(item.dataset.char));
+  });
+
+  document.querySelectorAll('.block').forEach(block => {
+    const av = block.querySelector('.avatar');
+    if (av) av.addEventListener('click', () => selectCharacter(block.dataset.character));
+  });
+
+  // =================== Поиск ===================
+  const searchInput = document.getElementById('searchInput');
+  const searchBtn   = document.getElementById('searchBtn');
+
+  function doSearch() {
+    const q = searchInput.value.trim().toLowerCase();
+    if (!q) return;
+    const blocks = document.querySelectorAll('.block');
+    for (const block of blocks) {
+      if (block.textContent.toLowerCase().includes(q)) {
+        if (block.style.display === 'none') {
+          activeChar = null;
+          applyFilter();
+          updateInfoPanel();
+        }
+        block.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        block.classList.remove('search-hit');
+        void block.offsetWidth;
+        block.classList.add('search-hit');
+        setTimeout(() => block.classList.remove('search-hit'), 3000);
+        return;
+      }
+    }
+    alert('Не найдено: «' + searchInput.value + '»');
+  }
+
+  searchBtn.addEventListener('click', doSearch);
+  searchInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') doSearch();
+    if (e.key === 'Escape') { searchInput.value = ''; searchInput.blur(); }
+  });
+})();
+</script>
+</body>
+</html>

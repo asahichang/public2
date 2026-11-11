@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Логика рассказа Юнги</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    background: radial-gradient(ellipse at top, #1e293b 0%, #0f172a 60%);
+    color: #e2e8f0; min-height: 100vh;
+  }
+
+  /* ==================== ФИКСИРОВАННОЕ МЕНЮ ==================== */
+  .topnav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100; height: 54px;
+    display: flex; align-items: center; gap: 4px;
+    padding: 0 16px;
+    background: rgba(15,23,42,0.94);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 2px 14px rgba(0,0,0,0.45);
+    overflow-x: auto;
+  }
+  .topnav::-webkit-scrollbar { height: 3px; }
+  .topnav::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
+  .topnav button {
+    flex-shrink: 0;
+    padding: 8px 14px;
+    background: transparent;
+    color: #94a3b8;
+    border: none; border-radius: 8px;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: inherit;
+    transition: all .15s;
+    white-space: nowrap;
+  }
+  .topnav button:hover { background: rgba(255,255,255,0.06); color: #cbd5e1; }
+  .topnav button.active {
+    background: linear-gradient(135deg, rgba(96,165,250,0.22), rgba(94,234,212,0.16));
+    color: #f1f5f9;
+    box-shadow: 0 0 0 1px rgba(96,165,250,0.45);
+  }
+
+  /* ==================== ОСНОВНАЯ ЗОНА ==================== */
+  main {
+    max-width: 1080px; margin: 0 auto;
+    padding: 76px 20px 80px;
+  }
+  .view { display: none; }
+  .view.active { display: block; animation: fadeView .22s ease-out; }
+  @keyframes fadeView {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  /* ==================== Заголовки ==================== */
+  header { margin-bottom: 24px; }
+  h1 {
+    font-size: 30px; font-weight: 800; margin: 0 0 6px;
+    letter-spacing: -0.5px;
+    background: linear-gradient(90deg, #60a5fa 0%, #5eead4 60%, #a78bfa 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .subtitle { color: #94a3b8; font-size: 15px; margin: 0; }
+  h2 {
+    font-size: 21px; margin: 0 0 18px; color: #f1f5f9;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    display: flex; align-items: center; gap: 10px;
+  }
+  h2 .h2-icon { font-size: 20px; }
+
+  /* ==================== ТАЙМБАР ==================== */
+  .top-timeline { margin: 26px 0 30px; padding: 0 4px; }
+  .tl-track {
+    display: flex; height: 36px; border-radius: 8px; overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+  .tl-segment {
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; letter-spacing: 1.2px;
+    text-transform: uppercase; color: #cbd5e1;
+    border-right: 1px solid rgba(0,0,0,0.3);
+  }
+  .tl-segment:last-child { border-right: none; }
+  .tl-markers {
+    display: flex; justify-content: space-between;
+    margin-top: 6px; font-size: 11px;
+    color: #64748b; font-weight: 600; letter-spacing: 0.5px;
+  }
+
+  /* ==================== ЛЕГЕНДА СХЕМЫ ==================== */
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 10px 22px;
+    padding: 14px 18px; background: rgba(255,255,255,0.03);
+    border-radius: 10px; margin-bottom: 30px;
+    border: 1px solid rgba(255,255,255,0.08);
+    font-size: 12px; color: #cbd5e1;
+  }
+  .legend .grp { display: flex; flex-wrap: wrap; gap: 10px 16px; flex: 1 1 100%; }
+  .legend .grp + .grp { padding-top: 10px; border-top: 1px dashed rgba(255,255,255,0.06); }
+  .legend .lbl {
+    font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px;
+    color: #64748b; font-weight: 800; flex: 1 1 100%; margin-bottom: 2px;
+  }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend i {
+    width: 9px; height: 9px; border-radius: 50%; display: inline-block;
+  }
+  .legend .ico {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 15px; height: 15px; border-radius: 50%;
+    font-size: 9px; font-weight: 900; color: #fff;
+  }
+  .ico.logic { background: #EF4444; }
+  .ico.style { background: #F59E0B; }
+  .ico.fact  { background: #3B82F6; }
+  .ico.minor { background: #64748b; }
+
+  /* ==================== ДИАГРАММА ==================== */
+  .diagram-wrap {
+    overflow-x: auto; margin: 0 -10px 40px;
+    padding: 20px 10px 10px;
+  }
+  .canvas {
+    position: relative; min-width: 720px;
+    padding: 10px 20px 20px;
+  }
+  .lines {
+    position: absolute; top: 0; left: 0;
+    pointer-events: none; z-index: 1; overflow: visible;
+  }
+  .row {
+    display: flex; justify-content: center; align-items: stretch;
+    gap: 60px; margin: 64px 0;
+    position: relative; z-index: 2;
+  }
+  .row:first-child { margin-top: 0; }
+  .row:last-child  { margin-bottom: 0; }
+  .row-duo { gap: 90px; }
+
+  .node {
+    background: linear-gradient(135deg, rgba(30,41,59,0.92), rgba(15,23,42,0.92));
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 12px 16px 12px 12px;
+    display: flex; gap: 12px; align-items: flex-start;
+    position: relative; min-width: 240px; max-width: 320px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.35);
+    backdrop-filter: blur(6px);
+    transition: transform .15s, box-shadow .15s;
+  }
+  .node:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.45); }
+  .node[data-type="fact"]        { border-color: rgba(59,130,246,0.55); }
+  .node[data-type="lost"]        { border-color: rgba(139,92,246,0.55); }
+  .node[data-type="evidence"]    { border-color: rgba(20,184,166,0.55); }
+  .node[data-type="speculation"] { border-color: rgba(245,158,11,0.55); }
+  .node[data-type="science"]     { border-color: rgba(16,185,129,0.55); }
+  .node[data-type="silence"]     { border-color: rgba(100,116,139,0.55); }
+  .node[data-type="classified"]  { border-color: rgba(239,68,68,0.55); }
+  .node[data-type="hero"]        { border-color: rgba(20,184,166,0.55); }
+  .node.dead-end {
+    opacity: 0.65;
+    background: linear-gradient(135deg, rgba(30,20,40,0.92), rgba(20,15,30,0.92));
+  }
+  .node.dead-end::after {
+    content: '';
+    position: absolute; inset: 0; border-radius: 12px;
+    background: repeating-linear-gradient(45deg, transparent, transparent 8px,
+      rgba(255,255,255,0.02) 8px, rgba(255,255,255,0.02) 10px);
+    pointer-events: none;
+  }
+  .node-icon {
+    font-size: 26px; line-height: 1; flex-shrink: 0;
+    width: 42px; height: 42px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255,255,255,0.05); border-radius: 10px;
+  }
+  .node-body { flex: 1; min-width: 0; }
+  .node-year {
+    font-size: 10px; font-weight: 800; letter-spacing: 1.2px;
+    text-transform: uppercase; color: #94a3b8; margin-bottom: 3px;
+  }
+  .node-title {
+    font-size: 15px; font-weight: 700; color: #f1f5f9;
+    margin-bottom: 3px; line-height: 1.25;
+  }
+  .node-desc { font-size: 12.5px; color: #94a3b8; line-height: 1.45; }
+
+  /* ==================== БЕЙДЖИ ОШИБОК ==================== */
+  .err-badge {
+    position: absolute; top: -8px; right: -8px;
+    width: 26px; height: 26px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 900; color: #fff;
+    cursor: pointer; border: 2px solid #0f172a;
+    z-index: 3; transition: transform .15s;
+  }
+  .err-badge:hover { transform: scale(1.15); }
+  .err-badge.logic { background: #dc2626; animation: pulseRed 2s ease-in-out infinite; }
+  .err-badge.style { background: #d97706; animation: pulseAmber 2.5s ease-in-out infinite; }
+  .err-badge.fact  { background: #2563eb; animation: pulseBlue 2.5s ease-in-out infinite; }
+  .err-badge.minor { background: #475569; }
+  @keyframes pulseRed {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(220,38,38,0.7); }
+    50%      { box-shadow: 0 0 0 8px rgba(220,38,38,0); }
+  }
+  @keyframes pulseAmber {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(217,119,6,0.7); }
+    50%      { box-shadow: 0 0 0 8px rgba(217,119,6,0); }
+  }
+  @keyframes pulseBlue {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(37,99,235,0.7); }
+    50%      { box-shadow: 0 0 0 8px rgba(37,99,235,0); }
+  }
+  .dead-end-label {
+    position: absolute; bottom: -28px; left: 50%; transform: translateX(-50%);
+    font-size: 10px; font-weight: 700; color: #a78bfa;
+    text-transform: uppercase; letter-spacing: 1px; white-space: nowrap;
+  }
+
+  /* ==================== МОДАЛКА ==================== */
+  .modal-backdrop {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(2,6,23,0.85);
+    backdrop-filter: blur(4px);
+    display: none; align-items: center; justify-content: center;
+    padding: 20px; animation: fadeIn .2s;
+  }
+  .modal-backdrop.open { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal {
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 16px;
+    max-width: 560px; width: 100%;
+    max-height: 90vh; overflow-y: auto;
+    padding: 24px 26px; position: relative;
+    animation: slideUp .25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px) scale(0.98); }
+    to   { opacity: 1; transform: none; }
+  }
+  .modal-close {
+    position: absolute; top: 12px; right: 12px;
+    width: 32px; height: 32px; border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    border: none; color: #cbd5e1;
+    font-size: 18px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .15s;
+  }
+  .modal-close:hover { background: rgba(255,255,255,0.18); }
+  .modal-type {
+    display: inline-block; padding: 3px 10px; border-radius: 12px;
+    font-size: 10px; font-weight: 800; letter-spacing: 1.2px;
+    text-transform: uppercase; color: #fff; margin-bottom: 10px;
+  }
+  .modal-type.logic { background: #dc2626; }
+  .modal-type.style { background: #d97706; }
+  .modal-type.fact  { background: #2563eb; }
+  .modal-type.minor { background: #475569; }
+  .modal h3 { margin: 0 0 4px; font-size: 20px; color: #f1f5f9; }
+  .modal .modal-node { font-size: 12px; color: #64748b; margin-bottom: 18px; }
+  .modal .m-section { margin-bottom: 16px; }
+  .modal .m-section:last-child { margin-bottom: 0; }
+  .modal .m-label {
+    font-size: 10px; font-weight: 800; letter-spacing: 1.5px;
+    text-transform: uppercase; color: #94a3b8; margin-bottom: 6px;
+  }
+  .modal .m-problem { color: #fca5a5; line-height: 1.6; font-size: 14px; }
+  .modal .m-fix     { color: #86efac; line-height: 1.6; font-size: 14px; }
+  .modal code {
+    background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size: 12px; color: #fbbf24;
+  }
+
+  /* ==================== ТЕКСТ РАССКАЗА ==================== */
+  .story-text {
+    background: rgba(30,41,59,0.5);
+    border-radius: 12px;
+    padding: 22px 26px;
+    border: 1px solid rgba(255,255,255,0.08);
+    font-size: 15px;
+    line-height: 1.75;
+    color: #cbd5e1;
+  }
+  .story-text p { margin: 0 0 14px; }
+  .story-text p:last-child { margin-bottom: 0; }
+  .story-text em { color: #94a3b8; font-style: italic; }
+
+  /* ==================== ХАЙЛАЙТЫ В АНАЛИЗЕ ==================== */
+  .hint {
+    color: #94a3b8; font-size: 14px;
+    margin: 0 0 16px; padding: 10px 14px;
+    background: rgba(96,165,250,0.08);
+    border-left: 3px solid #60a5fa;
+    border-radius: 0 6px 6px 0;
+  }
+  .analysis-legend {
+    display: flex; flex-wrap: wrap; gap: 10px 18px;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.06);
+    margin-bottom: 18px;
+    font-size: 12px; color: #cbd5e1;
+  }
+  .analysis-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .analysis-legend i {
+    width: 10px; height: 14px; border-radius: 3px;
+    display: inline-block; border-bottom: 2px solid;
+  }
+  .analysis-legend i.logic { background: rgba(239,68,68,0.25); border-color: #EF4444; }
+  .analysis-legend i.style { background: rgba(245,158,11,0.25); border-color: #F59E0B; }
+  .analysis-legend i.fact  { background: rgba(59,130,246,0.25); border-color: #3B82F6; }
+  .analysis-legend i.minor { background: rgba(100,116,139,0.3); border-color: #64748b; }
+
+  .mark {
+    cursor: pointer;
+    border-bottom: 2px solid;
+    padding: 1px 3px;
+    border-radius: 3px;
+    transition: filter .12s, box-shadow .12s;
+    position: relative;
+  }
+  .mark:hover { filter: brightness(1.25); }
+  .mark.logic { background: rgba(239,68,68,0.18); border-color: #EF4444; color: #fca5a5; }
+  .mark.style { background: rgba(245,158,11,0.18); border-color: #F59E0B; color: #fbbf24; }
+  .mark.fact  { background: rgba(59,130,246,0.18); border-color: #3B82F6; color: #93c5fd; }
+  .mark.minor { background: rgba(100,116,139,0.22); border-color: #64748b; color: #cbd5e1; }
+
+  /* ==================== ПРОФИЛЬ ==================== */
+  .profile-header {
+    display: flex; gap: 20px; align-items: center;
+    padding: 20px 22px; margin-bottom: 18px;
+    background: linear-gradient(135deg, rgba(30,41,59,0.8), rgba(15,23,42,0.8));
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+  }
+  .profile-avatar {
+    width: 84px; height: 84px; flex-shrink: 0;
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px rgba(96,165,250,0.3), 0 8px 24px rgba(0,0,0,0.4);
+    overflow: hidden;
+  }
+  .profile-avatar svg { width: 100%; height: 100%; display: block; }
+  .profile-header h3 { margin: 0 0 4px; font-size: 18px; color: #f1f5f9; }
+  .profile-header p { margin: 0; font-size: 13.5px; color: #94a3b8; line-height: 1.5; }
+  .profile-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .profile-tags span {
+    padding: 3px 9px; border-radius: 10px;
+    background: rgba(96,165,250,0.15); color: #93c5fd;
+    font-size: 11px; font-weight: 600;
+  }
+  .profile-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 14px;
+  }
+  .p-card {
+    background: rgba(30,41,59,0.65);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px; padding: 16px 18px;
+  }
+  .p-card h4 {
+    margin: 0 0 10px; font-size: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .p-card h4 .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .p-card ul { margin: 0; padding-left: 18px; font-size: 13px; color: #cbd5e1; line-height: 1.6; }
+  .p-card li { margin-bottom: 5px; }
+  .p-card li:last-child { margin-bottom: 0; }
+  .p-card em { color: #fbbf24; font-style: normal; }
+
+  /* ==================== ДО/ПОСЛЕ ==================== */
+  .ba-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .ba-card {
+    background: rgba(30,41,59,0.65);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px; padding: 16px 18px;
+  }
+  .ba-card.before { border-left: 3px solid #EF4444; }
+  .ba-card.after  { border-left: 3px solid #10B981; }
+  .ba-card h5 {
+    margin: 0 0 8px; font-size: 10px; font-weight: 800;
+    letter-spacing: 1.5px; text-transform: uppercase; color: #94a3b8;
+  }
+  .ba-card.before h5 { color: #fca5a5; }
+  .ba-card.after h5  { color: #86efac; }
+  .ba-card p { margin: 0 0 8px; font-size: 13.5px; line-height: 1.55; color: #cbd5e1; }
+  .ba-card p:last-child { margin-bottom: 0; }
+  .ba-card em { color: #fbbf24; font-style: normal; }
+  .ba-card .why { font-size: 12px; color: #94a3b8; font-style: italic; }
+
+  /* ==================== ЧТО НЕ ТРОГАТЬ ==================== */
+  .dont-touch {
+    background: rgba(16,185,129,0.06);
+    border: 1px solid rgba(16,185,129,0.3);
+    border-radius: 12px; padding: 18px 22px;
+  }
+  .dont-touch h3 { margin: 0 0 12px; font-size: 16px; color: #34d399; }
+  .dont-touch ul { margin: 0; padding-left: 20px; font-size: 13.5px; color: #cbd5e1; line-height: 1.7; }
+  .dont-touch code {
+    background: rgba(0,0,0,0.35); padding: 2px 6px; border-radius: 4px;
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size: 12px; color: #fbbf24;
+  }
+
+  @media (max-width: 680px) {
+    main { padding: 72px 12px 60px; }
+    h1 { font-size: 22px; }
+    .row, .row-duo { gap: 30px; }
+    .ba-grid { grid-template-columns: 1fr; }
+    .profile-header { flex-direction: column; text-align: center; }
+    .profile-tags { justify-content: center; }
+    .topnav { padding: 0 8px; }
+    .topnav button { padding: 8px 10px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== МЕНЮ ==================== -->
+<nav class="topnav" id="topnav">
+  <button class="active" data-view="schema">Схема</button>
+  <button data-view="source">Исходный текст</button>
+  <button data-view="analysis">Анализ текста</button>
+  <button data-view="profile">Профиль героя</button>
+  <button data-view="edits">Ключевые правки</button>
+  <button data-view="keep">Что не трогать</button>
+</nav>
+
+<main>
+
+  <!-- ==================== VIEW: СХЕМА ==================== -->
+  <section class="view active" id="view-schema">
+    <header>
+      <h1>Логика рассказа Юнги</h1>
+      <p class="subtitle">История «Фобос-2» — от запуска до архивов Ильи Леонова</p>
+    </header>
+
+    <div class="top-timeline">
+      <div class="tl-track">
+        <div class="tl-segment" style="flex:14; background: linear-gradient(90deg, rgba(59,130,246,0.45), rgba(139,92,246,0.45));">Советская эпоха</div>
+        <div class="tl-segment" style="flex:51; background: linear-gradient(90deg, rgba(100,116,139,0.3), rgba(100,116,139,0.12));">Забвение</div>
+        <div class="tl-segment" style="flex:35; background: linear-gradient(90deg, rgba(20,184,166,0.3), rgba(20,184,166,0.55));">Современность</div>
+      </div>
+      <div class="tl-markers">
+        <span>1988</span><span>1989</span><span>2026</span><span>2050</span>
+      </div>
+    </div>
+
+    <div class="legend">
+      <div class="grp">
+        <span class="lbl">Типы узлов</span>
+        <span><i style="background:#3B82F6"></i>Факт</span>
+        <span><i style="background:#8B5CF6"></i>Потеря / тайна</span>
+        <span><i style="background:#14B8A6"></i>Улика / герой</span>
+        <span><i style="background:#F59E0B"></i>Слух / версия</span>
+        <span><i style="background:#10B981"></i>Наука</span>
+        <span><i style="background:#64748b"></i>Забвение</span>
+        <span><i style="background:#EF4444"></i>Засекречено</span>
+      </div>
+      <div class="grp">
+        <span class="lbl">Маркеры правок (кликните)</span>
+        <span><span class="ico logic">!</span>Логическая дыра</span>
+        <span><span class="ico style">~</span>Стиль</span>
+        <span><span class="ico fact">i</span>Факт</span>
+        <span><span class="ico minor">·</span>Мелкое</span>
+      </div>
+    </div>
+
+    <div class="diagram-wrap">
+      <div class="canvas" id="canvas">
+        <svg class="lines" id="lines"></svg>
+
+        <div class="row">
+          <div class="node" data-id="launch" data-type="fact">
+            <div class="node-icon">🚀</div>
+            <div class="node-body">
+              <div class="node-year">12 июля 1988</div>
+              <div class="node-title">Запуск двух станций</div>
+              <div class="node-desc">СССР запускает «Фобос-1» и «Фобос-2» к Марсу</div>
+            </div>
+            <span class="err-badge fact" data-err="e1" title="Фактическая неточность">i</span>
+          </div>
+        </div>
+
+        <div class="row row-duo">
+          <div class="node dead-end" data-id="phobos1" data-type="lost">
+            <div class="node-icon">💫</div>
+            <div class="node-body">
+              <div class="node-year">Потерян</div>
+              <div class="node-title">«Фобос-1»</div>
+              <div class="node-desc">Гелиоцентрическая орбита. Поиски безуспешны.</div>
+            </div>
+            <div class="dead-end-label">обрывается</div>
+          </div>
+          <div class="node" data-id="phobos2" data-type="fact">
+            <div class="node-icon">🛰️</div>
+            <div class="node-body">
+              <div class="node-year">29 января 1989</div>
+              <div class="node-title">«Фобос-2»</div>
+              <div class="node-desc">Вышел на орбиту Марса</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="node" data-id="failure" data-type="evidence">
+            <div class="node-icon">📷</div>
+            <div class="node-body">
+              <div class="node-year">1989</div>
+              <div class="node-title">Отказ + последнее фото</div>
+              <div class="node-desc">Веретенообразный объект на фоне Марса</div>
+            </div>
+            <span class="err-badge minor" data-err="e3" title="Мелкая шероховатость">·</span>
+          </div>
+        </div>
+
+        <div class="row row-duo">
+          <div class="node" data-id="ufo" data-type="speculation">
+            <div class="node-icon">👽</div>
+            <div class="node-body">
+              <div class="node-year">Слухи</div>
+              <div class="node-title">НЛО</div>
+              <div class="node-desc">Американцы повторяли это ещё десятилетиями</div>
+            </div>
+            <span class="err-badge style" data-err="e2" title="Формулировка">~</span>
+          </div>
+          <div class="node" data-id="martian" data-type="speculation">
+            <div class="node-icon">🔴</div>
+            <div class="node-body">
+              <div class="node-year">Слухи</div>
+              <div class="node-title">Марсианский корабль</div>
+              <div class="node-desc">Тень от корабля, который сбил аппарат</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="node" data-id="science" data-type="science">
+            <div class="node-icon">🔬</div>
+            <div class="node-body">
+              <div class="node-year">Позднее</div>
+              <div class="node-title">Тень Фобоса</div>
+              <div class="node-desc">Медленная камера + быстрый спутник</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="node" data-id="silence" data-type="silence">
+            <div class="node-icon">💤</div>
+            <div class="node-body">
+              <div class="node-year">~30 лет</div>
+              <div class="node-title">Забвение</div>
+              <div class="node-desc">Историю почти забыли</div>
+            </div>
+            <span class="err-badge logic" data-err="e4" title="Логическая дыра">!</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="node" data-id="year2026" data-type="classified">
+            <div class="node-icon">🤖</div>
+            <div class="node-body">
+              <div class="node-year">2026</div>
+              <div class="node-title">ИИ сомневается</div>
+              <div class="node-desc">Общественность засомневалась в подлинности фото</div>
+            </div>
+            <span class="err-badge logic" data-err="e5" title="Логическая дыра">!</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="node" data-id="fsb" data-type="classified">
+            <div class="node-icon">🔒</div>
+            <div class="node-body">
+              <div class="node-year">2026</div>
+              <div class="node-title">ФСБ засекретило</div>
+              <div class="node-desc">Доступ в архивы никто не получил</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="node" data-id="leonov" data-type="hero">
+            <div class="node-icon">🎞️</div>
+            <div class="node-body">
+              <div class="node-year">2032–2050</div>
+              <div class="node-title">Илья Леонов</div>
+              <div class="node-desc">Архивные записи. Аудио перевёл Юнга.</div>
+            </div>
+            <span class="err-badge logic" data-err="e6" title="Логическая дыра">!</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== VIEW: ИСХОДНЫЙ ТЕКСТ ==================== -->
+  <section class="view" id="view-source">
+    <h2><span class="h2-icon">📄</span>Исходный текст</h2>
+    <div class="story-text">
+      <p>– 12 июля 1988 года Советский Союз запустил к Марсу две автоматические станции «Фобос-1» и «Фобос-2», – начал Юнга и вывел на большой экран архивные записи.</p>
+      <p>– 29 января 1989 года только один из них, «Фобос-2», вышел на орбиту Марса. Второй был потерян по дороге. Считалось, что он вышел на гелиоцентрическую орбиту вокруг Солнца, его пытались найти – но безуспешно. Это как пиксель искать в огромном стоге сена – так кажется земляне выражаются?</p>
+      <p>Он вопросительно посмотрел на меня, я лишь пожал плечами.</p>
+      <p>– Но и «Фобос-2» вышел из строя. Вот последняя фотография, которую он отправил: длинный веретенообразный объект на фоне Марса.</p>
+      <p>Он вывел старую черно-белую фотографию тени на Марсе.</p>
+      <p>– Сразу пошли слухи, что это НЛО (которые к слову пятьдесят лет после этого события ещё распространялись американцами). Некоторые в Советах верили, что это тень от ракеты или корабля марсиан, который и сбил их космический аппарат. Позднее ученые рассчитали и выяснили, что это была просто тень Фобоса на Марсе, а его необычно идеальную форму объяснили особенностями последовательной телевизионной съемки движущегося спутника. Кривоватая, но всё еще почти шарообразная тень Фобоса на последней фотографии сливается в эту длинную сигару из-за этого. Историю забыли почти на 30 лет. В 2026 она всплывает вновь – используя новые технологии искусственного интеллекта общественность засомневалась в подлинности фотографии. Однако ФСБ засекретило информацию и доступ в архивы так никто и не получил. Историю быстро забыли. А сейчас я вам покажу архивные видео. Был один человек, который пытался разобраться.</p>
+      <p>На экране появилась старая плоская картинка 8K из архивов 2050 года.</p>
+      <p>– Знакомьтесь, это Илья Леонов. В архивах доступны его записи в период 2032-2050 годы. Записи короткие – они тогда все были помешаны на этих коротышках-видео. Аудио-дорожка переведена мной лично.</p>
+    </div>
+  </section>
+
+  <!-- ==================== VIEW: АНАЛИЗ ТЕКСТА ==================== -->
+  <section class="view" id="view-analysis">
+    <h2><span class="h2-icon">🔍</span>Анализ текста</h2>
+    <p class="hint">Те же маркеры, что и на схеме. Кликните по подсвеченному фрагменту, чтобы увидеть проблему и предложение по правке.</p>
+
+    <div class="analysis-legend">
+      <span><i class="logic"></i>Логика</span>
+      <span><i class="style"></i>Стиль</span>
+      <span><i class="fact"></i>Факт</span>
+      <span><i class="minor"></i>Мелкое</span>
+    </div>
+
+    <div class="story-text">
+      <p>– <span class="mark fact" data-err="e1">12 июля 1988 года Советский Союз запустил к Марсу две автоматические станции «Фобос-1» и «Фобос-2»</span>, – начал Юнга и вывел на большой экран архивные записи.</p>
+      <p>– 29 января 1989 года только один из них, «Фобос-2», вышел на орбиту Марса. Второй был потерян по дороге. <span class="mark style" data-err="s1">Считалось, что он вышел на гелиоцентрическую орбиту вокруг Солнца, его пытались найти – но безуспешно.</span> Это как пиксель искать в огромном стоге сена – так кажется земляне выражаются?</p>
+      <p>Он вопросительно посмотрел на меня, я лишь пожал плечами.</p>
+      <p>– Но и «Фобос-2» вышел из строя. Вот последняя фотография, которую он отправил: длинный веретенообразный объект на фоне Марса.</p>
+      <p>Он вывел старую черно-белую фотографию тени на Марсе.</p>
+      <p>– <span class="mark style" data-err="e2">Сразу пошли слухи, что это НЛО (которые к слову пятьдесят лет после этого события ещё распространялись американцами). Некоторые в Советах верили, что это тень от ракеты или корабля марсиан, который и сбил их космический аппарат.</span> Позднее ученые рассчитали и выяснили, что это была просто тень Фобоса на Марсе, а его необычно идеальную форму объяснили особенностями последовательной телевизионной съемки движущегося спутника. <span class="mark minor" data-err="e3">Кривоватая, но всё еще почти шарообразная тень Фобоса на последней фотографии сливается в эту длинную сигару из-за этого.</span> <span class="mark logic" data-err="e4">Историю забыли почти на 30 лет.</span> В 2026 она всплывает вновь – используя новые технологии искусственного интеллекта общественность засомневалась в подлинности фотографии. <span class="mark logic" data-err="e5">Однако ФСБ засекретило информацию и доступ в архивы так никто и не получил.</span> Историю быстро забыли. <span class="mark logic" data-err="e6">А сейчас я вам покажу архивные видео.</span> Был один человек, который пытался разобраться.</p>
+      <p>На экране появилась старая <span class="mark minor" data-err="e7">плоская картинка 8K</span> из архивов 2050 года.</p>
+      <p>– Знакомьтесь, это Илья Леонов. В архивах доступны его записи в период 2032-2050 годы. Записи короткие – они тогда все были помешаны на этих коротышках-видео. Аудио-дорожка переведена мной лично.</p>
+    </div>
+  </section>
+
+  <!-- ==================== VIEW: ПРОФИЛЬ ГЕРОЯ ==================== -->
+  <section class="view" id="view-profile">
+    <h2><span class="h2-icon">👤</span>Профиль героя — Юнга</h2>
+
+    <div class="profile-header">
+      <div class="profile-avatar">
+        <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="30" cy="30" r="30" fill="#FFE066"/>
+          <circle cx="30" cy="28" r="13" fill="#FFE0B2"/>
+          <path d="M17 24 Q30 10 43 24 L43 28 Q30 24 17 28 Z" fill="#5D4037"/>
+          <rect x="20" y="48" width="20" height="12" fill="#1976D2" rx="2"/>
+          <circle cx="26" cy="27" r="1.5" fill="#000"/>
+          <circle cx="34" cy="27" r="1.5" fill="#000"/>
+          <path d="M26 33 Q30 36 34 33" stroke="#000" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+          <rect x="14" y="24" width="4" height="10" fill="#D32F2F" rx="1"/>
+          <rect x="42" y="24" width="4" height="10" fill="#D32F2F" rx="1"/>
+        </svg>
+      </div>
+      <div>
+        <h3>Косплей-подросток + квантовый ИИ</h3>
+        <p>Говорит так, будто его русский — английский, прогнанный через автопереводчика. Сыплет сленгом 2020-х из обучающей выборки. Стримит свою жизнь. Выучил идиомы, но не чувствует их нутром.</p>
+        <div class="profile-tags">
+          <span>chat</span><span>fr fr</span><span>based</span><span>bet</span>
+          <span>literally</span><span>lowkey</span><span>no cap</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-grid">
+      <div class="p-card">
+        <h4><span class="dot" style="background:#60a5fa"></span>Слой сленга</h4>
+        <ul>
+          <li><strong>Кальки:</strong> «я literally…», «lowkey», «no cap», «hits different».</li>
+          <li><strong>Маркеры:</strong> «fr fr», «based», «bet», «sus» — пачками, без меры.</li>
+          <li><strong>Повторы:</strong> «реально-реально», «честно-честно» — калька «fr fr».</li>
+          <li><strong>Чат:</strong> «chat, подтвердите», «chat, я прав?» — не к читателю, а к рубке.</li>
+        </ul>
+      </div>
+      <div class="p-card">
+        <h4><span class="dot" style="background:#a78bfa"></span>ИИ-теллы</h4>
+        <ul>
+          <li>Проверяет идиомы: <em>«так земляне выражаются?»</em> → пауза → <em>«Запишу»</em>.</li>
+          <li>Сам себя поправляет: <em>«12 июля… хотя нет, 7-го. У вас в вики ошибка»</em>.</li>
+          <li>Описывает эмоции как данные: <em>«должен чувствовать. Отмечаю как баг»</em>.</li>
+          <li>Переходит на третье лицо при перегреве: <em>«Юнга нашёл raw!»</em> → <em>«то есть я. Сбой»</em>.</li>
+        </ul>
+      </div>
+      <div class="p-card">
+        <h4><span class="dot" style="background:#34d399"></span>Один момент без сленга</h4>
+        <ul>
+          <li>Когда речь заходит про 2026-й и ИИ — сленг <strong>пропадает</strong>. Речь точная, почти холодная.</li>
+          <li>Это страшнее любого «fr fr»: под маской подростка — что-то, что умеет быть очень серьёзным.</li>
+          <li>Маска — это выбор, а не суть. Один такой момент делает всю сцену.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== VIEW: КЛЮЧЕВЫЕ ПРАВКИ ==================== -->
+  <section class="view" id="view-edits">
+    <h2><span class="h2-icon">🔧</span>Ключевые правки</h2>
+
+    <div class="ba-grid">
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>– 29 января 1989 года только один из них, «Фобос-2», вышел на орбиту Марса… Это как пиксель искать в огромном стоге сена – так кажется земляне выражаются?</p>
+        <p>Он вопросительно посмотрел на меня, я лишь пожал плечами.</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>– 29 января 1989-го на орбиту Марса вышел только «Фобос-2»… Это как… <em>как искать пиксель в стоге сена?</em> Так вы, земляне, говорите, да? Chat, подтвердите.</p>
+        <p><em>— Ладно, — сказал он. — Значит, не совсем. Запишу.</em></p>
+        <p class="why">+ ИИ-телл: проверяет идиому и обновляет модель.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>– Сразу пошли слухи, что это НЛО (которые к слову пятьдесят лет после этого события ещё распространялись американцами).</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>– Сразу пошли слухи. НЛО. <em>— Он закатил глаза. —</em> Американцы ещё десятилетиями это повторяли. Официально забыли, а в интернете… chat, вы же знаете: интернет ничего не забывает.</p>
+        <p class="why">+ Убрана привязка «50 лет» к 2039, обыграно через характер.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>– А сейчас я вам покажу архивные видео. Был один человек, который пытался разобраться.</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>– А сейчас… <em>— он сделал паузу, как стример перед дропом, —</em> сейчас я вам покажу то, чего у меня официально нет. ФСБ засекретило? Ну да. А я, chat, квантовый. У меня и неофициально есть. Был один человек… Зовут Илья Леонов.</p>
+        <p class="why">+ Дыра «засекречено, но показывает» превращена в фичу.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>– В 2026 она всплывает вновь – используя новые технологии искусственного интеллекта общественность засомневалась в подлинности фотографии.</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>– В 2026-м она всплывает снова. И вот тут… <em>— он вдруг стал серьёзным, без сленга, —</em> тут уже ИИ. Такие, как я. Мы задали вопросы. Много вопросов. И знаете… иногда мне кажется, что я помню тот день. Хотя не должен.</p>
+        <p class="why">+ Личная мотивация + жуть + оправдание сомнения в фото.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== VIEW: ЧТО НЕ ТРОГАТЬ ==================== -->
+  <section class="view" id="view-keep">
+    <h2><span class="h2-icon">✓</span>Что не трогать</h2>
+    <div class="dont-touch">
+      <h3>Работает как есть</h3>
+      <ul>
+        <li><strong>«Пиксель в стоге сена»</strong> — идеально. Не трогать.</li>
+        <li><strong>«Чат, внимание! Юнга нашёл истинный raw!»</strong> — лучший телл: третье лицо + английский при перегреве.</li>
+        <li><strong>«Это based! Находка! Это bet.»</strong> — именно так ИИ, выучивший сленг по тиктоку, и говорит: маркеры пачками, без меры.</li>
+        <li><strong><code>Fr fr</code> от Лиса</strong> — смешно: фамильяр подхватывает за хозяином. Показывает, что Юнга его научил.</li>
+        <li><strong>Вопрос про «так земляне выражаются?»</strong> — оставить, докрутить паузой и записью в модель.</li>
+      </ul>
+    </div>
+  </section>
+
+</main>
+
+<!-- ==================== МОДАЛКА ==================== -->
+<div class="modal-backdrop" id="modal">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<script>
+(function () {
+  // ===================== Данные ошибок =====================
+  const errors = {
+    e1: {
+      type: 'fact', label: 'Фактическая неточность',
+      node: '12 июля 1988 — Запуск двух станций',
+      problem: '12 июля запущен только «Фобос-2». «Фобос-1» стартовал 7 июля 1988. Фраза «запустил две» в этот день — фактическая неточность.',
+      fix: 'Развести даты или обыграть как ИИ-педантизм Юнги: <code>«12 июля 1988-го. Хотя, поправка: „Фобос-1“ — 7-го. У вас в вики ошибка, chat»</code>.'
+    },
+    e2: {
+      type: 'style', label: 'Стиль / формулировка',
+      node: 'Слухи — НЛО и Марсианский корабль',
+      problem: 'Двусмысленность: «тень от ракеты или корабля марсиан, <em>который</em> сбил» — «который» может относиться и к тени, и к кораблю. Плюс «50 лет» не бьётся с «забыли после 2026».',
+      fix: 'Развести: <code>«Тень от марсианского корабля — того, что сбил аппарат»</code>. Про 50 лет: <code>«американцы ещё десятилетиями это повторяли — уже когда архивы были закрыты»</code>.'
+    },
+    e3: {
+      type: 'minor', label: 'Мелкое',
+      node: 'Отказ + последнее фото — Тень Фобоса',
+      problem: '«Кривоватая, но почти шарообразная тень… сливается в сигару» — образ сбивает: как шар «сливается» в сигару? Смысл верный, формулировка противоречивая.',
+      fix: '<code>«Камера сканировала построчно, а спутник двигался — тень „растянулась“. Не НЛО. Медленная камера и быстрый спутник»</code>.'
+    },
+    e4: {
+      type: 'logic', label: 'Логическая дыра',
+      node: '~30 лет — Забвение',
+      problem: '1989 + 30 ≈ 2019, а «всплывает» в 2026. Если считать от научного объяснения (середина 90-х) — сходится, но текст не уточняет, когда оно было.',
+      fix: 'Либо убрать цифру: <code>«историю забыли»</code>, либо привязать: <code>«почти тридцать лет после объяснения»</code>.'
+    },
+    e5: {
+      type: 'logic', label: 'Логическая дыра',
+      node: '2026 — ИИ сомневается',
+      problem: 'Зачем ИИ сомневаться в подлинности фото, если наука уже объяснила тень Фобоса? В чём сомнение — в подлинности снимка или в объяснении?',
+      fix: 'Обыграть через характер: <code>«В 2026-м она всплывает снова. Тут уже ИИ. Такие, как я. Мы задали вопросы. Много вопросов»</code> + добавить личную мотивацию: <code>«Иногда мне кажется, я помню тот день. Хотя не должен»</code>.'
+    },
+    e6: {
+      type: 'logic', label: 'Логическая дыра',
+      node: 'Противоречие: ФСБ vs. Юнга',
+      problem: 'ФСБ засекретило архивы, доступ никто не получил — но через две фразы Юнга показывает архивные видео. Прямое противоречие.',
+      fix: 'Обыграть через характер: <code>«ФСБ засекретило. Ну, почти. Я же квантовый. У меня и неофициально есть»</code> + <code>«Официально этого нет. Но я не очень официальный»</code>.'
+    },
+    e7: {
+      type: 'minor', label: 'Мелкое',
+      node: 'Архив 2050 — 8K',
+      problem: '8K — это разрешение, а не тип изображения. «Плоская картинка 8K» — смешение категорий.',
+      fix: '<code>«старая плоская запись»</code> или <code>«архивное видео в высоком разрешении»</code>.'
+    },
+    s1: {
+      type: 'style', label: 'Стиль / формулировка',
+      node: '«Фобос-1» — гелиоцентрическая орбита',
+      problem: 'Громоздкая фраза: два придаточных через запятую без союза.',
+      fix: '<code>«Считалось, что он ушёл на гелиоцентрическую — вокруг Солнца. Искали. Не нашли»</code>.'
+    }
+  };
+
+  // ===================== Переключение видов =====================
+  const views = document.querySelectorAll('.view');
+  const navBtns = document.querySelectorAll('.topnav button');
+
+  function switchView(name) {
+    views.forEach(v => v.classList.toggle('active', v.id === 'view-' + name));
+    navBtns.forEach(b => b.classList.toggle('active', b.dataset.view === name));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (name === 'schema') requestAnimationFrame(draw);
+  }
+  navBtns.forEach(b => b.addEventListener('click', () => switchView(b.dataset.view)));
+
+  // ===================== Модалка =====================
+  const modal = document.getElementById('modal');
+  const modalContent = document.getElementById('modalContent');
+
+  function openModal(id) {
+    const e = errors[id];
+    if (!e) return;
+    modalContent.innerHTML = `
+      <button class="modal-close" aria-label="Закрыть">✕</button>
+      <span class="modal-type ${e.type}">${e.label}</span>
+      <h3>${e.node}</h3>
+      <div class="modal-node">Ошибка ${id.toUpperCase()}</div>
+      <div class="m-section">
+        <div class="m-label">Проблема</div>
+        <div class="m-problem">${e.problem}</div>
+      </div>
+      <div class="m-section">
+        <div class="m-label">Решение</div>
+        <div class="m-fix">${e.fix}</div>
+      </div>
+    `;
+    modal.classList.add('open');
+    modalContent.querySelector('.modal-close').addEventListener('click', closeModal);
+  }
+  function closeModal() { modal.classList.remove('open'); }
+  modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  // ===================== Клики по ошибкам =====================
+  document.querySelectorAll('[data-err]').forEach(el => {
+    el.addEventListener('click', e => {
+      e.stopPropagation();
+      openModal(el.dataset.err);
+    });
+  });
+
+  // ===================== Рисование линий =====================
+  const canvas = document.getElementById('canvas');
+  const svg = document.getElementById('lines');
+
+  const connections = [
+    { from: 'launch', to: 'phobos1', type: 'lost', dashed: true },
+    { from: 'launch', to: 'phobos2', type: 'fact' },
+    { from: 'phobos2', to: 'failure', type: 'evidence' },
+    { from: 'failure', to: 'ufo', type: 'speculation' },
+    { from: 'failure', to: 'martian', type: 'speculation' },
+    { from: 'ufo', to: 'science', type: 'science' },
+    { from: 'martian', to: 'science', type: 'science' },
+    { from: 'science', to: 'silence', type: 'silence' },
+    { from: 'silence', to: 'year2026', type: 'classified' },
+    { from: 'year2026', to: 'fsb', type: 'classified' },
+    { from: 'fsb', to: 'leonov', type: 'hero' }
+  ];
+
+  const strokeColors = {
+    fact: '#3B82F6', lost: '#8B5CF6', evidence: '#14B8A6',
+    speculation: '#F59E0B', science: '#10B981', silence: '#64748b',
+    classified: '#EF4444', hero: '#14B8A6'
+  };
+
+  function svgEl(name, attrs) {
+    const el = document.createElementNS('http://www.w3.org/2000/svg', name);
+    for (const k in attrs) el.setAttribute(k, attrs[k]);
+    return el;
+  }
+
+  function nodeRect(id) {
+    const el = document.querySelector(`[data-id="${id}"]`);
+    if (!el) return null;
+    const r = el.getBoundingClientRect();
+    const c = canvas.getBoundingClientRect();
+    return {
+      x: r.left - c.left + canvas.scrollLeft,
+      y: r.top - c.top + canvas.scrollTop,
+      w: r.width, h: r.height,
+      cx: r.left - c.left + canvas.scrollLeft + r.width / 2,
+      bottom: r.top - c.top + canvas.scrollTop + r.height,
+      top: r.top - c.top + canvas.scrollTop
+    };
+  }
+
+  function draw() {
+    if (!canvas || !canvas.offsetParent) return;
+    svg.setAttribute('width', canvas.scrollWidth);
+    svg.setAttribute('height', canvas.scrollHeight);
+    svg.innerHTML = '';
+
+    const bySource = {};
+    const byTarget = {};
+    connections.forEach(c => {
+      (bySource[c.from] = bySource[c.from] || []).push(c);
+      (byTarget[c.to] = byTarget[c.to] || []).push(c);
+    });
+
+    connections.forEach(conn => {
+      const from = nodeRect(conn.from);
+      const to = nodeRect(conn.to);
+      if (!from || !to) return;
+
+      const sx = from.cx, sy = from.bottom;
+      const tx = to.cx, ty = to.top;
+      const color = strokeColors[conn.type] || '#475569';
+
+      let d;
+      if (Math.abs(sx - tx) < 2) {
+        d = `M ${sx} ${sy} L ${tx} ${ty}`;
+      } else {
+        const isFork = bySource[conn.from].length > 1;
+        const isMerge = byTarget[conn.to].length > 1;
+        let midY;
+        if (isFork) midY = sy + 22;
+        else if (isMerge) midY = ty - 22;
+        else midY = (sy + ty) / 2;
+        d = `M ${sx} ${sy} L ${sx} ${midY} L ${tx} ${midY} L ${tx} ${ty}`;
+      }
+
+      const path = svgEl('path', {
+        d, fill: 'none', stroke: color,
+        'stroke-width': '2',
+        'stroke-linecap': 'round', 'stroke-linejoin': 'round',
+        opacity: 0.85
+      });
+      if (conn.dashed) path.setAttribute('stroke-dasharray', '6 5');
+      svg.appendChild(path);
+    });
+
+    // Dead-end
+    const ph1 = nodeRect('phobos1');
+    if (ph1) {
+      const x = ph1.cx, y = ph1.bottom, endY = y + 34;
+      const color = '#8B5CF6';
+      svg.appendChild(svgEl('path', {
+        d: `M ${x} ${y} L ${x} ${endY}`,
+        stroke: color, 'stroke-width': 2, 'stroke-dasharray': '4 4',
+        fill: 'none', opacity: 0.6
+      }));
+      const s = 6;
+      svg.appendChild(svgEl('path', {
+        d: `M ${x - s} ${endY - s} L ${x + s} ${endY + s}`,
+        stroke: color, 'stroke-width': 2, fill: 'none', 'stroke-linecap': 'round'
+      }));
+      svg.appendChild(svgEl('path', {
+        d: `M ${x + s} ${endY - s} L ${x - s} ${endY + s}`,
+        stroke: color, 'stroke-width': 2, fill: 'none', 'stroke-linecap': 'round'
+      }));
+    }
+  }
+
+  function redraw() { requestAnimationFrame(draw); }
+  window.addEventListener('load', redraw);
+  window.addEventListener('resize', redraw);
+  redraw();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(redraw);
+})();
+</script>
+</body>
+</html>

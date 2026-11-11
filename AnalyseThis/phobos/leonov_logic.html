@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Логика записей Ильи Леонова</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    background: radial-gradient(ellipse at top, #1e293b 0%, #0f172a 60%);
+    color: #e2e8f0; min-height: 100vh;
+  }
+  .topnav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100; height: 54px;
+    display: flex; align-items: center; gap: 4px;
+    padding: 0 16px;
+    background: rgba(15,23,42,0.94);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 2px 14px rgba(0,0,0,0.45);
+    overflow-x: auto;
+  }
+  .topnav::-webkit-scrollbar { height: 3px; }
+  .topnav::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
+  .topnav button {
+    flex-shrink: 0;
+    padding: 8px 14px;
+    background: transparent;
+    color: #94a3b8;
+    border: none; border-radius: 8px;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: inherit;
+    transition: all .15s;
+    white-space: nowrap;
+  }
+  .topnav button:hover { background: rgba(255,255,255,0.06); color: #cbd5e1; }
+  .topnav button.active {
+    background: linear-gradient(135deg, rgba(96,165,250,0.22), rgba(94,234,212,0.16));
+    color: #f1f5f9;
+    box-shadow: 0 0 0 1px rgba(96,165,250,0.45);
+  }
+  main {
+    max-width: 1080px; margin: 0 auto;
+    padding: 76px 20px 80px;
+  }
+  .view { display: none; }
+  .view.active { display: block; animation: fadeView .22s ease-out; }
+  @keyframes fadeView {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: none; }
+  }
+  header { margin-bottom: 24px; }
+  h1 {
+    font-size: 30px; font-weight: 800; margin: 0 0 6px;
+    letter-spacing: -0.5px;
+    background: linear-gradient(90deg, #60a5fa 0%, #5eead4 60%, #a78bfa 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .subtitle { color: #94a3b8; font-size: 15px; margin: 0; }
+  h2 {
+    font-size: 21px; margin: 0 0 18px; color: #f1f5f9;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    display: flex; align-items: center; gap: 10px;
+  }
+  h2 .h2-icon { font-size: 20px; }
+  .top-timeline { margin: 26px 0 30px; padding: 0 4px; }
+  .tl-track {
+    display: flex; height: 36px; border-radius: 8px; overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+  .tl-segment {
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; letter-spacing: 1.2px;
+    text-transform: uppercase; color: #cbd5e1;
+    border-right: 1px solid rgba(0,0,0,0.3);
+  }
+  .tl-segment:last-child { border-right: none; }
+  .tl-markers {
+    display: flex; justify-content: space-between;
+    margin-top: 6px; font-size: 11px;
+    color: #64748b; font-weight: 600; letter-spacing: 0.5px;
+  }
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 10px 22px;
+    padding: 14px 18px; background: rgba(255,255,255,0.03);
+    border-radius: 10px; margin-bottom: 30px;
+    border: 1px solid rgba(255,255,255,0.08);
+    font-size: 12px; color: #cbd5e1;
+  }
+  .legend .grp { display: flex; flex-wrap: wrap; gap: 10px 16px; flex: 1 1 100%; }
+  .legend .grp + .grp { padding-top: 10px; border-top: 1px dashed rgba(255,255,255,0.06); }
+  .legend .lbl {
+    font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px;
+    color: #64748b; font-weight: 800; flex: 1 1 100%; margin-bottom: 2px;
+  }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend i {
+    width: 9px; height: 9px; border-radius: 50%; display: inline-block;
+  }
+  .legend .ico {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 15px; height: 15px; border-radius: 50%;
+    font-size: 9px; font-weight: 900; color: #fff;
+  }
+  .ico.logic { background: #EF4444; }
+  .ico.style { background: #F59E0B; }
+  .ico.fact  { background: #3B82F6; }
+  .ico.minor { background: #64748b; }
+  .diagram-wrap {
+    overflow-x: auto; margin: 0 -10px 40px;
+    padding: 20px 10px 10px;
+  }
+  .canvas {
+    position: relative; min-width: 720px;
+    padding: 10px 20px 20px;
+  }
+  .lines {
+    position: absolute; top: 0; left: 0;
+    pointer-events: none; z-index: 1; overflow: visible;
+  }
+  .row {
+    display: flex; justify-content: center; align-items: stretch;
+    gap: 60px; margin: 64px 0;
+    position: relative; z-index: 2;
+  }
+  .row:first-child { margin-top: 0; }
+  .row:last-child  { margin-bottom: 0; }
+  .row-duo { gap: 90px; }
+  .node {
+    background: linear-gradient(135deg, rgba(30,41,59,0.92), rgba(15,23,42,0.92));
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 12px 16px 12px 12px;
+    display: flex; gap: 12px; align-items: flex-start;
+    position: relative; min-width: 240px; max-width: 320px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.35);
+    backdrop-filter: blur(6px);
+    transition: transform .15s, box-shadow .15s;
+  }
+  .node:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.45); }
+  .node[data-type="fact"]        { border-color: rgba(59,130,246,0.55); }
+  .node[data-type="lost"]        { border-color: rgba(139,92,246,0.55); }
+  .node[data-type="evidence"]    { border-color: rgba(20,184,166,0.55); }
+  .node[data-type="speculation"] { border-color: rgba(245,158,11,0.55); }
+  .node[data-type="science"]     { border-color: rgba(16,185,129,0.55); }
+  .node[data-type="silence"]     { border-color: rgba(100,116,139,0.55); }
+  .node[data-type="classified"]  { border-color: rgba(239,68,68,0.55); }
+  .node[data-type="hero"]        { border-color: rgba(20,184,166,0.55); }
+  .node.dead-end {
+    opacity: 0.65;
+    background: linear-gradient(135deg, rgba(30,20,40,0.92), rgba(20,15,30,0.92));
+  }
+  .node.dead-end::after {
+    content: '';
+    position: absolute; inset: 0; border-radius: 12px;
+    background: repeating-linear-gradient(45deg, transparent, transparent 8px,
+      rgba(255,255,255,0.02) 8px, rgba(255,255,255,0.02) 10px);
+    pointer-events: none;
+  }
+  .node-icon {
+    font-size: 26px; line-height: 1; flex-shrink: 0;
+    width: 42px; height: 42px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255,255,255,0.05); border-radius: 10px;
+  }
+  .node-body { flex: 1; min-width: 0; }
+  .node-year {
+    font-size: 10px; font-weight: 800; letter-spacing: 1.2px;
+    text-transform: uppercase; color: #94a3b8; margin-bottom: 3px;
+  }
+  .node-title {
+    font-size: 15px; font-weight: 700; color: #f1f5f9;
+    margin-bottom: 3px; line-height: 1.25;
+  }
+  .node-desc { font-size: 12.5px; color: #94a3b8; line-height: 1.45; }
+  .err-badge {
+    position: absolute; top: -8px; right: -8px;
+    width: 26px; height: 26px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 900; color: #fff;
+    cursor: pointer; border: 2px solid #0f172a;
+    z-index: 3; transition: transform .15s;
+  }
+  .err-badge:hover { transform: scale(1.15); }
+  .err-badge.logic { background: #dc2626; animation: pulseRed 2s ease-in-out infinite; }
+  .err-badge.style { background: #d97706; animation: pulseAmber 2.5s ease-in-out infinite; }
+  .err-badge.fact  { background: #2563eb; animation: pulseBlue 2.5s ease-in-out infinite; }
+  .err-badge.minor { background: #475569; }
+  .err-badge + .err-badge { right: 22px; }
+  .err-badge + .err-badge + .err-badge { right: 48px; }
+  @keyframes pulseRed {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(220,38,38,0.7); }
+    50%      { box-shadow: 0 0 0 8px rgba(220,38,38,0); }
+  }
+  @keyframes pulseAmber {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(217,119,6,0.7); }
+    50%      { box-shadow: 0 0 0 8px rgba(217,119,6,0); }
+  }
+  @keyframes pulseBlue {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(37,99,235,0.7); }
+    50%      { box-shadow: 0 0 0 8px rgba(37,99,235,0); }
+  }
+  .dead-end-label {
+    position: absolute; bottom: -28px; left: 50%; transform: translateX(-50%);
+    font-size: 10px; font-weight: 700; color: #a78bfa;
+    text-transform: uppercase; letter-spacing: 1px; white-space: nowrap;
+  }
+  .modal-backdrop {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(2,6,23,0.85);
+    backdrop-filter: blur(4px);
+    display: none; align-items: center; justify-content: center;
+    padding: 20px; animation: fadeIn .2s;
+  }
+  .modal-backdrop.open { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal {
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 16px;
+    max-width: 560px; width: 100%;
+    max-height: 90vh; overflow-y: auto;
+    padding: 24px 26px; position: relative;
+    animation: slideUp .25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px) scale(0.98); }
+    to   { opacity: 1; transform: none; }
+  }
+  .modal-close {
+    position: absolute; top: 12px; right: 12px;
+    width: 32px; height: 32px; border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    border: none; color: #cbd5e1;
+    font-size: 18px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .15s;
+  }
+  .modal-close:hover { background: rgba(255,255,255,0.18); }
+  .modal-type {
+    display: inline-block; padding: 3px 10px; border-radius: 12px;
+    font-size: 10px; font-weight: 800; letter-spacing: 1.2px;
+    text-transform: uppercase; color: #fff; margin-bottom: 10px;
+  }
+  .modal-type.logic { background: #dc2626; }
+  .modal-type.style { background: #d97706; }
+  .modal-type.fact  { background: #2563eb; }
+  .modal-type.minor { background: #475569; }
+  .modal h3 { margin: 0 0 4px; font-size: 20px; color: #f1f5f9; }
+  .modal .modal-node { font-size: 12px; color: #64748b; margin-bottom: 18px; }
+  .modal .m-section { margin-bottom: 16px; }
+  .modal .m-section:last-child { margin-bottom: 0; }
+  .modal .m-label {
+    font-size: 10px; font-weight: 800; letter-spacing: 1.5px;
+    text-transform: uppercase; color: #94a3b8; margin-bottom: 6px;
+  }
+  .modal .m-problem { color: #fca5a5; line-height: 1.6; font-size: 14px; }
+  .modal .m-fix     { color: #86efac; line-height: 1.6; font-size: 14px; }
+  .modal code {
+    background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size: 12px; color: #fbbf24;
+  }
+  .story-text {
+    background: rgba(30,41,59,0.5);
+    border-radius: 12px;
+    padding: 22px 26px;
+    border: 1px solid rgba(255,255,255,0.08);
+    font-size: 15px;
+    line-height: 1.75;
+    color: #cbd5e1;
+  }
+  .story-text p { margin: 0 0 14px; }
+  .story-text p:last-child { margin-bottom: 0; }
+  .story-text em { color: #94a3b8; font-style: italic; }
+  .hint {
+    color: #94a3b8; font-size: 14px;
+    margin: 0 0 16px; padding: 10px 14px;
+    background: rgba(96,165,250,0.08);
+    border-left: 3px solid #60a5fa;
+    border-radius: 0 6px 6px 0;
+  }
+  .analysis-legend {
+    display: flex; flex-wrap: wrap; gap: 10px 18px;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.06);
+    margin-bottom: 18px;
+    font-size: 12px; color: #cbd5e1;
+  }
+  .analysis-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .analysis-legend i {
+    width: 10px; height: 14px; border-radius: 3px;
+    display: inline-block; border-bottom: 2px solid;
+  }
+  .analysis-legend i.logic { background: rgba(239,68,68,0.25); border-color: #EF4444; }
+  .analysis-legend i.style { background: rgba(245,158,11,0.25); border-color: #F59E0B; }
+  .analysis-legend i.fact  { background: rgba(59,130,246,0.25); border-color: #3B82F6; }
+  .analysis-legend i.minor { background: rgba(100,116,139,0.3); border-color: #64748b; }
+  .mark {
+    cursor: pointer;
+    border-bottom: 2px solid;
+    padding: 1px 3px;
+    border-radius: 3px;
+    transition: filter .12s, box-shadow .12s;
+    position: relative;
+  }
+  .mark:hover { filter: brightness(1.25); }
+  .mark.logic { background: rgba(239,68,68,0.18); border-color: #EF4444; color: #fca5a5; }
+  .mark.style { background: rgba(245,158,11,0.18); border-color: #F59E0B; color: #fbbf24; }
+  .mark.fact  { background: rgba(59,130,246,0.18); border-color: #3B82F6; color: #93c5fd; }
+  .mark.minor { background: rgba(100,116,139,0.22); border-color: #64748b; color: #cbd5e1; }
+  .profile-header {
+    display: flex; gap: 20px; align-items: center;
+    padding: 20px 22px; margin-bottom: 18px;
+    background: linear-gradient(135deg, rgba(30,41,59,0.8), rgba(15,23,42,0.8));
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+  }
+  .profile-avatar {
+    width: 84px; height: 84px; flex-shrink: 0;
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px rgba(96,165,250,0.3), 0 8px 24px rgba(0,0,0,0.4);
+    overflow: hidden;
+  }
+  .profile-avatar svg { width: 100%; height: 100%; display: block; }
+  .profile-header h3 { margin: 0 0 4px; font-size: 18px; color: #f1f5f9; }
+  .profile-header p { margin: 0; font-size: 13.5px; color: #94a3b8; line-height: 1.5; }
+  .profile-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .profile-tags span {
+    padding: 3px 9px; border-radius: 10px;
+    background: rgba(96,165,250,0.15); color: #93c5fd;
+    font-size: 11px; font-weight: 600;
+  }
+  .profile-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 14px;
+  }
+  .p-card {
+    background: rgba(30,41,59,0.65);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px; padding: 16px 18px;
+  }
+  .p-card h4 {
+    margin: 0 0 10px; font-size: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .p-card h4 .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .p-card ul { margin: 0; padding-left: 18px; font-size: 13px; color: #cbd5e1; line-height: 1.6; }
+  .p-card li { margin-bottom: 5px; }
+  .p-card li:last-child { margin-bottom: 0; }
+  .p-card em { color: #fbbf24; font-style: normal; }
+  .ba-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .ba-card {
+    background: rgba(30,41,59,0.65);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px; padding: 16px 18px;
+  }
+  .ba-card.before { border-left: 3px solid #EF4444; }
+  .ba-card.after  { border-left: 3px solid #10B981; }
+  .ba-card h5 {
+    margin: 0 0 8px; font-size: 10px; font-weight: 800;
+    letter-spacing: 1.5px; text-transform: uppercase; color: #94a3b8;
+  }
+  .ba-card.before h5 { color: #fca5a5; }
+  .ba-card.after h5  { color: #86efac; }
+  .ba-card p { margin: 0 0 8px; font-size: 13.5px; line-height: 1.55; color: #cbd5e1; }
+  .ba-card p:last-child { margin-bottom: 0; }
+  .ba-card em { color: #fbbf24; font-style: normal; }
+  .ba-card .why { font-size: 12px; color: #94a3b8; font-style: italic; }
+  .dont-touch {
+    background: rgba(16,185,129,0.06);
+    border: 1px solid rgba(16,185,129,0.3);
+    border-radius: 12px; padding: 18px 22px;
+  }
+  .dont-touch h3 { margin: 0 0 12px; font-size: 16px; color: #34d399; }
+  .dont-touch ul { margin: 0; padding-left: 20px; font-size: 13.5px; color: #cbd5e1; line-height: 1.7; }
+  .dont-touch code {
+    background: rgba(0,0,0,0.35); padding: 2px 6px; border-radius: 4px;
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size: 12px; color: #fbbf24;
+  }
+  .fork-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+  }
+  .fork-card {
+    background: rgba(30,41,59,0.65);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px; padding: 18px 20px;
+  }
+  .fork-card h4 { margin: 0 0 6px; font-size: 16px; color: #f1f5f9; }
+  .fork-card .fork-sub { font-size: 12px; color: #94a3b8; margin-bottom: 14px; line-height: 1.4; }
+  .fork-card .fork-section { margin-bottom: 14px; }
+  .fork-card .fork-section:last-child { margin-bottom: 0; }
+  .fork-card .fork-label {
+    font-size: 10px; font-weight: 800; letter-spacing: 1.5px;
+    text-transform: uppercase; color: #94a3b8; margin-bottom: 5px;
+  }
+  .fork-card ul { margin: 0; padding-left: 18px; font-size: 13px; color: #cbd5e1; line-height: 1.6; }
+  .fork-card li { margin-bottom: 4px; }
+  .fork-card li:last-child { margin-bottom: 0; }
+  .fork-card em { color: #fbbf24; font-style: normal; }
+  .fork-card.v1 { border-left: 3px solid #F59E0B; }
+  .fork-card.v2 { border-left: 3px solid #8B5CF6; }
+  .fork-card.v3 { border-left: 3px solid #EF4444; }
+  @media (max-width: 680px) {
+    main { padding: 72px 12px 60px; }
+    h1 { font-size: 22px; }
+    .row, .row-duo { gap: 30px; }
+    .ba-grid { grid-template-columns: 1fr; }
+    .profile-header { flex-direction: column; text-align: center; }
+    .profile-tags { justify-content: center; }
+    .topnav { padding: 0 8px; }
+    .topnav button { padding: 8px 10px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav" id="topnav">
+  <button class="active" data-view="schema">Схема</button>
+  <button data-view="source">Исходный текст</button>
+  <button data-view="analysis">Анализ текста</button>
+  <button data-view="fork">Развилка</button>
+  <button data-view="profile">Профиль героя</button>
+  <button data-view="edits">Ключевые правки</button>
+  <button data-view="keep">Что не трогать</button>
+</nav>
+
+<main>
+
+  <!-- ==================== VIEW: СХЕМА ==================== -->
+  <section class="view active" id="view-schema">
+    <header>
+      <h1>Логика записей Ильи Леонова</h1>
+      <p class="subtitle">История «Фобос-2» — от магнитной ленты до термодинамической аномалии</p>
+    </header>
+
+    <div class="top-timeline">
+      <div class="tl-track">
+        <div class="tl-segment" style="flex:15; background: linear-gradient(90deg, rgba(59,130,246,0.45), rgba(139,92,246,0.45));">Советская эпоха</div>
+        <div class="tl-segment" style="flex:45; background: linear-gradient(90deg, rgba(100,116,139,0.3), rgba(100,116,139,0.12));">Забвение</div>
+        <div class="tl-segment" style="flex:40; background: linear-gradient(90deg, rgba(20,184,166,0.3), rgba(20,184,166,0.55));">Записи Ильи</div>
+      </div>
+      <div class="tl-markers">
+        <span>1988</span><span>1990</span><span>2032</span><span>2050</span>
+      </div>
+    </div>
+
+    <div class="legend">
+      <div class="grp">
+        <span class="lbl">Типы узлов</span>
+        <span><i style="background:#3B82F6"></i>Факт</span>
+        <span><i style="background:#8B5CF6"></i>Потеря / тайна</span>
+        <span><i style="background:#14B8A6"></i>Улика / герой</span>
+        <span><i style="background:#F59E0B"></i>Слух / версия</span>
+        <span><i style="background:#10B981"></i>Наука</span>
+        <span><i style="background:#64748b"></i>Забвение</span>
+        <span><i style="background:#EF4444"></i>Засекречено</span>
+      </div>
+      <div class="grp">
+        <span class="lbl">Маркеры правок (кликните)</span>
+        <span><span class="ico logic">!</span>Логическая дыра</span>
+        <span><span class="ico style">~</span>Стиль</span>
+        <span><span class="ico fact">i</span>Факт</span>
+        <span><span class="ico minor">·</span>Мелкое</span>
+      </div>
+    </div>
+
+    <div class="diagram-wrap">
+      <div class="canvas" id="canvas">
+        <svg class="lines" id="lines"></svg>
+
+        <div class="row">
+          <div class="node" data-id="start" data-type="hero">
+            <div class="node-icon">🎞️</div>
+            <div class="node-body">
+              <div class="node-year">2032–2050</div>
+              <div class="node-title">Илья Леонов</div>
+              <div class="node-desc">Архивные записи. Исследователь, который пытался разобраться.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="node" data-id="tape" data-type="evidence">
+            <div class="node-icon">📼</div>
+            <div class="node-body">
+              <div class="node-year">Наши дни</div>
+              <div class="node-title">Бобина из Евпатории</div>
+              <div class="node-desc">9-дорожечная лента 1/2 дюйма. Копия данных «Фобос-2». Считыватель напечатан на 3D-принтере.</div>
+            </div>
+            <span class="err-badge minor" data-err="e12" title="Мелкое">·</span>
+            <span class="err-badge style" data-err="e9" title="Упущенная возможность">~</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="node" data-id="data" data-type="fact">
+            <div class="node-icon">💾</div>
+            <div class="node-body">
+              <div class="node-year">Наши дни</div>
+              <div class="node-title">Исходные данные</div>
+              <div class="node-desc">Полный доступ. Код прикреплён к видео. Проверка через Фортран или нейросеть.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row row-duo">
+          <div class="node dead-end" data-id="condcode" data-type="lost">
+            <div class="node-icon">🖥️</div>
+            <div class="node-body">
+              <div class="node-year">В кадре</div>
+              <div class="node-title">COND CODE = 0000</div>
+              <div class="node-desc">Зелёные буквы на пузатом мониторе. Что это значит — не объяснено.</div>
+            </div>
+            <span class="err-badge minor" data-err="e3" title="Неразвёрнутая деталь">·</span>
+            <div class="dead-end-label">не объяснено</div>
+          </div>
+          <div class="node" data-id="audio" data-type="evidence">
+            <div class="node-icon">🔊</div>
+            <div class="node-body">
+              <div class="node-year">Наши дни</div>
+              <div class="node-title">Скрытый аудиопакет</div>
+              <div class="node-desc">Телеметрия шла вместе с картинкой. Белый шум + низкочастотный пульс.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row row-duo">
+          <div class="node" data-id="report" data-type="classified">
+            <div class="node-icon">📋</div>
+            <div class="node-body">
+              <div class="node-year">Год спустя</div>
+              <div class="node-title">Отчёт «Термоскан»</div>
+              <div class="node-desc">ДОП № 90-68/115 «Мираж». Не ИКИ АН СССР, а КГБ.</div>
+            </div>
+            <span class="err-badge fact" data-err="e2" title="РАН СССР — анахронизм">i</span>
+            <span class="err-badge style" data-err="e5" title="«Якобы тень»">~</span>
+            <span class="err-badge minor" data-err="e8" title="ДОП без расшифровки">·</span>
+          </div>
+          <div class="node" data-id="breathing" data-type="speculation">
+            <div class="node-icon">🫁</div>
+            <div class="node-body">
+              <div class="node-year">Наши дни</div>
+              <div class="node-title">Дыхание</div>
+              <div class="node-desc">Паттерн совпадает с утробным дыханием. Голоса. Головная боль.</div>
+            </div>
+            <span class="err-badge style" data-err="e6" title="Стиль">~</span>
+            <span class="err-badge logic" data-err="e15" title="Парейдолия">!</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="node" data-id="discrepancy" data-type="evidence">
+            <div class="node-icon">📐</div>
+            <div class="node-body">
+              <div class="node-year">Наши дни</div>
+              <div class="node-title">250–300 км vs 9–10 км</div>
+              <div class="node-desc">В отчёте — 250–300 км. Расчёт: 1,2 с × 8 км/с = 9–10 км. Цифра вписана постфактум.</div>
+            </div>
+            <span class="err-badge fact" data-err="e1" title="8 км/с — не для Марса">i</span>
+            <span class="err-badge logic" data-err="e11" title="Самопротиворечие">!</span>
+            <span class="err-badge logic" data-err="e18" title="Опечатка vs заговор">!</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="node" data-id="conversation" data-type="classified">
+            <div class="node-icon">🎙️</div>
+            <div class="node-body">
+              <div class="node-year">Наши дни</div>
+              <div class="node-title">Разговор с Аркадием Павловичем</div>
+              <div class="node-desc">«Ты уже понял, что скрыть хотели другое». «Они заплатили огромную цену».</div>
+            </div>
+            <span class="err-badge logic" data-err="e4" title="«Законы физики перестали работать»">!</span>
+            <span class="err-badge logic" data-err="e13" title="Микрофон в кармане">!</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="node" data-id="sharp_edge" data-type="evidence">
+            <div class="node-icon">🌡️</div>
+            <div class="node-body">
+              <div class="node-year">Наши дни</div>
+              <div class="node-title">Резкая граница тени</div>
+              <div class="node-desc">Перепад за 1 пиксель (1,8 км). Термодинамически невозможно для естественной тени.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row row-duo">
+          <div class="node" data-id="variant1" data-type="speculation">
+            <div class="node-icon">🌀</div>
+            <div class="node-body">
+              <div class="node-year">Вариант 1</div>
+              <div class="node-title">Термодинамическая дыра</div>
+              <div class="node-desc">Объект на 42 км с идеальным тепловым поглощением. Стирает ИК-излучение по идеальному контуру.</div>
+            </div>
+            <span class="err-badge logic" data-err="e17" title="Третье начало">!</span>
+            <span class="err-badge logic" data-err="e16" title="Внутри атмосферы">!</span>
+          </div>
+          <div class="node" data-id="variant2" data-type="speculation">
+            <div class="node-icon">🌌</div>
+            <div class="node-body">
+              <div class="node-year">Вариант 2</div>
+              <div class="node-title">Разлом / поле</div>
+              <div class="node-desc">Локальное нарушение второго начала термодинамики. Разлом в пространстве.</div>
+            </div>
+            <span class="err-badge style" data-err="e7" title="Стиль">~</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="node dead-end" data-id="missed" data-type="lost">
+            <div class="node-icon">❓</div>
+            <div class="node-body">
+              <div class="node-year">Не рассмотрено</div>
+              <div class="node-title">Что Илья не учёл</div>
+              <div class="node-desc">Артефакт камеры. Атмосфера Марса. Парейдолия в аудио. Опечатка вместо заговора.</div>
+            </div>
+            <span class="err-badge logic" data-err="e14" title="Артефакт">!</span>
+            <div class="dead-end-label">не рассмотрено</div>
+          </div>
+        </div>
+
+        <div class="row row-duo">
+          <div class="node" data-id="sanatorium" data-type="silence">
+            <div class="node-icon">🏥</div>
+            <div class="node-body">
+              <div class="node-year">Конец записи</div>
+              <div class="node-title">Санаторий</div>
+              <div class="node-desc">«Ты переработал. Забудь». Отправляют отдыхать.</div>
+            </div>
+          </div>
+          <div class="node" data-id="price" data-type="classified">
+            <div class="node-icon">💀</div>
+            <div class="node-body">
+              <div class="node-year">Конец записи</div>
+              <div class="node-title">«Они заплатили цену»</div>
+              <div class="node-desc">Что именно? Не объяснено. Висящая угроза.</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== VIEW: ИСХОДНЫЙ ТЕКСТ ==================== -->
+  <section class="view" id="view-source">
+    <h2><span class="h2-icon">📄</span>Исходный текст</h2>
+    <div class="story-text">
+      <p>На фоне серверного архива, судя по свету это было подвальное помещение, Илья держит в руке большую магнитофонную бобину. Свет от настольной лампы падает ему прямо на лицо.</p>
+      <p>«Это копия девяти-дорожечной магнитной ленты на катушках шириной 1/2 дюйма из Центра дальней космической связи в Евпатории», – говорит Илья и трясёт бобиной прямо в камеру, а потом откладывает её в сторону.</p>
+      <p>«На точно такую же были записаны данные Фобоса-2. Сегодня уже достаточно трудно добыть не только такую копию, но и оборудование, которое может его прочитать. Но мне получилось снять именно копию. На 3D-станке Д-Дайнамикс я напечатал машину для считывания – поэтому у меня есть полноценный доступ к самым исходным данным!»</p>
+      <p>Илья переводит камеру и позади него мы видим громоздкий аппарат, видимо тот, на котором он и производил считывание.</p>
+      <p>«Я лично перевёл все данные для современной цифровой обработки, никаких фейков или кода, который мог быть написан другими. Я прикрепил код к этому видео, вы можете его сами проверить, если знаете Фортран, либо поручить это дело нейросети. Я гарантирую достоверность! Прикладываю видео снэпшот всего процесса».</p>
+      <p>Голос Ильи как будто слегка дрожит, но взгляд его остаётся сосредоточенным. Это не была запись безумца-уфолога, охотника за инопланетными артефактами. Позади него стоит старый пузатый монитор, на котором светящимися зелеными буквами можно было заметить: «COND CODE = 0000».</p>
+      <p>На следующей записи волосы Ильи взъерошены и взгляд его уже был другим.</p>
+      <p>«Вы не поверите, что я узнал! Я приложу скрытую запись разговора со своим начальником. Кажется, за это мне положена статья, но я решил рискнуть».</p>
+      <p>«Я извлёк скрытый аудиопакет телеметрии Фобоса-2, он шёл вместе с записью картинки. В космосе нет звуков, но они зачем-то добавили функцию к аппарату. Уже странно да? Возможно, это какой-то аналог советской сонификации и звук был добавлен уже на Земле, я пока не разобрался. На записи слышен в основном белый шум, но в нём ритмично пульсирует низкочастотный звук. Он похож на дыхание! Я вам клянусь, как будто кто-то там дышит. Мысль об этом сводит с ума, и кажется через несколько дней прослушивания я стал слышать странные голоса».</p>
+      <p>Илья делает перерыв, будто запыхался. Включает запись и там действительно есть какие-то посторонние шумы. Дальше он раскладывает аудиопоток в график, ИИ накладывает все известные шумы и звуки, когда-либо созданные на основе космических данных – будь то звуки чёрной дыры или юпитерианского шторма, но лишь паттерн земных звуков ритмичного утробного дыхания идеально совпадает с его графиком.</p>
+      <p>«Теперь главное. Вот выдержка из отчёта по Фобосу-2 созданному год спустя».</p>
+      <p>На экране бегут буквы и цифры, Илья голосом озвучивает:</p>
+      <p>«Объект: тень Фобоса на поверхности Марса».</p>
+      <p>«Прибор: Термоскан, ИК-диапазон».</p>
+      <p>«Понижение температуры в зоне тени: 4–6°C».</p>
+      <p>«Вытянутая форма эллипса обусловлена смещением аппарата на 250–300 км во время экспозиции».</p>
+      <p>«ДОП № 90-68/115 "Мираж"».</p>
+      <p>«Обратите внимание, что это не отчет Института космических исследований РАН СССР. Это больше похоже на отчёт созданный в глубине КГБ! Они уже знали, что это была якобы просто тень, но молчали!! А "Мираж" – к чему это вообще?!»</p>
+      <p>«Я сел за расчёты, используя самые современные нейросети, чтобы всё достоверно проверить».</p>
+      <p>«Сначала было разочарование».</p>
+      <p>«Потом я решил проверить все последовательности данных: как в действительности было записано смещение Фобоса-2 на 300 км во время съемки. Но таких данных нет!»</p>
+      <p>Илья говорит всё быстрее и быстрее, как будто опасается, что за ним кто-то придёт.</p>
+      <p>«Я сел за расчеты. Реальная выдержка кадра «Термоскана» составляла 1,2 секунды. Орбитальная скорость аппарата относительно поверхности в тот момент была около 8 км/с. За 1,2 секунды аппарат мог сместиться максимум на 9–10 км, а не на 250–300 км, как указано в официальном отчете! Цифра «300 км» была вручную вписана в итоговый доклад постфактум. Кто-то осознанно сфальсифицировал данные о движении аппарата, чтобы объяснить неестественную вытянутость тени. Зачем врать про тень, если она так естественна?»</p>
+      <p>На следующем видео был только звук разговора и многочисленные посторонние шумы.</p>
+      <p>«Илья Николаевич, – говорил неизвестный голос, – ты думаешь, что они солгали про 300 километров, чтобы скрыть инопланетную технологию?»</p>
+      <p>«Нет, Аркадий Павлович,– тихо говорит Илья. — Я не настолько глуп».</p>
+      <p>«Тогда, судя по твоим расчётам, ты уже понял, что скрыть они хотели другое – тот неопровержимый факт, что законы физики в том месте перестали работать».</p>
+      <p>«Да!» – голос Ильи был возбуждён.</p>
+      <p>«Смотрите, всё сходится! Вернее, расходится с официальной версией».</p>
+      <p>«В природе у любой тени есть полутень, градиент, особенно на неровной поверхности Марса и при движении камеры. Но граница тени слишком резкая. Перепад температуры происходит за один пиксель исходного изображения, а это всего 1,8 км на поверхности Марса. Это термодинамически невозможно для естественной тени. Значит свет тут вообще не причем».</p>
+      <p>Илья прерывается, но его собеседник молчит.</p>
+      <p>«Вариант №1: это не тень от Фобоса, перед нами объект с идеальным тепловым поглощением, своего рода «термодинамическая дыра», которая не просто отбрасывает тень, а стирает тепловое излучение по идеальному геометрическому контуру. Я применил триангуляции параллакса, используя фоновые кратеры Марса. И понял – тень не лежит на поверхности. Расчетная высота объекта, отбрасывающего эту тень, составляет 42 километра над поверхностью Марса. Значит объект не был тенью Фобоса, он выстроился в одну линию с Фобосом и Солнцем, чтобы имитировать его тень! Это могло бы быть идеальной маскировкой. Вариант №2… может это было какое-то … поле. Локальное нарушение второго начала термодинамики? Разлом в пространстве? Но это согласен звучит слишком фантастично».</p>
+      <p>Голос Ильи дрожит, микрофон записывает посторонние звуки – то ли он трёт его в кармане, то ли посторонние шумы. Треск усиливается.</p>
+      <p>«Что с тобой Илья?»</p>
+      <p>«Голова… резко заболела голова. Вы знаете, такое уже было несколько раз, когда я слушал аудиозаписи».</p>
+      <p>«Какие аудиозаписи?» – встревоженно спросил Аркадий Павлович.</p>
+      <p>«Они были вшиты в данные. Я слушал их, там какие-то шумы. Пытался найти объяснение».</p>
+      <p>«Успокойся. Ты переработал. Тебе нужен отдых. Давай отправим тебя в хороший санаторий, я подпишу. Только забудь про всю эту ерунду, ты нужен нам для реальных задач».</p>
+      <p>Но Илья не унимается.</p>
+      <p>«То есть они всё это время знали, про термодинамическую аномалию, и ничего не сделали?»</p>
+      <p>«Почему же, сделали. Всё что надо. Но у всего есть цена. И они тогда заплатили огромную цену».</p>
+      <p>Конец записи.</p>
+    </div>
+  </section>
+
+  <!-- ==================== VIEW: АНАЛИЗ ТЕКСТА ==================== -->
+  <section class="view" id="view-analysis">
+    <h2><span class="h2-icon">🔍</span>Анализ текста</h2>
+    <p class="hint">Те же маркеры, что и на схеме. Кликните по подсвеченному фрагменту, чтобы увидеть проблему и предложение по правке.</p>
+
+    <div class="analysis-legend">
+      <span><i class="logic"></i>Логика</span>
+      <span><i class="style"></i>Стиль</span>
+      <span><i class="fact"></i>Факт</span>
+      <span><i class="minor"></i>Мелкое</span>
+    </div>
+
+    <div class="story-text">
+      <p>На фоне серверного архива, судя по свету это было подвальное помещение, Илья держит в руке большую магнитофонную бобину. Свет от настольной лампы падает ему прямо на лицо.</p>
+      <p>«Это копия девяти-дорожечной магнитной ленты на катушках шириной 1/2 дюйма из Центра дальней космической связи в Евпатории», – говорит Илья и трясёт бобиной прямо в камеру, а потом откладывает её в сторону.</p>
+      <p>«На точно такую же были записаны данные Фобоса-2. Сегодня уже достаточно трудно добыть не только такую копию, но и <span class="mark minor" data-err="e12">оборудование, которое может его прочитать</span>. Но мне получилось снять именно копию. <span class="mark style" data-err="e9">На 3D-станке Д-Дайнамикс я напечатал машину для считывания</span> – поэтому у меня есть полноценный доступ к самым исходным данным!»</p>
+      <p>Илья переводит камеру и позади него мы видим громоздкий аппарат, видимо тот, на котором он и производил считывание.</p>
+      <p>«Я лично перевёл все данные для современной цифровой обработки, никаких фейков или кода, который мог быть написан другими. Я прикрепил код к этому видео, вы можете его сами проверить, если знаете Фортран, либо поручить это дело нейросети. Я гарантирую достоверность! Прикладываю видео снэпшот всего процесса».</p>
+      <p>Голос Ильи как будто слегка дрожит, но взгляд его остаётся сосредоточенным. Это не была запись безумца-уфолога, охотника за инопланетными артефактами. Позади него стоит старый пузатый монитор, на котором светящимися зелеными буквами можно было заметить: <span class="mark minor" data-err="e3">«COND CODE = 0000»</span>.</p>
+      <p>На следующей записи волосы Ильи взъерошены и взгляд его уже был другим.</p>
+      <p>«Вы не поверите, что я узнал! Я приложу скрытую запись разговора со своим начальником. Кажется, за это мне положена статья, но я решил рискнуть».</p>
+      <p>«Я извлёк скрытый аудиопакет телеметрии Фобоса-2, он шёл вместе с записью картинки. В космосе нет звуков, но они зачем-то добавили функцию к аппарату. Уже странно да? Возможно, это какой-то аналог советской сонификации и звук был добавлен уже на Земле, я пока не разобрался. На записи слышен в основном белый шум, но в нём ритмично пульсирует низкочастотный звук. Он похож на дыхание! Я вам клянусь, как будто кто-то там дышит. Мысль об этом сводит с ума, и кажется <span class="mark logic" data-err="e15">через несколько дней прослушивания я стал слышать странные голоса</span>».</p>
+      <p>Илья делает перерыв, будто запыхался. Включает запись и там действительно есть какие-то посторонние шумы. Дальше он раскладывает аудиопоток в график, ИИ накладывает все известные шумы и звуки, когда-либо созданные на основе космических данных – будь то звуки чёрной дыры или юпитерианского шторма, но лишь паттерн земных звуков ритмичного утробного дыхания идеально совпадает с его графиком.</p>
+      <p>«Теперь главное. Вот выдержка из отчёта по Фобосу-2 созданному год спустя».</p>
+      <p>На экране бегут буквы и цифры, Илья голосом озвучивает:</p>
+      <p>«Объект: тень Фобоса на поверхности Марса».</p>
+      <p>«Прибор: Термоскан, ИК-диапазон».</p>
+      <p>«Понижение температуры в зоне тени: 4–6°C».</p>
+      <p>«Вытянутая форма эллипса обусловлена смещением аппарата на 250–300 км во время экспозиции».</p>
+      <p><span class="mark minor" data-err="e8">«ДОП № 90-68/115 "Мираж"»</span>.</p>
+      <p>«Обратите внимание, что это не отчет Института космических исследований <span class="mark fact" data-err="e2">РАН СССР</span>. Это больше похоже на отчёт созданный в глубине КГБ! <span class="mark style" data-err="e5">Они уже знали, что это была якобы просто тень, но молчали!!</span> А "Мираж" – к чему это вообще?!»</p>
+      <p>«Я сел за расчёты, используя самые современные нейросети, чтобы всё достоверно проверить».</p>
+      <p>«Сначала было разочарование».</p>
+      <p>«Потом я решил проверить все последовательности данных: как в действительности было записано смещение Фобоса-2 на 300 км во время съемки. Но таких данных нет!»</p>
+      <p>Илья говорит всё быстрее и быстрее, как будто опасается, что за ним кто-то придёт.</p>
+      <p>«Я сел за расчеты. Реальная выдержка кадра «Термоскана» составляла 1,2 секунды. <span class="mark fact" data-err="e1">Орбитальная скорость аппарата относительно поверхности в тот момент была около 8 км/с.</span> За 1,2 секунды аппарат мог сместиться максимум на 9–10 км, а не на 250–300 км, как указано в официальном отчете! Цифра «300 км» была вручную вписана в итоговый доклад постфактум. <span class="mark logic" data-err="e18">Кто-то осознанно сфальсифицировал данные о движении аппарата</span>, чтобы объяснить неестественную вытянутость тени. <span class="mark logic" data-err="e11">Зачем врать про тень, если она так естественна?</span>»</p>
+      <p>На следующем видео был только звук разговора и многочисленные посторонние шумы.</p>
+      <p>«Илья Николаевич, – говорил неизвестный голос, – ты думаешь, что они солгали про 300 километров, чтобы скрыть инопланетную технологию?»</p>
+      <p>«Нет, Аркадий Павлович,– тихо говорит Илья. — Я не настолько глуп».</p>
+      <p>«Тогда, судя по твоим расчётам, ты уже понял, что скрыть они хотели другое – тот неопровержимый факт, что <span class="mark logic" data-err="e4">законы физики в том месте перестали работать</span>».</p>
+      <p>«Да!» – голос Ильи был возбуждён.</p>
+      <p>«Смотрите, всё сходится! Вернее, расходится с официальной версией».</p>
+      <p>«В природе у любой тени есть полутень, градиент, особенно на неровной поверхности Марса и при движении камеры. Но граница тени слишком резкая. Перепад температуры происходит за один пиксель исходного изображения, а это всего 1,8 км на поверхности Марса. Это термодинамически невозможно для естественной тени. Значит свет тут вообще не причем».</p>
+      <p>Илья прерывается, но его собеседник молчит.</p>
+      <p>«Вариант №1: это не тень от Фобоса, перед нами <span class="mark logic" data-err="e17">объект с идеальным тепловым поглощением, своего рода «термодинамическая дыра»</span>, которая не просто отбрасывает тень, а стирает тепловое излучение по идеальному геометрическому контуру. <span class="mark logic" data-err="e14">Я применил триангуляции параллакса, используя фоновые кратеры Марса. И понял – тень не лежит на поверхности.</span> <span class="mark logic" data-err="e16">Расчетная высота объекта, отбрасывающего эту тень, составляет 42 километра над поверхностью Марса.</span> Значит объект не был тенью Фобоса, он выстроился в одну линию с Фобосом и Солнцем, чтобы имитировать его тень! Это могло бы быть идеальной маскировкой. Вариант №2… может это было какое-то … поле. Локальное нарушение второго начала термодинамики? Разлом в пространстве? <span class="mark style" data-err="e7">Но это согласен звучит слишком фантастично</span>».</p>
+      <p>Голос Ильи дрожит, микрофон записывает посторонние звуки – <span class="mark logic" data-err="e13">то ли он трёт его в кармане</span>, то ли посторонние шумы. Треск усиливается.</p>
+      <p>«Что с тобой Илья?»</p>
+      <p>«<span class="mark style" data-err="e6">Голова… резко заболела голова.</span> Вы знаете, такое уже было несколько раз, когда я слушал аудиозаписи».</p>
+      <p>«Какие аудиозаписи?» – встревоженно спросил Аркадий Павлович.</p>
+      <p>«Они были вшиты в данные. Я слушал их, там какие-то шумы. Пытался найти объяснение».</p>
+      <p>«Успокойся. Ты переработал. Тебе нужен отдых. Давай отправим тебя в хороший санаторий, я подпишу. Только забудь про всю эту ерунду, ты нужен нам для реальных задач».</p>
+      <p>Но Илья не унимается.</p>
+      <p>«То есть они всё это время знали, про термодинамическую аномалию, и ничего не сделали?»</p>
+      <p>«Почему же, сделали. Всё что надо. Но у всего есть цена. И они тогда заплатили огромную цену».</p>
+      <p>Конец записи.</p>
+    </div>
+  </section>
+
+  <!-- ==================== VIEW: РАЗВИЛКА ==================== -->
+  <section class="view" id="view-fork">
+    <h2><span class="h2-icon">🌀</span>Развилка: варианты и что не учтено</h2>
+    <p class="hint">Илья предлагает два варианта. Оба фантастичны. Но есть третий путь — самый очевидный, который он не рассматривает.</p>
+
+    <div class="fork-grid">
+      <div class="fork-card v1">
+        <h4>Вариант 1 — «Термодинамическая дыра»</h4>
+        <div class="fork-sub">Объект на 42 км с идеальным тепловым поглощением. Стирает ИК-излучение по идеальному контуру.</div>
+        <div class="fork-section">
+          <div class="fork-label">За</div>
+          <ul>
+            <li>Объясняет резкую границу тени.</li>
+            <li>Объясняет, почему тень не на поверхности (параллакс).</li>
+            <li>Согласуется с оценкой высоты 42 км.</li>
+          </ul>
+        </div>
+        <div class="fork-section">
+          <div class="fork-label">Против</div>
+          <ul>
+            <li><em>Третье начало:</em> идеальный поглотитель должен быть при 0 K — невозможно.</li>
+            <li>Он бы излучал как чёрное тело — Термоскан увидел бы источник, а не только тень.</li>
+            <li><em>Атмосфера:</em> объект на 42 км внутри атмосферы Марса — нужен активный удержание, иначе упадёт.</li>
+            <li>Его бы засекли другие аппараты (орбитеры, роверы).</li>
+          </ul>
+        </div>
+        <div class="fork-section">
+          <div class="fork-label">Что не учтено</div>
+          <ul>
+            <li>Почему Илья не применяет тот же скепсис, что к варианту 2?</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="fork-card v2">
+        <h4>Вариант 2 — «Разлом / поле»</h4>
+        <div class="fork-sub">Локальное нарушение второго начала термодинамики. Разлом в пространстве.</div>
+        <div class="fork-section">
+          <div class="fork-label">За</div>
+          <ul>
+            <li>Объясняет «идеальность» контура.</li>
+            <li>Не требует физического объекта.</li>
+          </ul>
+        </div>
+        <div class="fork-section">
+          <div class="fork-label">Против</div>
+          <ul>
+            <li>Второе начало — статистическое; макроскопическое нарушение крайне маловероятно.</li>
+            <li>«Разлом в пространстве» — научная фантастика, не физика.</li>
+            <li>Илья сам говорит: «слишком фантастично».</li>
+          </ul>
+        </div>
+        <div class="fork-section">
+          <div class="fork-label">Что не учтено</div>
+          <ul>
+            <li>Если вариант 2 «слишком фантастичен», почему вариант 1 — нет?</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="fork-card v3">
+        <h4>Третий путь — что не учтено</h4>
+        <div class="fork-sub">Самые очевидные объяснения, которые Илья пропустил.</div>
+        <div class="fork-section">
+          <div class="fork-label">1. Артефакт камеры / ошибка данных</div>
+          <ul>
+            <li>«Веретенообразный объект» — типичная форма линзового блика.</li>
+            <li>Сбой сенсора, ошибка обработки, повреждение данных.</li>
+            <li>Илья прыгает от «не тень Фобоса» к «объект на 42 км», не исключив артефакт.</li>
+          </ul>
+        </div>
+        <div class="fork-section">
+          <div class="fork-label">2. Атмосфера Марса</div>
+          <ul>
+            <li>Объект на 42 км — внутри атмосферы (разреженной, но не пустой).</li>
+            <li>Нужен активный удержание, иначе упадёт.</li>
+            <li>Его бы засекли другие аппараты (орбитеры, роверы).</li>
+          </ul>
+        </div>
+        <div class="fork-section">
+          <div class="fork-label">3. Парейдолия в аудио</div>
+          <ul>
+            <li>«Стал слышать голоса» — классический признак слуховой парейдолии.</li>
+            <li>Периодический сигнал мог быть вращающимся компонентом (катушка, вентилятор).</li>
+            <li>Илья не проверил механическую природу сигнала.</li>
+          </ul>
+        </div>
+        <div class="fork-section">
+          <div class="fork-label">4. Опечатка вместо заговора</div>
+          <ul>
+            <li>250–300 км могло быть опечаткой (метры вместо километров).</li>
+            <li>Бюрократическая ошибка вероятнее заговора (бритва Оккама).</li>
+            <li>Илья сразу заключает «сфальсифицировали».</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== VIEW: ПРОФИЛЬ ГЕРОЯ ==================== -->
+  <section class="view" id="view-profile">
+    <h2><span class="h2-icon">👤</span>Профиль героя — Илья Леонов</h2>
+
+    <div class="profile-header">
+      <div class="profile-avatar">
+        <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="30" cy="30" r="30" fill="#1e293b"/>
+          <circle cx="30" cy="26" r="12" fill="#FFE0B2"/>
+          <path d="M18 22 Q30 8 42 22 L42 26 Q30 22 18 26 Z" fill="#4E342E"/>
+          <rect x="22" y="45" width="16" height="12" fill="#455A64" rx="2"/>
+          <circle cx="26" cy="25" r="1.5" fill="#000"/>
+          <circle cx="34" cy="25" r="1.5" fill="#000"/>
+          <path d="M27 30 Q30 32 33 30" stroke="#000" stroke-width="1" fill="none"/>
+          <circle cx="30" cy="26" r="14" fill="none" stroke="#90CAF9" stroke-width="1.5" opacity="0.5"/>
+        </svg>
+      </div>
+      <div>
+        <h3>Инженер-исследователь, одержимый данными</h3>
+        <p>Раскопал то, что не должен был. Слышит голоса в белом шуме. Начальник отправил его в санаторий — но он не остановился. Говорит быстро, сбивчиво, как будто боится, что не успеет.</p>
+        <div class="profile-tags">
+          <span>магнитная лента</span><span>3D-принтер</span><span>Фортран</span>
+          <span>термодинамика</span><span>паранойя</span><span>санаторий</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-grid">
+      <div class="p-card">
+        <h4><span class="dot" style="background:#60a5fa"></span>Технический слой</h4>
+        <ul>
+          <li><strong>Лексика:</strong> «девятидорожечная лента», «1/2 дюйма», «Термоскан», «ИК-диапазон», «параллакс», «второе начало термодинамики».</li>
+          <li><strong>Аргументация:</strong> цифры, расчёты, «1,2 секунды × 8 км/с = 9–10 км».</li>
+          <li><strong>Доказательства:</strong> «код прикреплён», «видео снэпшот», «проверьте через Фортран или нейросеть».</li>
+          <li><strong>Слабость:</strong> 3D-принтер для считывателя ленты — подано буднично, хотя это подвиг.</li>
+        </ul>
+      </div>
+      <div class="p-card">
+        <h4><span class="dot" style="background:#a78bfa"></span>Паранойя</h4>
+        <ul>
+          <li>«Кажется, за это мне положена статья, но я решил рискнуть».</li>
+          <li>«Голос Ильи как будто слегка дрожит».</li>
+          <li>«Илья говорит всё быстрее и быстрее, как будто опасается, что за ним кто-то придёт».</li>
+          <li>«Голова… резко заболела голова» → «стал слышать странные голоса».</li>
+        </ul>
+      </div>
+      <div class="p-card">
+        <h4><span class="dot" style="background:#34d399"></span>Один момент без паранойи</h4>
+        <ul>
+          <li>«Зачем врать про тень, если она так естественна?» — вопрос сформулирован криво, но за ним — холодная логика.</li>
+          <li>«То есть они всё это время знали про термодинамическую аномалию, и ничего не сделали?» — обида, не страх.</li>
+          <li>«Они тогда заплатили огромную цену» — начальник отвечает туманно, и Илья замолкает. Это страшнее любого крика.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== VIEW: КЛЮЧЕВЫЕ ПРАВКИ ==================== -->
+  <section class="view" id="view-edits">
+    <h2><span class="h2-icon">🔧</span>Ключевые правки</h2>
+
+    <div class="ba-grid">
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«Орбитальная скорость аппарата относительно поверхности в тот момент была около 8 км/с. За 1,2 секунды аппарат мог сместиться максимум на 9–10 км».</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«Орбитальная скорость аппарата относительно поверхности в тот момент была около <em>3,5 км/с</em>. За 1,2 секунды аппарат мог сместиться максимум на <em>4–5 км</em>, а не на 250–300 км!»</p>
+        <p class="why">+ Марсианская орбитальная скорость — не 8 км/с (это земная). Расчёт остаётся убийственным: 4–5 км ≠ 250–300 км.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«это не отчет Института космических исследований РАН СССР».</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«это не отчёт Института космических исследований <em>АН СССР</em>».</p>
+        <p class="why">+ Отчёт — 1990 год. РАН создана в 1991-м. «РАН СССР» — анахронизм. ИКИ АН СССР — исторически верно.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«Зачем врать про тень, если она так естественна?»</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«Зачем подделывать данные, чтобы объяснить <em>естественную</em> тень, если она и так должна была быть естественной?»</p>
+        <p class="why">+ Снято самопротиворечие: двумя фразами раньше Илья доказал, что тень неестественна. Теперь вопрос бьёт в логику фальсификаторов, а не в свою же аргументацию.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«Я применил триангуляции параллакса, используя фоновые кратеры Марса. И понял – тень не лежит на поверхности. Расчетная высота объекта, отбрасывающего эту тень, составляет 42 километра».</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«У меня был <em>не один кадр</em> — „Термоскан“ снимал серию. Я применил триангуляцию параллакса по фоновым кратерам. И понял: <em>источник тени не на поверхности</em>. Если бы это была обычная тень от Фобоса, она бы лежала на грунте. А параллакс говорит: объект висит в 42 километрах над Марсом».</p>
+        <p class="why">+ Параллакс требует минимум двух точек обзора. Текст должен явно сказать, что кадров было несколько — иначе расчёт «42 км» повисает.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«объект с идеальным тепловым поглощением, своего рода «термодинамическая дыра»».</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«Я назвал это „термодинамической дырой“ — но <em>сам понимаю, что идеальный поглотитель невозможен</em>. Третье начало. Он бы имел температуру и излучал. Термоскан увидел бы источник, а не только тень. Но источника нет. Значит, я что-то упускаю».</p>
+        <p class="why">+ Илья применяет скепсис к варианту 2, но не к варианту 1. Если он честный исследователь — он должен заметить противоречие сам.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«Кто-то осознанно сфальсифицировал данные о движении аппарата».</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«Может, это просто опечатка? 250–300 метров, а не километров? Я проверил: в отчёте везде километры. Но кто-то мог ошибиться при вводе. <em>Однако ошибка слишком удобна</em> — она объясняет ровно то, что нужно объяснить. Слишком удобно».</p>
+        <p class="why">+ Бритва Оккама: бюрократическая ошибка вероятнее заговора. Но Илья замечает, что ошибка «слишком удобна» — и это усиливает подозрение, а не ослабляет.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«На 3D-станке Д-Дайнамикс я напечатал машину для считывания — поэтому у меня есть полноценный доступ».</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«Оборудования для чтения нет. Нигде. Поэтому я его <em>напечатал</em>. Корпус, механику, головки — на „Д-Дайнамикс“. Головки пришлось доводить вручную, но оно читает».</p>
+        <p class="why">+ К 2032–2050 это правдоподобно. Приём не отработан: текст сам говорит «оборудование добыть трудно», а Илья отвечает «я напечатал» — это подвиг, а не будни.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«оборудование, которое может его прочитать».</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«оборудование, которое может <em>её</em> прочитать».</p>
+        <p class="why">+ «Его» — не согласуется ни с «копией» (ж.р.), ни с «данными» (мн.ч.). Для героя-педанта — заметный сбой.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«микрофон записывает посторонние звуки – то ли он трёт его в кармане, то ли посторонние шумы».</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«микрофон ловит посторонние звуки — то ли Илья трёт <em>лацкан</em>, то ли шорохи комнаты».</p>
+        <p class="why">+ Если микрофон в кармане — голос звучит иначе. Сцена одновременно хочет «чистый голос» и «шорохи из кармана». Физика записи не сходится.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«Они уже знали, что это была якобы просто тень, но молчали!!»</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«Они уже тогда знали, что это <em>не просто тень</em>. И молчали. Понимаете? Они знали — и молчали».</p>
+        <p class="why">+ Убрана логическая петля «знали, что якобы тень».</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«Голова… резко заболела голова». <br>«Но это согласен звучит слишком фантастично».</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«Голова… <em>резко заболела</em>». <br>«Но это, согласен, звучит слишком фантастично».</p>
+        <p class="why">+ Убран повтор «голова… голова», исправлена грамматика.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«через несколько дней прослушивания я стал слышать странные голоса».</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«Я проверил: не вращается ли что-то в аппарате? Не пульсирует ли лента? Период не совпадает. Но и на дыхание не похоже — слишком регулярно. <em>Я записал свой пульс. Не совпадает</em>. Что это?»</p>
+        <p class="why">+ Илья должен хотя бы попытаться исключить механику и собственную физиологию, прежде чем говорить о «голосах». Иначе он звучит как человек, который уже потерял критическое мышление.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«И понял – тень не лежит на поверхности».</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«Прежде чем строить теорию, я проверил: это не артефакт оптики? Не сбой сенсора? Не ошибка обработки? <em>Проверил. Нет</em>. Тогда я применил триангуляцию параллакса...»</p>
+        <p class="why">+ Самое очевидное объяснение — артефакт камеры. Илья должен его исключить, иначе он выглядит как уфолог, а не как инженер.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== VIEW: ЧТО НЕ ТРОГАТЬ ==================== -->
+  <section class="view" id="view-keep">
+    <h2><span class="h2-icon">✓</span>Что не трогать</h2>
+    <div class="dont-touch">
+      <h3>Работает как есть</h3>
+      <ul>
+        <li><strong>«COND CODE = 0000»</strong> — загадка, которая держит. Можно оставить как есть или чуть обыграть, но не объяснять до конца.</li>
+        <li><strong>«Я вам клянусь, как будто кто-то там дышит»</strong> — живая, сбивчивая речь. Именно так говорит человек, который напуган и не выспался.</li>
+        <li><strong>«Они тогда заплатили огромную цену»</strong> — висящая угроза. Не расшифровывать. Пусть читатель сам придумывает, чем именно.</li>
+        <li><strong>Дрожащий голос и сосредоточенный взгляд</strong> — контраст между паникой и контролем. Это ядро характера.</li>
+        <li><strong>«То есть они всё это время знали, про термодинамическую аномалию, и ничего не сделали?»</strong> — обида, а не страх. Тоже оставить.</li>
+        <li><strong>3D-печать считывателя</strong> — к 2032–2050 это правдоподобно. Не «убирать натяжку», а <em>доиграть</em> как подвиг: «оборудования нет — я его напечатал».</li>
+        <li><strong>«Смотрите, всё сходится! Вернее, расходится с официальной версией»</strong> — хорошая оговорка, показывает, что Илья слышит себя со стороны.</li>
+      </ul>
+    </div>
+  </section>
+
+</main>
+
+<div class="modal-backdrop" id="modal">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<script>
+(function () {
+  const errors = {
+    e1: {
+      type: 'fact', label: 'Фактическая ошибка',
+      node: 'Расчёт: 250–300 км vs 9–10 км',
+      problem: 'Орбитальная скорость у Марса — около 3,5 км/с, а не 8 км/с. 8 км/с — это первая космическая для Земли. С такой скоростью 1,2 с × 8 км/с = 9,6 км, что и написано. Но цифра неверна фактически.',
+      fix: 'Заменить на <code>3,5 км/с</code> и пересчитать: <code>1,2 с × 3,5 км/с = 4,2 км</code>. Вывод тот же: 4–5 км ≠ 250–300 км. Фальсификация остаётся очевидной.'
+    },
+    e2: {
+      type: 'fact', label: 'Фактическая ошибка / анахронизм',
+      node: 'Отчёт «Термоскан»',
+      problem: '«РАН СССР» — Франкенштейн из двух эпох. Российская академия наук создана в 1991 году. Отчёт — «год спустя» после 1989-го, то есть 1990-й. Тогда была Академия наук СССР (АН СССР).',
+      fix: 'Заменить на <code>«ИКИ АН СССР»</code>. Контраст «академический институт — а отчёт кэгэбэшный» от этого только сильнее.'
+    },
+    e3: {
+      type: 'minor', label: 'Мелкое / неразвёрнутая деталь',
+      node: 'COND CODE = 0000',
+      problem: 'Что означает «COND CODE = 0000»? В тексте не объясняется. Если это улика — она не выстреливает. Если атмосферная деталь — она слишком заметна, чтобы ничего не значить. Это не дыра, но упущенный крючок.',
+      fix: 'Либо чуть обыграть: <code>«Это код состояния. Ноль-ноль-ноль-ноль. Всё чисто. Слишком чисто»</code>, либо оставить как есть — но тогда не удивляться, что читатель ждёт разгадки.'
+    },
+    e4: {
+      type: 'logic', label: 'Логическая дыра',
+      node: 'Разговор с Аркадием Павловичем',
+      problem: 'Начальник говорит: «законы физики в том месте перестали работать». Но Илья только что предложил вариант 1 — физический объект (термодинамическая дыра). Это не «законы перестали работать», это объект с необычными свойствами. Противоречие.',
+      fix: 'Либо переформулировать начальника: <code>«скрыть хотели то, что это не тень и не Фобос»</code>, либо дать Илье сначала сказать про вариант 2, а потом уже начальник подхватывает.'
+    },
+    e5: {
+      type: 'style', label: 'Стиль / логика',
+      node: 'Отчёт «Термоскан»',
+      problem: '«Они уже знали, что это была якобы просто тень, но молчали» — если знали, что «якобы», значит знали, что не тень. Тогда зачем фальсифицировали отчёт, где сказано, что это тень? Логический круг.',
+      fix: '<code>«Они уже тогда знали, что это не просто тень. И молчали»</code>. Убрать «якобы» — и петля исчезает.'
+    },
+    e6: {
+      type: 'style', label: 'Стиль',
+      node: 'Дыхание / головная боль',
+      problem: '«Голова… резко заболела голова» — повтор слова «голова» в одной фразе.',
+      fix: '<code>«Голова… резко заболела»</code>.'
+    },
+    e7: {
+      type: 'style', label: 'Стиль',
+      node: 'Вариант 2',
+      problem: '«Но это согласен звучит слишком фантастично» — грамматическая ошибка. Нужна запятая или перестановка.',
+      fix: '<code>«Но это, согласен, звучит слишком фантастично»</code>.'
+    },
+    e8: {
+      type: 'minor', label: 'Мелкое',
+      node: 'Отчёт «Термоскан»',
+      problem: '«ДОП № 90-68/115» — аббревиатура не расшифрована. Читатель не понимает, что это за документ.',
+      fix: 'Добавить расшифровку: <code>«ДОП — дело оперативной проверки. № 90-68/115 "Мираж"»</code>. Или убрать номер, оставить только «Мираж».'
+    },
+    e9: {
+      type: 'style', label: 'Упущенная возможность',
+      node: 'Бобина из Евпатории',
+      problem: 'Печать считывателя для 9-дорожечной ленты к 2032–2050 — правдоподобно (печатная электроника, мультиматериальная печать; сама лента — технология 1970-х с низкими допусками). Но текст подаёт это буднично, хотя сам же говорит, что «оборудование добыть трудно». Приём не отработан.',
+      fix: 'Обыграть как подвиг: <code>«Оборудования для чтения нет. Нигде. Поэтому я его напечатал. Корпус, механику, головки — на "Д-Дайнамикс". Головки пришлось доводить вручную, но оно читает»</code>.'
+    },
+    e10: {
+      type: 'logic', label: 'Логическая дыра (серьёзная)',
+      node: 'Параллакс и высота 42 км',
+      problem: 'Параллакс требует минимум двух точек обзора. В первом тексте последний снимок «Фобос-2» описан как одна фотография. Если кадр один — параллакса нет, и вся оценка «42 км» повисает. Это центр разоблачения.',
+      fix: 'Явно сказать, что кадров было несколько: <code>«У меня был не один кадр — "Термоскан" снимал серию»</code>. Тогда параллакс работает.'
+    },
+    e11: {
+      type: 'logic', label: 'Логическое противоречие (кульминация)',
+      node: '250–300 км vs 9–10 км',
+      problem: '«Зачем врать про тень, если она так естественна?» — двумя фразами раньше Илья доказал, что тень неестественна (резкая граница, 42 км). Фраза читается как «почему вы врали, если всё и так естественно?» — самопротиворечие в кульминации.',
+      fix: '<code>«Зачем подделывать данные, чтобы объяснить естественную тень, если она и так должна была быть естественной?»</code> — вопрос бьёт в логику фальсификаторов, а не в свою же аргументацию.'
+    },
+    e12: {
+      type: 'minor', label: 'Мелкое / грамматика',
+      node: 'Бобина из Евпатории',
+      problem: '«оборудование, которое может его прочитать» — «его» не согласуется ни с «копией» (ж.р.), ни с «данными» (мн.ч.).',
+      fix: '<code>«оборудование, которое может её прочитать»</code> (ленту/копию) или <code>«их прочитать»</code> (данные). Для героя-педанта — заметный сбой.'
+    },
+    e13: {
+      type: 'logic', label: 'Физика сцены',
+      node: 'Разговор с Аркадием Павловичем',
+      problem: '«микрофон записывает посторонние звуки – то ли он трёт его в кармане» — если микрофон в кармане, голос Ильи звучит иначе. Сцена одновременно хочет «чистый голос крупным планом» и «шорохи из кармана».',
+      fix: '<code>«микрофон ловит посторонние звуки — то ли Илья трёт лацкан, то ли шорохи комнаты»</code>.'
+    },
+    e14: {
+      type: 'logic', label: 'Логическая дыра (самое очевидное)',
+      node: 'Что Илья не учёл',
+      problem: 'Илья прыгает от «не тень Фобоса» к «объект на 42 км», не рассмотрев простейшее: блик в оптике, сбой сенсора, ошибка обработки. «Веретенообразный объект» — типичная форма линзового блика. Прежде чем строить теорию об инопланетном объекте, нужно исключить артефакт.',
+      fix: 'Добавить: <code>«Прежде чем строить теорию, я проверил: это не артефакт оптики? Не сбой сенсора? Не ошибка обработки? Проверил. Нет. Тогда...»</code> — и только потом переходить к вариантам.'
+    },
+    e15: {
+      type: 'logic', label: 'Логическая дыра (психология)',
+      node: 'Дыхание',
+      problem: '«Через несколько дней прослушивания я стал слышать странные голоса» — это классический признак слуховой парейдолии, а не доказательство. Илья сам признаёт, что слушал запись днями. Периодический низкочастотный сигнал мог быть вращающимся компонентом (катушка, вентилятор, гироскоп). Он не проверил механическую природу.',
+      fix: '<code>«Я проверил: не вращается ли что-то в аппарате? Не пульсирует ли лента? Период не совпадает. Но и на дыхание не похоже — слишком регулярно. Я записал свой пульс. Не совпадает. Что это?»</code> — показать, что он хотя бы попытался исключить механику.'
+    },
+    e16: {
+      type: 'logic', label: 'Логическая дыра (физика)',
+      node: 'Вариант 1',
+      problem: 'Атмосфера Марса простирается до ~100+ км. Объект на 42 км был бы внутри атмосферы, испытывал бы сопротивление и нуждался бы в активном удержании. Его бы засекли другие аппараты (орбитеры, роверы). Илья не рассматривает эту проблему.',
+      fix: '<code>«Объект на 42 км — это внутри атмосферы. Разреженной, но не пустой. Он должен был бы постоянно подруливать. И его бы засекли другие аппараты. Но — не засекли. Или засекли, но молчат»</code>.'
+    },
+    e17: {
+      type: 'logic', label: 'Логическая дыра (третье начало)',
+      node: 'Вариант 1',
+      problem: 'Идеальный поглотитель должен быть при 0 K, что невозможно (третье начало термодинамики). Он бы имел температуру и излучал бы как чёрное тело. Термоскан увидел бы источник, а не только тень. Илья применяет скепсис к варианту 2 («слишком фантастично»), но не к варианту 1, который столь же невозможен.',
+      fix: '<code>«Идеальный поглотитель должен быть при 0 K. Это невозможно — третье начало. Он бы излучал. Термоскан увидел бы источник, а не только тень. Но источник не виден. Значит, вариант 1 тоже не работает. Или работает, но не так, как я думаю»</code>.'
+    },
+    e18: {
+      type: 'logic', label: 'Логическая дыра (бритва Оккама)',
+      node: '250–300 км vs 9–10 км',
+      problem: 'Илья сразу заключает «кто-то осознанно сфальсифицировал». Но 250–300 км могло быть опечаткой (метры вместо километров) или ошибкой ввода. Бюрократическая ошибка вероятнее заговора. Илья не рассматривает эту возможность.',
+      fix: '<code>«Может, это просто опечатка? 250–300 метров, а не километров? Я проверил: в отчёте везде километры. Но кто-то мог ошибиться при вводе. Однако ошибка слишком удобна — она объясняет ровно то, что нужно объяснить. Слишком удобно»</code>.'
+    }
+  };
+
+  const views = document.querySelectorAll('.view');
+  const navBtns = document.querySelectorAll('.topnav button');
+
+  function switchView(name) {
+    views.forEach(v => v.classList.toggle('active', v.id === 'view-' + name));
+    navBtns.forEach(b => b.classList.toggle('active', b.dataset.view === name));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (name === 'schema') requestAnimationFrame(draw);
+  }
+  navBtns.forEach(b => b.addEventListener('click', () => switchView(b.dataset.view)));
+
+  const modal = document.getElementById('modal');
+  const modalContent = document.getElementById('modalContent');
+
+  function openModal(id) {
+    const e = errors[id];
+    if (!e) return;
+    modalContent.innerHTML = `
+      <button class="modal-close" aria-label="Закрыть">✕</button>
+      <span class="modal-type ${e.type}">${e.label}</span>
+      <h3>${e.node}</h3>
+      <div class="modal-node">Ошибка ${id.toUpperCase()}</div>
+      <div class="m-section">
+        <div class="m-label">Проблема</div>
+        <div class="m-problem">${e.problem}</div>
+      </div>
+      <div class="m-section">
+        <div class="m-label">Решение</div>
+        <div class="m-fix">${e.fix}</div>
+      </div>
+    `;
+    modal.classList.add('open');
+    modalContent.querySelector('.modal-close').addEventListener('click', closeModal);
+  }
+  function closeModal() { modal.classList.remove('open'); }
+  modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  document.querySelectorAll('[data-err]').forEach(el => {
+    el.addEventListener('click', e => {
+      e.stopPropagation();
+      openModal(el.dataset.err);
+    });
+  });
+
+  const canvas = document.getElementById('canvas');
+  const svg = document.getElementById('lines');
+
+  const connections = [
+    { from: 'start', to: 'tape', type: 'evidence' },
+    { from: 'tape', to: 'data', type: 'fact' },
+    { from: 'data', to: 'condcode', type: 'lost', dashed: true },
+    { from: 'data', to: 'audio', type: 'evidence' },
+    { from: 'data', to: 'report', type: 'classified' },
+    { from: 'audio', to: 'breathing', type: 'speculation' },
+    { from: 'breathing', to: 'conversation', type: 'classified' },
+    { from: 'report', to: 'discrepancy', type: 'evidence' },
+    { from: 'discrepancy', to: 'conversation', type: 'classified' },
+    { from: 'conversation', to: 'sharp_edge', type: 'evidence' },
+    { from: 'sharp_edge', to: 'variant1', type: 'speculation' },
+    { from: 'sharp_edge', to: 'variant2', type: 'speculation' },
+    { from: 'variant1', to: 'missed', type: 'silence', dashed: true },
+    { from: 'variant2', to: 'missed', type: 'silence', dashed: true },
+    { from: 'conversation', to: 'sanatorium', type: 'silence' },
+    { from: 'conversation', to: 'price', type: 'classified' }
+  ];
+
+  const strokeColors = {
+    fact: '#3B82F6', lost: '#8B5CF6', evidence: '#14B8A6',
+    speculation: '#F59E0B', science: '#10B981', silence: '#64748b',
+    classified: '#EF4444', hero: '#14B8A6'
+  };
+
+  function svgEl(name, attrs) {
+    const el = document.createElementNS('http://www.w3.org/2000/svg', name);
+    for (const k in attrs) el.setAttribute(k, attrs[k]);
+    return el;
+  }
+
+  function nodeRect(id) {
+    const el = document.querySelector(`[data-id="${id}"]`);
+    if (!el) return null;
+    const r = el.getBoundingClientRect();
+    const c = canvas.getBoundingClientRect();
+    return {
+      x: r.left - c.left + canvas.scrollLeft,
+      y: r.top - c.top + canvas.scrollTop,
+      w: r.width, h: r.height,
+      cx: r.left - c.left + canvas.scrollLeft + r.width / 2,
+      bottom: r.top - c.top + canvas.scrollTop + r.height,
+      top: r.top - c.top + canvas.scrollTop
+    };
+  }
+
+  function draw() {
+    if (!canvas || !canvas.offsetParent) return;
+    svg.setAttribute('width', canvas.scrollWidth);
+    svg.setAttribute('height', canvas.scrollHeight);
+    svg.innerHTML = '';
+
+    const bySource = {};
+    const byTarget = {};
+    connections.forEach(c => {
+      (bySource[c.from] = bySource[c.from] || []).push(c);
+      (byTarget[c.to] = byTarget[c.to] || []).push(c);
+    });
+
+    connections.forEach(conn => {
+      const from = nodeRect(conn.from);
+      const to = nodeRect(conn.to);
+      if (!from || !to) return;
+
+      const sx = from.cx, sy = from.bottom;
+      const tx = to.cx, ty = to.top;
+      const color = strokeColors[conn.type] || '#475569';
+
+      let d;
+      if (Math.abs(sx - tx) < 2) {
+        d = `M ${sx} ${sy} L ${tx} ${ty}`;
+      } else {
+        const isFork = bySource[conn.from].length > 1;
+        const isMerge = byTarget[conn.to].length > 1;
+        let midY;
+        if (isFork) midY = sy + 22;
+        else if (isMerge) midY = ty - 22;
+        else midY = (sy + ty) / 2;
+        d = `M ${sx} ${sy} L ${sx} ${midY} L ${tx} ${midY} L ${tx} ${ty}`;
+      }
+
+      const path = svgEl('path', {
+        d, fill: 'none', stroke: color,
+        'stroke-width': '2',
+        'stroke-linecap': 'round', 'stroke-linejoin': 'round',
+        opacity: 0.85
+      });
+      if (conn.dashed) path.setAttribute('stroke-dasharray', '6 5');
+      svg.appendChild(path);
+    });
+
+    const cc = nodeRect('condcode');
+    if (cc) {
+      const x = cc.cx, y = cc.bottom, endY = y + 34;
+      const color = '#8B5CF6';
+      svg.appendChild(svgEl('path', {
+        d: `M ${x} ${y} L ${x} ${endY}`,
+        stroke: color, 'stroke-width': 2, 'stroke-dasharray': '4 4',
+        fill: 'none', opacity: 0.6
+      }));
+      const s = 6;
+      svg.appendChild(svgEl('path', {
+        d: `M ${x - s} ${endY - s} L ${x + s} ${endY + s}`,
+        stroke: color, 'stroke-width': 2, fill: 'none', 'stroke-linecap': 'round'
+      }));
+      svg.appendChild(svgEl('path', {
+        d: `M ${x + s} ${endY - s} L ${x - s} ${endY + s}`,
+        stroke: color, 'stroke-width': 2, fill: 'none', 'stroke-linecap': 'round'
+      }));
+    }
+
+    const ms = nodeRect('missed');
+    if (ms) {
+      const x = ms.cx, y = ms.bottom, endY = y + 34;
+      const color = '#8B5CF6';
+      svg.appendChild(svgEl('path', {
+        d: `M ${x} ${y} L ${x} ${endY}`,
+        stroke: color, 'stroke-width': 2, 'stroke-dasharray': '4 4',
+        fill: 'none', opacity: 0.6
+      }));
+      const s = 6;
+      svg.appendChild(svgEl('path', {
+        d: `M ${x - s} ${endY - s} L ${x + s} ${endY + s}`,
+        stroke: color, 'stroke-width': 2, fill: 'none', 'stroke-linecap': 'round'
+      }));
+      svg.appendChild(svgEl('path', {
+        d: `M ${x + s} ${endY - s} L ${x - s} ${endY + s}`,
+        stroke: color, 'stroke-width': 2, fill: 'none', 'stroke-linecap': 'round'
+      }));
+    }
+  }
+
+  function redraw() { requestAnimationFrame(draw); }
+  window.addEventListener('load', redraw);
+  window.addEventListener('resize', redraw);
+  redraw();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(redraw);
+})();
+</script>
+</body>
+</html>
