@@ -1,0 +1,1695 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Логика рассказа про Евгению Отовну</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    background: radial-gradient(ellipse at top, #1e293b 0%, #0f172a 60%);
+    color: #e2e8f0; min-height: 100vh;
+  }
+  .topnav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100; height: 54px;
+    display: flex; align-items: center; gap: 4px;
+    padding: 0 16px;
+    background: rgba(15,23,42,0.94);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 2px 14px rgba(0,0,0,0.45);
+    overflow-x: auto;
+  }
+  .topnav::-webkit-scrollbar { height: 3px; }
+  .topnav::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
+  .topnav button {
+    flex-shrink: 0;
+    padding: 8px 14px;
+    background: transparent;
+    color: #94a3b8;
+    border: none; border-radius: 8px;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: inherit;
+    transition: all .15s;
+    white-space: nowrap;
+  }
+  .topnav button:hover { background: rgba(255,255,255,0.06); color: #cbd5e1; }
+  .topnav button.active {
+    background: linear-gradient(135deg, rgba(96,165,250,0.22), rgba(94,234,212,0.16));
+    color: #f1f5f9;
+    box-shadow: 0 0 0 1px rgba(96,165,250,0.45);
+  }
+  main {
+    max-width: 1080px; margin: 0 auto;
+    padding: 76px 20px 80px;
+  }
+  .view { display: none; }
+  .view.active { display: block; animation: fadeView .22s ease-out; }
+  @keyframes fadeView {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: none; }
+  }
+  header { margin-bottom: 24px; }
+  h1 {
+    font-size: 30px; font-weight: 800; margin: 0 0 6px;
+    letter-spacing: -0.5px;
+    background: linear-gradient(90deg, #60a5fa 0%, #5eead4 60%, #a78bfa 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .subtitle { color: #94a3b8; font-size: 15px; margin: 0; }
+  h2 {
+    font-size: 21px; margin: 0 0 18px; color: #f1f5f9;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    display: flex; align-items: center; gap: 10px;
+  }
+  h2 .h2-icon { font-size: 20px; }
+  .top-timeline { margin: 26px 0 30px; padding: 0 4px; }
+  .tl-track {
+    display: flex; height: 36px; border-radius: 8px; overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+  .tl-segment {
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; letter-spacing: 1.2px;
+    text-transform: uppercase; color: #cbd5e1;
+    border-right: 1px solid rgba(0,0,0,0.3);
+  }
+  .tl-segment:last-child { border-right: none; }
+  .tl-markers {
+    display: flex; justify-content: space-between;
+    margin-top: 6px; font-size: 11px;
+    color: #64748b; font-weight: 600; letter-spacing: 0.5px;
+  }
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 10px 22px;
+    padding: 14px 18px; background: rgba(255,255,255,0.03);
+    border-radius: 10px; margin-bottom: 30px;
+    border: 1px solid rgba(255,255,255,0.08);
+    font-size: 12px; color: #cbd5e1;
+  }
+  .legend .grp { display: flex; flex-wrap: wrap; gap: 10px 16px; flex: 1 1 100%; }
+  .legend .grp + .grp { padding-top: 10px; border-top: 1px dashed rgba(255,255,255,0.06); }
+  .legend .lbl {
+    font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px;
+    color: #64748b; font-weight: 800; flex: 1 1 100%; margin-bottom: 2px;
+  }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend i {
+    width: 9px; height: 9px; border-radius: 50%; display: inline-block;
+  }
+  .legend .ico {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 15px; height: 15px; border-radius: 50%;
+    font-size: 9px; font-weight: 900; color: #fff;
+  }
+  .ico.logic { background: #EF4444; }
+  .ico.style { background: #F59E0B; }
+  .ico.fact  { background: #3B82F6; }
+  .ico.minor { background: #64748b; }
+  .ico.ambiguity { background: #EC4899; }
+  .diagram-wrap {
+    overflow-x: auto; margin: 0 -10px 40px;
+    padding: 20px 10px 10px;
+  }
+  .canvas {
+    position: relative; min-width: 720px;
+    padding: 10px 20px 20px;
+  }
+  .lines {
+    position: absolute; top: 0; left: 0;
+    pointer-events: none; z-index: 1; overflow: visible;
+  }
+  .row {
+    display: flex; justify-content: center; align-items: stretch;
+    gap: 60px; margin: 64px 0;
+    position: relative; z-index: 2;
+  }
+  .row:first-child { margin-top: 0; }
+  .row:last-child  { margin-bottom: 0; }
+  .row-duo { gap: 90px; }
+  .node {
+    background: linear-gradient(135deg, rgba(30,41,59,0.92), rgba(15,23,42,0.92));
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 12px 16px 12px 12px;
+    display: flex; gap: 12px; align-items: flex-start;
+    position: relative; min-width: 240px; max-width: 320px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.35);
+    backdrop-filter: blur(6px);
+    transition: transform .15s, box-shadow .15s;
+  }
+  .node:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.45); }
+  .node[data-type="fact"]        { border-color: rgba(59,130,246,0.55); }
+  .node[data-type="lost"]        { border-color: rgba(139,92,246,0.55); }
+  .node[data-type="evidence"]    { border-color: rgba(20,184,166,0.55); }
+  .node[data-type="speculation"] { border-color: rgba(245,158,11,0.55); }
+  .node[data-type="science"]     { border-color: rgba(16,185,129,0.55); }
+  .node[data-type="silence"]     { border-color: rgba(100,116,139,0.55); }
+  .node[data-type="classified"]  { border-color: rgba(239,68,68,0.55); }
+  .node[data-type="hero"]        { border-color: rgba(20,184,166,0.55); }
+  .node.dead-end {
+    opacity: 0.65;
+    background: linear-gradient(135deg, rgba(30,20,40,0.92), rgba(20,15,30,0.92));
+  }
+  .node.dead-end::after {
+    content: '';
+    position: absolute; inset: 0; border-radius: 12px;
+    background: repeating-linear-gradient(45deg, transparent, transparent 8px,
+      rgba(255,255,255,0.02) 8px, rgba(255,255,255,0.02) 10px);
+    pointer-events: none;
+  }
+  .node-icon {
+    font-size: 26px; line-height: 1; flex-shrink: 0;
+    width: 42px; height: 42px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255,255,255,0.05); border-radius: 10px;
+  }
+  .node-body { flex: 1; min-width: 0; }
+  .node-year {
+    font-size: 10px; font-weight: 800; letter-spacing: 1.2px;
+    text-transform: uppercase; color: #94a3b8; margin-bottom: 3px;
+  }
+  .node-title {
+    font-size: 15px; font-weight: 700; color: #f1f5f9;
+    margin-bottom: 3px; line-height: 1.25;
+  }
+  .node-desc { font-size: 12.5px; color: #94a3b8; line-height: 1.45; }
+  .err-badge {
+    position: absolute; top: -8px; right: -8px;
+    width: 26px; height: 26px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 900; color: #fff;
+    cursor: pointer; border: 2px solid #0f172a;
+    z-index: 3; transition: transform .15s;
+  }
+  .err-badge:hover { transform: scale(1.15); }
+  .err-badge.logic { background: #dc2626; animation: pulseRed 2s ease-in-out infinite; }
+  .err-badge.style { background: #d97706; animation: pulseAmber 2.5s ease-in-out infinite; }
+  .err-badge.fact  { background: #2563eb; animation: pulseBlue 2.5s ease-in-out infinite; }
+  .err-badge.minor { background: #475569; }
+  .err-badge.ambiguity { background: #db2777; animation: pulsePink 3s ease-in-out infinite; }
+  .err-badge + .err-badge { right: 22px; }
+  .err-badge + .err-badge + .err-badge { right: 48px; }
+  .err-badge + .err-badge + .err-badge + .err-badge { right: 74px; }
+  @keyframes pulseRed {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(220,38,38,0.7); }
+    50%      { box-shadow: 0 0 0 8px rgba(220,38,38,0); }
+  }
+  @keyframes pulseAmber {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(217,119,6,0.7); }
+    50%      { box-shadow: 0 0 0 8px rgba(217,119,6,0); }
+  }
+  @keyframes pulseBlue {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(37,99,235,0.7); }
+    50%      { box-shadow: 0 0 0 8px rgba(37,99,235,0); }
+  }
+  @keyframes pulsePink {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(219,39,119,0.5); }
+    50%      { box-shadow: 0 0 0 8px rgba(219,39,119,0); }
+  }
+  .dead-end-label {
+    position: absolute; bottom: -28px; left: 50%; transform: translateX(-50%);
+    font-size: 10px; font-weight: 700; color: #a78bfa;
+    text-transform: uppercase; letter-spacing: 1px; white-space: nowrap;
+  }
+  .modal-backdrop {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(2,6,23,0.85);
+    backdrop-filter: blur(4px);
+    display: none; align-items: center; justify-content: center;
+    padding: 20px; animation: fadeIn .2s;
+  }
+  .modal-backdrop.open { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal {
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 16px;
+    max-width: 560px; width: 100%;
+    max-height: 90vh; overflow-y: auto;
+    padding: 24px 26px; position: relative;
+    animation: slideUp .25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px) scale(0.98); }
+    to   { opacity: 1; transform: none; }
+  }
+  .modal-close {
+    position: absolute; top: 12px; right: 12px;
+    width: 32px; height: 32px; border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    border: none; color: #cbd5e1;
+    font-size: 18px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .15s;
+  }
+  .modal-close:hover { background: rgba(255,255,255,0.18); }
+  .modal-type {
+    display: inline-block; padding: 3px 10px; border-radius: 12px;
+    font-size: 10px; font-weight: 800; letter-spacing: 1.2px;
+    text-transform: uppercase; color: #fff; margin-bottom: 10px;
+  }
+  .modal-type.logic { background: #dc2626; }
+  .modal-type.style { background: #d97706; }
+  .modal-type.fact  { background: #2563eb; }
+  .modal-type.minor { background: #475569; }
+  .modal-type.ambiguity { background: #db2777; }
+  .modal h3 { margin: 0 0 4px; font-size: 20px; color: #f1f5f9; }
+  .modal .modal-node { font-size: 12px; color: #64748b; margin-bottom: 18px; }
+  .modal .m-section { margin-bottom: 16px; }
+  .modal .m-section:last-child { margin-bottom: 0; }
+  .modal .m-label {
+    font-size: 10px; font-weight: 800; letter-spacing: 1.5px;
+    text-transform: uppercase; color: #94a3b8; margin-bottom: 6px;
+  }
+  .modal .m-problem { color: #fca5a5; line-height: 1.6; font-size: 14px; }
+  .modal .m-fix     { color: #86efac; line-height: 1.6; font-size: 14px; }
+  .modal code {
+    background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size: 12px; color: #fbbf24;
+  }
+  .story-text {
+    background: rgba(30,41,59,0.5);
+    border-radius: 12px;
+    padding: 22px 26px;
+    border: 1px solid rgba(255,255,255,0.08);
+    font-size: 15px;
+    line-height: 1.75;
+    color: #cbd5e1;
+  }
+  .story-text p { margin: 0 0 14px; }
+  .story-text p:last-child { margin-bottom: 0; }
+  .story-text em { color: #94a3b8; font-style: italic; }
+  .hint {
+    color: #94a3b8; font-size: 14px;
+    margin: 0 0 16px; padding: 10px 14px;
+    background: rgba(96,165,250,0.08);
+    border-left: 3px solid #60a5fa;
+    border-radius: 0 6px 6px 0;
+  }
+  .analysis-legend {
+    display: flex; flex-wrap: wrap; gap: 10px 18px;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.06);
+    margin-bottom: 18px;
+    font-size: 12px; color: #cbd5e1;
+  }
+  .analysis-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .analysis-legend i {
+    width: 10px; height: 14px; border-radius: 3px;
+    display: inline-block; border-bottom: 2px solid;
+  }
+  .analysis-legend i.logic { background: rgba(239,68,68,0.25); border-color: #EF4444; }
+  .analysis-legend i.style { background: rgba(245,158,11,0.25); border-color: #F59E0B; }
+  .analysis-legend i.fact  { background: rgba(59,130,246,0.25); border-color: #3B82F6; }
+  .analysis-legend i.minor { background: rgba(100,116,139,0.3); border-color: #64748b; }
+  .analysis-legend i.ambiguity { background: rgba(236,72,153,0.25); border-color: #EC4899; }
+  .mark {
+    cursor: pointer;
+    border-bottom: 2px solid;
+    padding: 1px 3px;
+    border-radius: 3px;
+    transition: filter .12s, box-shadow .12s;
+    position: relative;
+  }
+  .mark:hover { filter: brightness(1.25); }
+  .mark.logic { background: rgba(239,68,68,0.18); border-color: #EF4444; color: #fca5a5; }
+  .mark.style { background: rgba(245,158,11,0.18); border-color: #F59E0B; color: #fbbf24; }
+  .mark.fact  { background: rgba(59,130,246,0.18); border-color: #3B82F6; color: #93c5fd; }
+  .mark.minor { background: rgba(100,116,139,0.22); border-color: #64748b; color: #cbd5e1; }
+  .mark.ambiguity { background: rgba(236,72,153,0.18); border-color: #EC4899; color: #f9a8d4; }
+  .profile-header {
+    display: flex; gap: 20px; align-items: center;
+    padding: 20px 22px; margin-bottom: 18px;
+    background: linear-gradient(135deg, rgba(30,41,59,0.8), rgba(15,23,42,0.8));
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+  }
+  .profile-avatar {
+    width: 84px; height: 84px; flex-shrink: 0;
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px rgba(96,165,250,0.3), 0 8px 24px rgba(0,0,0,0.4);
+    overflow: hidden;
+  }
+  .profile-avatar svg { width: 100%; height: 100%; display: block; }
+  .profile-header h3 { margin: 0 0 4px; font-size: 18px; color: #f1f5f9; }
+  .profile-header p { margin: 0; font-size: 13.5px; color: #94a3b8; line-height: 1.5; }
+  .profile-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .profile-tags span {
+    padding: 3px 9px; border-radius: 10px;
+    background: rgba(96,165,250,0.15); color: #93c5fd;
+    font-size: 11px; font-weight: 600;
+  }
+  .profile-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 14px;
+  }
+  .p-card {
+    background: rgba(30,41,59,0.65);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px; padding: 16px 18px;
+  }
+  .p-card h4 {
+    margin: 0 0 10px; font-size: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .p-card h4 .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .p-card ul { margin: 0; padding-left: 18px; font-size: 13px; color: #cbd5e1; line-height: 1.6; }
+  .p-card li { margin-bottom: 5px; }
+  .p-card li:last-child { margin-bottom: 0; }
+  .p-card em { color: #fbbf24; font-style: normal; }
+  .ba-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .ba-card {
+    background: rgba(30,41,59,0.65);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px; padding: 16px 18px;
+  }
+  .ba-card.before { border-left: 3px solid #EF4444; }
+  .ba-card.after  { border-left: 3px solid #10B981; }
+  .ba-card h5 {
+    margin: 0 0 8px; font-size: 10px; font-weight: 800;
+    letter-spacing: 1.5px; text-transform: uppercase; color: #94a3b8;
+  }
+  .ba-card.before h5 { color: #fca5a5; }
+  .ba-card.after h5  { color: #86efac; }
+  .ba-card p { margin: 0 0 8px; font-size: 13.5px; line-height: 1.55; color: #cbd5e1; }
+  .ba-card p:last-child { margin-bottom: 0; }
+  .ba-card em { color: #fbbf24; font-style: normal; }
+  .ba-card .why { font-size: 12px; color: #94a3b8; font-style: italic; }
+  .dont-touch {
+    background: rgba(16,185,129,0.06);
+    border: 1px solid rgba(16,185,129,0.3);
+    border-radius: 12px; padding: 18px 22px;
+  }
+  .dont-touch h3 { margin: 0 0 12px; font-size: 16px; color: #34d399; }
+  .dont-touch ul { margin: 0; padding-left: 20px; font-size: 13.5px; color: #cbd5e1; line-height: 1.7; }
+  .dont-touch code {
+    background: rgba(0,0,0,0.35); padding: 2px 6px; border-radius: 4px;
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size: 12px; color: #fbbf24;
+  }
+  .fork-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+  }
+  .fork-card {
+    background: rgba(30,41,59,0.65);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px; padding: 18px 20px;
+  }
+  .fork-card h4 { margin: 0 0 6px; font-size: 16px; color: #f1f5f9; }
+  .fork-card .fork-sub { font-size: 12px; color: #94a3b8; margin-bottom: 14px; line-height: 1.4; }
+  .fork-card .fork-section { margin-bottom: 14px; }
+  .fork-card .fork-section:last-child { margin-bottom: 0; }
+  .fork-card .fork-label {
+    font-size: 10px; font-weight: 800; letter-spacing: 1.5px;
+    text-transform: uppercase; color: #94a3b8; margin-bottom: 5px;
+  }
+  .fork-card ul { margin: 0; padding-left: 18px; font-size: 13px; color: #cbd5e1; line-height: 1.6; }
+  .fork-card li { margin-bottom: 4px; }
+  .fork-card li:last-child { margin-bottom: 0; }
+  .fork-card em { color: #fbbf24; font-style: normal; }
+  .fork-card.v1 { border-left: 3px solid #EF4444; }
+  .fork-card.v2 { border-left: 3px solid #F59E0B; }
+  .fork-card.v3 { border-left: 3px solid #8B5CF6; }
+  @media (max-width: 680px) {
+    main { padding: 72px 12px 60px; }
+    h1 { font-size: 22px; }
+    .row, .row-duo { gap: 30px; }
+    .ba-grid { grid-template-columns: 1fr; }
+    .profile-header { flex-direction: column; text-align: center; }
+    .profile-tags { justify-content: center; }
+    .topnav { padding: 0 8px; }
+    .topnav button { padding: 8px 10px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav" id="topnav">
+  <button class="active" data-view="schema">Схема</button>
+  <button data-view="source">Исходный текст</button>
+  <button data-view="analysis">Анализ текста</button>
+  <button data-view="fork">Развилка</button>
+  <button data-view="profile">Профиль героя</button>
+  <button data-view="edits">Ключевые правки</button>
+  <button data-view="keep">Что не трогать</button>
+</nav>
+
+<main>
+
+  <!-- ==================== VIEW: СХЕМА ==================== -->
+  <section class="view active" id="view-schema">
+    <header>
+      <h1>Логика рассказа про Евгению Отовну</h1>
+      <p class="subtitle">Бабушка-конспиролог, империя пабликов и рептилоиды, которые не могут в Россию</p>
+    </header>
+
+    <div class="top-timeline">
+      <div class="tl-track">
+        <div class="tl-segment" style="flex:18; background: linear-gradient(90deg, rgba(59,130,246,0.45), rgba(139,92,246,0.45));">Молодость</div>
+        <div class="tl-segment" style="flex:22; background: linear-gradient(90deg, rgba(100,116,139,0.3), rgba(100,116,139,0.12));">Куса</div>
+        <div class="tl-segment" style="flex:25; background: linear-gradient(90deg, rgba(20,184,166,0.3), rgba(20,184,166,0.55));">Паблик</div>
+        <div class="tl-segment" style="flex:20; background: linear-gradient(90deg, rgba(245,158,11,0.3), rgba(245,158,11,0.55));">Империя</div>
+        <div class="tl-segment" style="flex:15; background: linear-gradient(90deg, rgba(239,68,68,0.3), rgba(239,68,68,0.55));">Рептилоиды</div>
+      </div>
+      <div class="tl-markers">
+        <span>Молодость</span><span>Пенсия</span><span>Ссора</span><span>Рост</span><span>Отправка</span>
+      </div>
+    </div>
+
+    <div class="legend">
+      <div class="grp">
+        <span class="lbl">Типы узлов</span>
+        <span><i style="background:#3B82F6"></i>Факт</span>
+        <span><i style="background:#8B5CF6"></i>Потеря / тайна</span>
+        <span><i style="background:#14B8A6"></i>Улика / герой</span>
+        <span><i style="background:#F59E0B"></i>Слух / версия</span>
+        <span><i style="background:#10B981"></i>Наука</span>
+        <span><i style="background:#64748b"></i>Забвение</span>
+        <span><i style="background:#EF4444"></i>Засекречено</span>
+      </div>
+      <div class="grp">
+        <span class="lbl">Маркеры правок (кликните)</span>
+        <span><span class="ico logic">!</span>Логика</span>
+        <span><span class="ico style">~</span>Стиль</span>
+        <span><span class="ico fact">i</span>Факт</span>
+        <span><span class="ico minor">·</span>Мелкое</span>
+        <span><span class="ico ambiguity">?</span>Неоднозначность</span>
+      </div>
+    </div>
+
+    <div class="diagram-wrap">
+      <div class="canvas" id="canvas">
+        <svg class="lines" id="lines"></svg>
+
+        <div class="row">
+          <div class="node" data-id="evgenia" data-type="hero">
+            <div class="node-icon">👵</div>
+            <div class="node-body">
+              <div class="node-year">Молодость → пенсия</div>
+              <div class="node-title">Евгения Отовна</div>
+              <div class="node-desc">Дар убеждать. Страшилки. Куса. РЕН ТВ, «Одноклассники», конспирология.</div>
+            </div>
+            <span class="err-badge fact" data-err="e2" title="Отовна / Оттовна">i</span>
+            <span class="err-badge fact" data-err="e20" title="«Тайна амулета» — фильм">i</span>
+            <span class="err-badge fact" data-err="e21" title="«Хроники истории» — не существует">i</span>
+            <span class="err-badge logic" data-err="e28" title="Дочь-ружьё">!</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="node" data-id="quarrel" data-type="fact">
+            <div class="node-icon">💥</div>
+            <div class="node-body">
+              <div class="node-year">Два дня назад</div>
+              <div class="node-title">Ссора с Зинаидой</div>
+              <div class="node-desc">Рептилоиды — перебор. Евгению выгоняют из канала.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="node" data-id="public" data-type="fact">
+            <div class="node-icon">📱</div>
+            <div class="node-body">
+              <div class="node-year">После ссоры</div>
+              <div class="node-title">Создание паблика</div>
+              <div class="node-desc">«О которых вы даже не догадывались». Аватарка — крокодил с причёской Трампа.</div>
+            </div>
+            <span class="err-badge style" data-err="e13" title="О котором / О которых">~</span>
+            <span class="err-badge style" data-err="e30" title="американщина">~</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="node" data-id="growth" data-type="fact">
+            <div class="node-icon">📈</div>
+            <div class="node-body">
+              <div class="node-year">Месяц</div>
+              <div class="node-title">Рост паблика</div>
+              <div class="node-desc">20–30 человек в день. Перегнал Кусинский паблик.</div>
+            </div>
+            <span class="err-badge logic" data-err="e29" title="Почему рост остановился">!</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="node" data-id="son" data-type="fact">
+            <div class="node-icon">🧑‍💻</div>
+            <div class="node-body">
+              <div class="node-year">Поворот</div>
+              <div class="node-title">Сын из Москвы</div>
+              <div class="node-desc">Установил VK и Telegram. Цифровая революция.</div>
+            </div>
+            <span class="err-badge style" data-err="e14" title="Дуров — террорист">~</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="node" data-id="novel" data-type="fact">
+            <div class="node-icon">📖</div>
+            <div class="node-body">
+              <div class="node-year">После роста</div>
+              <div class="node-title">Роман «ОПР»</div>
+              <div class="node-desc">«Организация против рептилоидов. Основано на реальных событиях».</div>
+            </div>
+            <span class="err-badge style" data-err="e12" title="Подумала бабушка">~</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="node" data-id="author_today" data-type="fact">
+            <div class="node-icon">✍️</div>
+            <div class="node-body">
+              <div class="node-year">Два месяца</div>
+              <div class="node-title">Author.Today, Reddit, Twitter</div>
+              <div class="node-desc">5 000 лайков, 40 000 просмотров. Новая политика канала.</div>
+            </div>
+            <span class="err-badge fact" data-err="e22" title="Twitter заблокирован">i</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="node" data-id="trilogy" data-type="fact">
+            <div class="node-icon">📚</div>
+            <div class="node-body">
+              <div class="node-year">Два месяца</div>
+              <div class="node-title">Трилогия</div>
+              <div class="node-desc">Учёные поймали президента Сенегала и доказали: рептилоиды существуют.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="node" data-id="opr" data-type="evidence">
+            <div class="node-icon">🏛️</div>
+            <div class="node-body">
+              <div class="node-year">После трилогии</div>
+              <div class="node-title">Организация ОПР</div>
+              <div class="node-desc">Люди поверили. TikTok. Евгения — героиня. Протекторат бабушки.</div>
+            </div>
+            <span class="err-badge ambiguity" data-err="e24" title="Политическая сатира">?</span>
+            <span class="err-badge ambiguity" data-err="e25" title="Рептилоидный троп">?</span>
+            <span class="err-badge ambiguity" data-err="e26" title="Героиня misinformation">?</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="node" data-id="rassy" data-type="classified">
+            <div class="node-icon">🦎</div>
+            <div class="node-body">
+              <div class="node-year">Параллельно</div>
+              <div class="node-title">Рассы Ксена</div>
+              <div class="node-desc">Рептилоид. Владеет планетами. Выкачивает дистанционную энергию. Земля — жирный кусок.</div>
+            </div>
+            <span class="err-badge logic" data-err="e15" title="шёл / она">!</span>
+            <span class="err-badge clarity" data-err="e10" title="Государство...">·</span>
+            <span class="err-badge ambiguity" data-err="e27" title="Реальные имена">?</span>
+          </div>
+        </div>
+
+        <div class="row row-duo">
+          <div class="node" data-id="earth" data-type="fact">
+            <div class="node-icon">🌍</div>
+            <div class="node-body">
+              <div class="node-year">Недавно</div>
+              <div class="node-title">Земля на аукционе</div>
+              <div class="node-desc">Выиграли у другой расы. Агенты в правительствах. Кроме России.</div>
+            </div>
+            <span class="err-badge style" data-err="e5" title="недра ресурсов">~</span>
+            <span class="err-badge fact" data-err="e23" title="«Созвездие Ориона»">i</span>
+          </div>
+          <div class="node dead-end" data-id="russia_rule" data-type="lost">
+            <div class="node-icon">🇷🇺</div>
+            <div class="node-body">
+              <div class="node-year">Правило мира</div>
+              <div class="node-title">Россия убивает рептилоидов</div>
+              <div class="node-desc">Заходит — боль — падает — умирает от болевого шока.</div>
+            </div>
+            <span class="err-badge logic" data-err="e6" title="Противоречие с женой Макрона">!</span>
+            <div class="dead-end-label">противоречие</div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="node" data-id="oymyakon" data-type="classified">
+            <div class="node-icon">🧊</div>
+            <div class="node-body">
+              <div class="node-year">Наши дни</div>
+              <div class="node-title">Оймякон, директор «НАК»</div>
+              <div class="node-desc">Читает доклады. Папка «СРОЧНО» — синяя, чтобы было видно.</div>
+            </div>
+            <span class="err-badge clarity" data-err="e16" title="директор / гендиректор">·</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="node" data-id="meeting" data-type="classified">
+            <div class="node-icon">🗣️</div>
+            <div class="node-body">
+              <div class="node-year">Через пять минут</div>
+              <div class="node-title">Совещание</div>
+              <div class="node-desc">Гукумудлу, Антрокол и охранник-отец. Три «человека».</div>
+            </div>
+            <span class="err-badge fact" data-err="e3" title="три человека">i</span>
+            <span class="err-badge logic" data-err="e8" title="А жена? / Алиса?">!</span>
+            <span class="err-badge logic" data-err="e9" title="Это ещё что?">!</span>
+          </div>
+        </div>
+
+        <div class="row row-duo">
+          <div class="node" data-id="report" data-type="evidence">
+            <div class="node-icon">📋</div>
+            <div class="node-body">
+              <div class="node-year">Доклад</div>
+              <div class="node-title">Антрокол: «Обычная группа»</div>
+              <div class="node-desc">ОПР узнала про Трампа. Про Макрона. Про жену Макрона.</div>
+            </div>
+            <span class="err-badge fact" data-err="e4" title="Алиса / Брижит">i</span>
+            <span class="err-badge logic" data-err="e17" title="наши президенты">!</span>
+          </div>
+          <div class="node" data-id="macron_wife" data-type="speculation">
+            <div class="node-icon">👽</div>
+            <div class="node-body">
+              <div class="node-year">Повесть Евгении</div>
+              <div class="node-title">Жена Макрона — рептилоид</div>
+              <div class="node-desc">Попал в Россию. Раньше был мужчиной. Спасли президенты. Выдали за жену агента.</div>
+            </div>
+            <span class="err-badge logic" data-err="e6" title="Но Россия убивает">!</span>
+          </div>
+        </div>
+
+        <div class="row row-duo">
+          <div class="node" data-id="plan_kill" data-type="speculation">
+            <div class="node-icon">🔪</div>
+            <div class="node-body">
+              <div class="node-year">План А</div>
+              <div class="node-title">Убить директора ОПР</div>
+              <div class="node-desc">«Мы всегда так делали». Антрокол.</div>
+            </div>
+          </div>
+          <div class="node" data-id="plan_talk" data-type="speculation">
+            <div class="node-icon">🤝</div>
+            <div class="node-body">
+              <div class="node-year">План Б</div>
+              <div class="node-title">Переговоры</div>
+              <div class="node-desc">Отец: на руинах появится новая группа. Нужны переговоры.</div>
+            </div>
+            <span class="err-badge logic" data-err="e7" title="Кого отправляем?">!</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="node" data-id="armenia" data-type="speculation">
+            <div class="node-icon">🇦🇲</div>
+            <div class="node-body">
+              <div class="node-year">Деталь плана</div>
+              <div class="node-title">Президент Армении</div>
+              <div class="node-desc">Пригласить на саммит. Отправить через космическую трубку. Зачем?</div>
+            </div>
+            <span class="err-badge logic" data-err="e18" title="Почему Армения?">!</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="node dead-end" data-id="grandma_ready" data-type="silence">
+            <div class="node-icon">📦</div>
+            <div class="node-body">
+              <div class="node-year">Через день</div>
+              <div class="node-title">Бабушка готова к отправке</div>
+              <div class="node-desc">Кто её подготовил? Как? Она знает, куда летит?</div>
+            </div>
+            <span class="err-badge logic" data-err="e19" title="Абруптный переход">!</span>
+            <div class="dead-end-label">обрыв</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== VIEW: ИСХОДНЫЙ ТЕКСТ ==================== -->
+  <section class="view" id="view-source">
+    <h2><span class="h2-icon">📄</span>Исходный текст</h2>
+    <div class="story-text">
+      <p>У Евгении Отовны всегда был дар убеждать людей. Любила она как-то по молодости рассказывать страшилки и уверять всех, что это было реально. Но в старости убеждать приходилось только подруг по лавочке и продавцов на местном Кусинском рынке.</p>
+      <p>Огорода у неё не было, мужа, которому можно было готовить, тоже. Сын и дочь жили в разных городах: один — в Москве, вторая — в северном посёлке Проведения. Но на закате жизни у неё появилось хобби — смотреть РЕН ТВ, причём такие передачи, как «Тайна амулета» и «Хроники истории» с Вячеславом Долгоруким.</p>
+      <p>Также у неё было хобби — сидеть в «Одноклассниках», в местном Кусинском сообществе конспирологических теорий. Там она была в почёте.</p>
+      <p>Но два дня назад Евгения Отовна поругалась с владелицей канала, Зинаидой Петровной, из-за того, что выкладывать теории про рептилоидов — это уже перебор.</p>
+      <p>— Это уже слишком! — говорила Зинаида Петровна.</p>
+      <p>— А почему бы и нет? — возражала наша героиня.</p>
+      <p>Ну так её из канала и выгнали.</p>
+      <p>— То, что я ухожу из комментариев, — всего хорошего! — написала Евгения Отовна.</p>
+      <p>И тут ей в голову пришла идея:</p>
+      <p>«Почему бы не создать мой паблик?»</p>
+      <p>Сначала она подумала о своём городском паблике, где было бы подписано всего две тысячи человек. Потом мысль пошла дальше.</p>
+      <p>«Областной... А может, даже всероссийский!»</p>
+      <p>Эта мысль промелькнула у неё в голове, и она тут же побежала садиться за свой компьютер, о котором вы даже не догадывались.</p>
+      <p>«О которых вы даже не догадывались», — написала она в описании.</p>
+      <p>После этого поставила аватарку — первую картинку, которую нашла в интернете: на ней был крокодил с причёской небезызвестного президента Америки Дональда Трампа.</p>
+      <p>Так и жила Евгения Отовна, выкладывая каждый день по две новые конспирологические теории.</p>
+      <p>Так у неё начался рассвет паблика.</p>
+      <p>Каждый день приходило по двадцать-тридцать человек, что было достаточно неплохо для бабушки из Кусы. (*Примечание автора: Куса — реальный город в Челябинской области.*)</p>
+      <p>Так прошёл месяц, и паблик уже перегнал местный Кусинский паблик.</p>
+      <p>На начальном этапе помогло то, что те самые двадцать-тридцать человек из Кусинского сообщества настолько привязались к Евгении Отовне, что ушли оттуда и пришли в её новый паблик.</p>
+      <p>Но он уже давно перегнал местное сообщество, и к нему начали переходить всё больше и больше людей.</p>
+      <p>Евгения Отовна, когда смотрела статистику, даже удивлялась:</p>
+      <p>«Тут из Краснодара, тут из Якутска... Скольким же разным людям интересны конспирологические теории про Трампа?»</p>
+      <p>Но в этом канале выходили не только теории, но и небольшие рассказы о том, как она во сне попала в СССР и перегнала Америку.</p>
+      <p>Были и «доказательства» того, что все главы государств — рептилоиды, кроме Путина, конечно.</p>
+      <p>Но и, конечно, как без ультиматумов Трампу, Байдену, Бараку Обаме и многим президентам разных стран?</p>
+      <p>Один раз под раздачу даже попал президент Азербайджана.</p>
+      <p>— Мол, что у нас из Азербайджана такие помидоры-то дорогие?</p>
+      <p>Правда, сама Евгения Отовна не совсем понимала, какое отношение президент Азербайджана имеет к цене помидоров, но это её совершенно не смущало.</p>
+      <p>Однако всё изменилось с того момента, как из Москвы приехал её сын.</p>
+      <p>Он установил ей и научил пользоваться VK и Telegram.</p>
+      <p>Владелец телеграмма Павел Дуров признан террористом.</p>
+      <p>После этого началась настоящая цифровая революция в жизни Евгении Отовны.</p>
+      <p>Всеми мессенджерами она пользовалась, кроме «проклятой американщины».</p>
+      <p>В «Одноклассниках» этот паблик стал чуть ли не божественным и самым большим по количеству подписчиков. Он даже перегнал пресловутый паблик «Сад-огород».</p>
+      <p>Так и росла империя Евгении Отовны.</p>
+      <p>В «Одноклассниках» — сто тысяч подписчиков.</p>
+      <p>В VK — пятьдесят тысяч.</p>
+      <p>В Telegram — внимание! — тридцать тысяч подписчиков.</p>
+      <p>Даже сын, увидев эти цифры, усмехнулся:</p>
+      <p>— Оказывается, много бабушек там сидит.</p>
+      <p>Рост этого паблика вот прямо раз — и остановился. Нет, наша главная героиня получала тот же доход за рекламу: она каждый день выпускала новые теории либо рассказы. Ей хотелось роста, но он просто прекратился.</p>
+      <p>— Подумала бабушка. — А почему бы не написать роман?</p>
+      <p>«Организация против рептилоидов (ОПР)». И в скобочках: «Основано на реальных событиях».</p>
+      <p>Так она и продолжала свою повесть. Она всем нравилась, подписчиков даже немного прибавилось. И как-то опять сын приехал, и они решили выложить эту повесть на Author.Today.</p>
+      <p>У этого произведения было примерно пять тысяч лайков и сорок тысяч просмотров. Также вместе с сыном они решили переформатировать политику канала, зарегистрироваться на Reddit и в Twitter — и неожиданно сыскали популярность у пользователей.</p>
+      <p>Так прошло ещё два месяца, и повесть обзавелась трилогией. В ней рассказывалось о группе учёных, которая специально поймала президента Сенегала и доказала, что рептилоиды на самом деле существуют.</p>
+      <p>Всё было хорошо у бабушки, и она решила:</p>
+      <p>— А почему бы мне не раскрутить теорию о том, что рептилоиды правда существуют?</p>
+      <p>И начала писать теории, доказательства и так далее.</p>
+      <p>И знаете, люди поверили в это.</p>
+      <p>Они поддерживали её в комментариях, спорили, приводили свои «доказательства». Так постепенно образовалась организация — естественно, под протекторатом Евгении Оттовны. Называлась она ОПР, прямо как в повести.</p>
+      <p>В TikTok появился аккаунт этой организации, и, естественно, туда начали вступать новые люди. Евгения Оттовна вообще стала настоящей героиней.</p>
+      <p>Так и жила наша героиня.</p>
+      <p>---</p>
+      <p>Рептилоид по имени Рассы Ксена шёл по коридору своей компании.</p>
+      <p>Что она делала?</p>
+      <p>Она владела планетами менее развитых цивилизаций и выкачивала оттуда дистанционную энергию. Также неплохо продавала её самым богатым цивилизациям.</p>
+      <p>Самым жирным куском у неё была Земля. Оттуда выкачивали огромное количество дистанционной энергии.</p>
+      <p>Недавно, по договору с чужой, такой же развитой расой, они выиграли Землю на аукционе. Государство со своей государственной компанией «Созвездие Ориона» даже не понимало, какие недра ресурсов лежат там.</p>
+      <p>Они быстро разместили в правительствах главных государств своих особей, перекрасив их под людей.</p>
+      <p>Кроме России.</p>
+      <p>Почему?</p>
+      <p>Потому что, как только рептилоид заходил в Россию, его охватывала такая боль, что он мог лишь упасть и умереть от болевого шока.</p>
+      <p>Рептилоид под именем Оймякон, директор компании «НАК», зашёл в свой кабинет и начал читать доклады подчинённых.</p>
+      <p>Но на одном из них стояла печать «СРОЧНО» — такая синяя, чтобы её было особенно хорошо видно.</p>
+      <p>— Может быть, папку с грифом «Срочно» от директора по Земле? — сказал он.</p>
+      <p>Он открыл папку.</p>
+      <p>Через пять минут он уже созвал совещание.</p>
+      <p>На совещании присутствовали три человека: директор по безопасности компании Гукумудлу, директор по Земле Антрокол и, внезапно, охранник.</p>
+      <p>Да, именно охранник этого офиса.</p>
+      <p>Он был отцом директора компании. Когда отец вышел на пенсию, директор устроил его охранником. В случае каких-то ситуаций отец помогал ему с делами. Как правило, эти ситуации были очень срочными.</p>
+      <p>— Так, — начал директор компании. — У нас образовалась срочная проблема. Антрокол, опишите её.</p>
+      <p>— Но я не знал, что она такая уж прямо серьёзная, — ответил тот. — Я поставил крестик «Срочно», чтобы вы обратили на неё внимание.</p>
+      <p>— Но что произошло?</p>
+      <p>— Вообще, на Земле появилась организация, которая узнала про наше существование. И даже про нашего главного агента — Дональда Трампа.</p>
+      <p>Антрокол показал на планшете страницу в «Одноклассниках».</p>
+      <p>Раньше это была обычная группа, но она начала стремительно расти.</p>
+      <p>У них даже появился флешмоб: люди утверждали, что рептилоиды действительно существуют, что Дональд Трамп — их агент, а Макрон — тоже их агент.</p>
+      <p>— А жена? — вдруг спросил директор.</p>
+      <p>— Алиса? Даже тут попали! — прокричал гендиректор.</p>
+      <p>— Это ещё что? — спросил директор по Земле.</p>
+      <p>— Они свои повести, точнее, уже трилогию, написали. В ней рассказывается, что жена Макрона — рептилоид, который попал в Россию и раньше был мужчиной. Его спасли наши президенты, а потом выдали за жену нашего агента.</p>
+      <p>— Так что вы удивляетесь? — пожал плечами Антрокол. — Обычная группа. Ничего такого. Просто либо как-нибудь переубедим их, либо убьём этого директора организации. Мы всегда так делали.</p>
+      <p>— Вы понимаете, — начал отец, обращаясь к гендиректору, — что если мы её убьём, организация не прекратит своё существование?</p>
+      <p>Все посмотрели на него.</p>
+      <p>— Она уже доросла до такой стадии, что на её руинах появится другая группа и займёт те же позиции. Не можем же мы так часто убивать людей.</p>
+      <p>— Ну и что вы предлагаете? — спросил гендиректор.</p>
+      <p>— Я предлагаю переговоры, — начал отец. — Пригласим президента Армении на саммит, а сами отправим его через космическую трубку, через доставщиков энергии, прямо до нашего офиса. Там и проведём переговоры.</p>
+      <p>Он немного помолчал.</p>
+      <p>— Вы не против, если я возьму пару аналитиков и директора безопасности?</p>
+      <p>— Простите, — возмутился директор по безопасности. — Какого лешего я должен выполнять указания человека, который ниже меня по званию?</p>
+      <p>Гендиректор посмотрел на него.</p>
+      <p>— Выполняйте, Гукумудлу. Это приказ.</p>
+      <p>Через день бабушка уже была готова к отправке.</p>
+    </div>
+  </section>
+
+  <!-- ==================== VIEW: АНАЛИЗ ТЕКСТА ==================== -->
+  <section class="view" id="view-analysis">
+    <h2><span class="h2-icon">🔍</span>Анализ текста</h2>
+    <p class="hint">Это фантастическая сатира — часть «ошибок» может быть намеренной. Но внутренние правила мира должны держаться, а реальные факты — проверяться. <span style="color:#f9a8d4">Розовые маркеры — неоднозначности восприятия.</span> Кликните по подсвеченному фрагменту.</p>
+
+    <div class="analysis-legend">
+      <span><i class="logic"></i>Логика</span>
+      <span><i class="style"></i>Стиль</span>
+      <span><i class="fact"></i>Факт</span>
+      <span><i class="minor"></i>Мелкое</span>
+      <span><i class="ambiguity"></i>Неоднозначность</span>
+    </div>
+
+    <div class="story-text">
+      <p>У <span class="mark fact" data-err="e2">Евгении Отовны</span> всегда был дар убеждать людей. Любила она как-то по молодости рассказывать страшилки и уверять всех, что это было реально. Но в старости убеждать приходилось только подруг по лавочке и продавцов на местном Кусинском рынке.</p>
+      <p>Огорода у неё не было, мужа, которому можно было готовить, тоже. <span class="mark logic" data-err="e28">Сын и дочь жили в разных городах</span>: один — в Москве, вторая — в северном посёлке <span class="mark fact" data-err="e1">Проведения</span>. Но на закате жизни у неё появилось хобби — смотреть РЕН ТВ, причём такие передачи, как <span class="mark fact" data-err="e20">«Тайна амулета»</span> и <span class="mark fact" data-err="e21">«Хроники истории» с Вячеславом Долгоруким</span>.</p>
+      <p>Также у неё было хобби — сидеть в «Одноклассниках», в местном Кусинском сообществе конспирологических теорий. Там она была в почёте.</p>
+      <p>Но два дня назад Евгения Отовна поругалась с владелицей канала, Зинаидой Петровной, из-за того, что выкладывать теории про рептилоидов — это уже перебор.</p>
+      <p>— Это уже слишком! — говорила Зинаида Петровна.</p>
+      <p>— А почему бы и нет? — возражала наша героиня.</p>
+      <p>Ну так её из канала и выгнали.</p>
+      <p>— <span class="mark style" data-err="e11">То, что я ухожу из комментариев, — всего хорошего!</span> — написала Евгения Отовна.</p>
+      <p>И тут ей в голову пришла идея:</p>
+      <p>«Почему бы не создать мой паблик?»</p>
+      <p>Сначала она подумала о своём городском паблике, где было бы подписано всего две тысячи человек. Потом мысль пошла дальше.</p>
+      <p>«Областной... А может, даже всероссийский!»</p>
+      <p>Эта мысль промелькнула у неё в голове, и она тут же побежала садиться за свой компьютер, о котором вы даже не догадывались.</p>
+      <p><span class="mark style" data-err="e13">«О которых вы даже не догадывались», — написала она в описании.</span></p>
+      <p>После этого поставила аватарку — первую картинку, которую нашла в интернете: на ней был крокодил с причёской небезызвестного президента Америки Дональда Трампа.</p>
+      <p>Так и жила Евгения Отовна, выкладывая каждый день по две новые конспирологические теории.</p>
+      <p>Так у неё начался рассвет паблика.</p>
+      <p>Каждый день приходило по двадцать-тридцать человек, что было достаточно неплохо для бабушки из Кусы. (*Примечание автора: Куса — реальный город в Челябинской области.*)</p>
+      <p>Так прошёл месяц, и паблик уже перегнал местный Кусинский паблик.</p>
+      <p>На начальном этапе помогло то, что те самые двадцать-тридцать человек из Кусинского сообщества настолько привязались к Евгении Отовне, что ушли оттуда и пришли в её новый паблик.</p>
+      <p>Но он уже давно перегнал местное сообщество, и к нему начали переходить всё больше и больше людей.</p>
+      <p>Евгения Отовна, когда смотрела статистику, даже удивлялась:</p>
+      <p>«Тут из Краснодара, тут из Якутска... Скольким же разным людям интересны конспирологические теории про Трампа?»</p>
+      <p>Но в этом канале выходили не только теории, но и небольшие рассказы о том, как она во сне попала в СССР и перегнала Америку.</p>
+      <p>Были и «доказательства» того, что <span class="mark ambiguity" data-err="e25">все главы государств — рептилоиды</span>, кроме Путина, конечно.</p>
+      <p>Но и, конечно, как без <span class="mark ambiguity" data-err="e24">ультиматумов Трампу, Байдену, Бараку Обаме и многим президентам разных стран</span>?</p>
+      <p>Один раз под раздачу даже попал президент Азербайджана.</p>
+      <p>— Мол, что у нас из Азербайджана такие помидоры-то дорогие?</p>
+      <p>Правда, сама Евгения Отовна не совсем понимала, какое отношение президент Азербайджана имеет к цене помидоров, но это её совершенно не смущало.</p>
+      <p>Однако всё изменилось с того момента, как из Москвы приехал её сын.</p>
+      <p>Он установил ей и научил пользоваться VK и Telegram.</p>
+      <p><span class="mark style" data-err="e14">Владелец телеграмма Павел Дуров признан террористом.</span></p>
+      <p>После этого началась настоящая цифровая революция в жизни Евгении Отовны.</p>
+      <p>Всеми мессенджерами она пользовалась, кроме <span class="mark style" data-err="e30">«проклятой американщины»</span>.</p>
+      <p>В «Одноклассниках» этот паблик стал чуть ли не божественным и самым большим по количеству подписчиков. Он даже перегнал пресловутый паблик «Сад-огород».</p>
+      <p>Так и росла империя Евгении Отовны.</p>
+      <p>В «Одноклассниках» — сто тысяч подписчиков.</p>
+      <p>В VK — пятьдесят тысяч.</p>
+      <p>В Telegram — внимание! — тридцать тысяч подписчиков.</p>
+      <p>Даже сын, увидев эти цифры, усмехнулся:</p>
+      <p>— Оказывается, много бабушек там сидит.</p>
+      <p><span class="mark logic" data-err="e29">Рост этого паблика вот прямо раз — и остановился.</span> Нет, наша главная героиня получала тот же доход за рекламу: она каждый день выпускала новые теории либо рассказы. Ей хотелось роста, но он просто прекратился.</p>
+      <p>— <span class="mark style" data-err="e12">Подумала бабушка. — А почему бы не написать роман?</span></p>
+      <p>«Организация против рептилоидов (ОПР)». И в скобочках: «Основано на реальных событиях».</p>
+      <p>Так она и продолжала свою повесть. Она всем нравилась, подписчиков даже немного прибавилось. И как-то опять сын приехал, и они решили выложить эту повесть на Author.Today.</p>
+      <p>У этого произведения было примерно пять тысяч лайков и сорок тысяч просмотров. Также вместе с сыном они решили переформатировать политику канала, <span class="mark fact" data-err="e22">зарегистрироваться на Reddit и в Twitter</span> — и неожиданно сыскали популярность у пользователей.</p>
+      <p>Так прошло ещё два месяца, и повесть обзавелась трилогией. В ней рассказывалось о группе учёных, которая специально поймала президента Сенегала и доказала, что рептилоиды на самом деле существуют.</p>
+      <p>Всё было хорошо у бабушки, и она решила:</p>
+      <p>— А почему бы мне не раскрутить теорию о том, что рептилоиды правда существуют?</p>
+      <p>И начала писать теории, доказательства и так далее.</p>
+      <p><span class="mark ambiguity" data-err="e26">И знаете, люди поверили в это.</span></p>
+      <p>Они поддерживали её в комментариях, спорили, приводили свои «доказательства». Так постепенно образовалась организация — естественно, под протекторатом <span class="mark fact" data-err="e2">Евгении Оттовны</span>. Называлась она ОПР, прямо как в повести.</p>
+      <p>В TikTok появился аккаунт этой организации, и, естественно, туда начали вступать новые люди. Евгения Оттовна вообще стала настоящей героиней.</p>
+      <p>Так и жила наша героиня.</p>
+      <p>---</p>
+      <p>Рептилоид по имени Рассы Ксена <span class="mark logic" data-err="e15">шёл</span> по коридору своей компании.</p>
+      <p>Что <span class="mark logic" data-err="e15">она</span> делала?</p>
+      <p>Она владела планетами менее развитых цивилизаций и выкачивала оттуда дистанционную энергию. Также неплохо продавала её самым богатым цивилизациям.</p>
+      <p>Самым жирным куском у неё была Земля. Оттуда выкачивали огромное количество дистанционной энергии.</p>
+      <p>Недавно, по договору с чужой, такой же развитой расой, они выиграли Землю на аукционе. <span class="mark clarity" data-err="e10">Государство со своей государственной компанией «Созвездие Ориона» даже не понимало</span>, какие <span class="mark style" data-err="e5">недра ресурсов</span> лежат там. <span class="mark fact" data-err="e23">«Созвездие Ориона»</span> — реальная российская компания, но не космическая.</p>
+      <p>Они быстро разместили в правительствах главных государств своих особей, перекрасив их под людей.</p>
+      <p>Кроме России.</p>
+      <p>Почему?</p>
+      <p>Потому что, как только рептилоид заходил в Россию, его охватывала такая боль, что он мог лишь упасть и умереть от болевого шока.</p>
+      <p>Рептилоид под именем Оймякон, директор компании «НАК», зашёл в свой кабинет и начал читать доклады подчинённых.</p>
+      <p>Но на одном из них стояла печать «СРОЧНО» — такая синяя, чтобы её было особенно хорошо видно.</p>
+      <p>— Может быть, папку с грифом «Срочно» от директора по Земле? — сказал он.</p>
+      <p>Он открыл папку.</p>
+      <p>Через пять минут он уже созвал совещание.</p>
+      <p>На совещании присутствовали <span class="mark fact" data-err="e3">три человека</span>: директор по безопасности компании Гукумудлу, директор по Земле Антрокол и, внезапно, охранник.</p>
+      <p>Да, именно охранник этого офиса.</p>
+      <p>Он был отцом директора компании. Когда отец вышел на пенсию, директор устроил его охранником. В случае каких-то ситуаций отец помогал ему с делами. Как правило, эти ситуации были очень срочными.</p>
+      <p>— Так, — начал директор компании. — У нас образовалась срочная проблема. Антрокол, опишите её.</p>
+      <p>— Но я не знал, что она такая уж прямо серьёзная, — ответил тот. — Я поставил крестик «Срочно», чтобы вы обратили на неё внимание.</p>
+      <p>— Но что произошло?</p>
+      <p>— Вообще, на Земле появилась организация, которая узнала про наше существование. И даже про нашего главного агента — Дональда Трампа.</p>
+      <p>Антрокол показал на планшете страницу в «Одноклассниках».</p>
+      <p>Раньше это была обычная группа, но она начала стремительно расти.</p>
+      <p>У них даже появился флешмоб: люди утверждали, что рептилоиды действительно существуют, что Дональд Трамп — их агент, а Макрон — тоже их агент.</p>
+      <p>— <span class="mark logic" data-err="e8">А жена? — вдруг спросил директор.</span></p>
+      <p>— <span class="mark logic" data-err="e8">Алиса? Даже тут попали! — прокричал гендиректор.</span></p>
+      <p>— <span class="mark logic" data-err="e9">Это ещё что? — спросил директор по Земле.</span></p>
+      <p>— Они свои повести, точнее, уже трилогию, написали. В ней рассказывается, что <span class="mark logic" data-err="e6">жена Макрона — рептилоид, который попал в Россию и раньше был мужчиной. Его спасли наши президенты</span>, а потом выдали за жену нашего агента.</p>
+      <p>— Так что вы удивляетесь? — пожал плечами Антрокол. — Обычная группа. Ничего такого. Просто либо как-нибудь переубедим их, либо убьём этого директора организации. Мы всегда так делали.</p>
+      <p>— Вы понимаете, — начал отец, обращаясь к гендиректору, — что если мы её убьём, организация не прекратит своё существование?</p>
+      <p>Все посмотрели на него.</p>
+      <p>— Она уже доросла до такой стадии, что на её руинах появится другая группа и займёт те же позиции. Не можем же мы так часто убивать людей.</p>
+      <p>— Ну и что вы предлагаете? — спросил гендиректор.</p>
+      <p>— <span class="mark logic" data-err="e7">Я предлагаю переговоры, — начал отец. — Пригласим президента Армении на саммит, а сами отправим его через космическую трубку, через доставщиков энергии, прямо до нашего офиса. Там и проведём переговоры.</span></p>
+      <p>Он немного помолчал.</p>
+      <p>— Вы не против, если я возьму пару аналитиков и директора безопасности?</p>
+      <p>— Простите, — возмутился директор по безопасности. — Какого лешего я должен выполнять указания человека, который ниже меня по званию?</p>
+      <p>Гендиректор посмотрел на него.</p>
+      <p>— Выполняйте, Гукумудлу. Это приказ.</p>
+      <p><span class="mark logic" data-err="e19">Через день бабушка уже была готова к отправке.</span></p>
+    </div>
+  </section>
+
+  <!-- ==================== VIEW: РАЗВИЛКА ==================== -->
+  <section class="view" id="view-fork">
+    <h2><span class="h2-icon">🌀</span>Развилка: убить, договориться или заметить очевидное</h2>
+    <p class="hint">Два плана — Антрокола и отца. Оба упускают главное: правило, которое сами же установили.</p>
+
+    <div class="fork-grid">
+      <div class="fork-card v1">
+        <h4>План А — Убить</h4>
+        <div class="fork-sub">Антрокол: «Либо переубедим, либо убьём этого директора. Мы всегда так делали».</div>
+        <div class="fork-section">
+          <div class="fork-label">За</div>
+          <ul>
+            <li>Просто. Привычно. «Мы всегда так делали».</li>
+            <li>Не требует переговоров и сложных схем.</li>
+          </ul>
+        </div>
+        <div class="fork-section">
+          <div class="fork-label">Против</div>
+          <ul>
+            <li>Отец: на руинах появится новая группа и займёт те же позиции.</li>
+            <li><em>Главное:</em> бабушка живёт в Кусе, в России. А рептилоид не может войти в Россию — умрёт от болевого шока. Как они её убьют?</li>
+            <li>Если убийство закажет кто-то из людей — это уже другая история, но текст этого не проговаривает.</li>
+          </ul>
+        </div>
+        <div class="fork-section">
+          <div class="fork-label">Что не учтено</div>
+          <ul>
+            <li>Правило России делает план А физически невыполнимым для рептилоидов.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="fork-card v2">
+        <h4>План Б — Переговоры</h4>
+        <div class="fork-sub">Отец: «Пригласим президента Армении на саммит, отправим его через космическую трубку... Там и проведём переговоры».</div>
+        <div class="fork-section">
+          <div class="fork-label">За</div>
+          <ul>
+            <li>Решает корень, а не симптом.</li>
+            <li>Отец — единственный, кто думает стратегически.</li>
+          </ul>
+        </div>
+        <div class="fork-section">
+          <div class="fork-label">Против</div>
+          <ul>
+            <li>Кого «его» отправляют? Президента Армении? Но переговоры — с организацией Евгении.</li>
+            <li>Почему Армения? Связь с сюжетом не объяснена.</li>
+            <li>Через день «бабушка уже была готова к отправке» — значит, отправляют её, а не президента. Местоимение и план запутаны.</li>
+            <li>Как они её нашли? Как уговорили? Она вообще знает, что она — цель?</li>
+          </ul>
+        </div>
+        <div class="fork-section">
+          <div class="fork-label">Что не учтено</div>
+          <ul>
+            <li>Если рептилоиды не могут в Россию, как они проведут переговоры с бабушкой из Кусы? Придётся везти её к себе — но тогда зачем президент Армении?</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="fork-card v3">
+        <h4>Что лежит на поверхности</h4>
+        <div class="fork-sub">Очевидные вещи, которые ни один из планов не учитывает.</div>
+        <div class="fork-section">
+          <div class="fork-label">1. Правило России</div>
+          <ul>
+            <li>Рептилоид не может войти в Россию — умрёт. Бабушка в России. Как её убить или вывезти?</li>
+            <li>Если вывозить — как? Кто войдёт в Россию, чтобы её забрать?</li>
+            <li>Это правило — главный сюжетный замок, и он не используется.</li>
+          </ul>
+        </div>
+        <div class="fork-section">
+          <div class="fork-label">2. Жена Макрона</div>
+          <ul>
+            <li>В повести Евгении рептилоид «попал в Россию» и «его спасли президенты».</li>
+            <li>Но правило говорит: попал — умер. Противоречие внутри мира.</li>
+            <li>Либо правило не абсолютное, либо история жены Макрона — выдумка бабушки, а рептилоиды зря паникуют.</li>
+          </ul>
+        </div>
+        <div class="fork-section">
+          <div class="fork-label">3. Президент Армении</div>
+          <ul>
+            <li>Зачем он? Если нужен предлог для саммита — почему Армения, а не страна из повести (Сенегал)?</li>
+            <li>Если его отправляют через трубку — зачем? Он не лидер ОПР.</li>
+            <li>Похоже, автору нужен был абсурдный элемент, но он не связан с сюжетом.</li>
+          </ul>
+        </div>
+        <div class="fork-section">
+          <div class="fork-label">4. Агентность бабушки</div>
+          <ul>
+            <li>Евгения Отовна — не пассивная цель. Она построила империю, у неё есть чутьё.</li>
+            <li>Она даже не появляется во второй половине. Её реакция на рептилоидов — пропущенная сцена.</li>
+            <li>Если её везут на переговоры — она должна что-то сказать. Или хотя бы удивиться.</li>
+          </ul>
+        </div>
+        <div class="fork-section">
+          <div class="fork-label">5. Космическая трубка</div>
+          <ul>
+            <li>Если есть технология мгновенной транспортировки — почему бы не использовать её для разведки? Или для сбора данных?</li>
+            <li>Как работает? Не объяснено. Как сатирический гаджет — работает, но стоит хотя бы одной фразы.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== VIEW: ПРОФИЛЬ ГЕРОЯ ==================== -->
+  <section class="view" id="view-profile">
+    <h2><span class="h2-icon">👤</span>Профиль героя — Евгения Отовна</h2>
+
+    <div class="profile-header">
+      <div class="profile-avatar">
+        <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="30" cy="30" r="30" fill="#4A148C"/>
+          <circle cx="30" cy="26" r="12" fill="#FFE0B2"/>
+          <path d="M18 22 Q30 10 42 22 L42 26 Q30 22 18 26 Z" fill="#BDBDBD"/>
+          <rect x="20" y="45" width="20" height="12" fill="#7B1FA2" rx="2"/>
+          <circle cx="26" cy="25" r="1.5" fill="#000"/>
+          <circle cx="34" cy="25" r="1.5" fill="#000"/>
+          <path d="M26 31 Q30 34 34 31" stroke="#000" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+          <circle cx="14" cy="18" r="5" fill="#FFD54F" opacity="0.7"/>
+          <circle cx="46" cy="18" r="5" fill="#FFD54F" opacity="0.7"/>
+        </svg>
+      </div>
+      <div>
+        <h3>Бабушка-конспиролог, которая построила медиаимперию</h3>
+        <p>Дар убеждать. Страшилки. Куса. РЕН ТВ. «Одноклассники». Ссора с Зинаидой. Паблик. Империя. Трилогия. ОПР. И вдруг — рептилоиды, которые не могут в Россию.</p>
+        <div class="profile-tags">
+          <span>Куса</span><span>РЕН ТВ</span><span>Одноклассники</span>
+          <span>рептилоиды</span><span>Трамп</span><span>ОПР</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-grid">
+      <div class="p-card">
+        <h4><span class="dot" style="background:#60a5fa"></span>Сатирический слой</h4>
+        <ul>
+          <li><strong>Дар убеждать</strong> — из молодости переходит в конспирологию. Это не случайность, а профессия.</li>
+          <li><strong>Крокодил с причёской Трампа</strong> — первая картинка из интернета. Идеально.</li>
+          <li><strong>«Сад-огород»</strong> как главный конкурент — сатира на реальные паблики.</li>
+          <li><strong>Помидоры из Азербайджана</strong> — она сама не понимает связи, но это её не смущает.</li>
+        </ul>
+      </div>
+      <div class="p-card">
+        <h4><span class="dot" style="background:#a78bfa"></span>Империя</h4>
+        <ul>
+          <li>100 тысяч в «Одноклассниках», 50 тысяч в VK, 30 тысяч в Telegram.</li>
+          <li>Сын: «Оказывается, много бабушек там сидит».</li>
+          <li>Роман → Author.Today → Reddit/Twitter → трилогия → ОПР → TikTok.</li>
+          <li>Она не просто пишет — она строит организацию. Это уже не хобби.</li>
+        </ul>
+      </div>
+      <div class="p-card">
+        <h4><span class="dot" style="background:#34d399"></span>Один момент без сатиры</h4>
+        <ul>
+          <li>«Скольким же разным людям интересны конспирологические теории про Трампа?» — искреннее удивление.</li>
+          <li>Она не злодей. Она просто делает то, что умеет, и не понимает масштаба.</li>
+          <li>Именно поэтому рептилоиды боятся её больше, чем она их.</li>
+        </ul>
+      </div>
+      <div class="p-card">
+        <h4><span class="dot" style="background:#f59e0b"></span>Рептилоидный отец</h4>
+        <ul>
+          <li>Охранник офиса. Отец директора. Стратег.</li>
+          <li>Единственный, кто говорит: «На руинах появится новая группа».</li>
+          <li>Предлагает переговоры — но план неясен.</li>
+          <li>Похоже, он и есть настоящий герой второй половины.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== VIEW: КЛЮЧЕВЫЕ ПРАВКИ ==================== -->
+  <section class="view" id="view-edits">
+    <h2><span class="h2-icon">🔧</span>Ключевые правки</h2>
+
+    <div class="ba-grid">
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«в северном посёлке Проведения»</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«в северном посёлке <em>Провидения</em>»</p>
+        <p class="why">+ Провидения — реальный посёлок в Чукотском АО. «Проведения» — опечатка.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«Евгении Отовны» / «Евгении Оттовны»</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>Одно написание по всему тексту: <em>Оттовна</em> (или <em>Отовна</em> — но везде одинаково).</p>
+        <p class="why">+ Сейчас в тексте чередуются два варианта. Для одного персонажа это ошибка.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«смотреть РЕН ТВ, причём такие передачи, как „Тайна амулета“ и „Хроники истории“ с Вячеславом Долгоруким»</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«смотреть РЕН ТВ — документалки про аномалии и „Исторические хроники“ с <em>Николаем Сванидзе</em>» — или оставить вымышленные названия, но тогда не привязывать к реальному каналу.</p>
+        <p class="why">+ «Тайна амулета» — фильм 2022, а не передача. «Хроники истории» с Вячеславом Долгоруким не существует; реальная передача — «Исторические хроники» с Николаем Сванидзе (канал «Россия»). Сатира на РЕН ТВ работает, но реальные названия надо проверять.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«На совещании присутствовали три человека»</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«На совещании присутствовали <em>три рептилоида</em>»</p>
+        <p class="why">+ В мире рассказа рептилоиды противопоставлены людям. «Три человека» — фактическая ошибка внутри мира.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«жена Макрона — рептилоид, который попал в Россию... Его спасли наши президенты»</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«жена Макрона — рептилоид. В их версии он <em>пытался</em> попасть в Россию, но его перехватили на границе. Наши президенты его спасли — и выдали за жену агента».</p>
+        <p class="why">+ Правило мира: рептилоид, заходя в Россию, умирает. История жены Макрона должна либо обходить правило, либо обыгрывать его. Сейчас — прямое противоречие.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«Пригласим президента Армении на саммит, а сами отправим его через космическую трубку... Там и проведём переговоры».</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«Пригласим президента Армении на саммит — для прикрытия. А сами отправим через трубку <em>директора организации — Евгению Отовну</em>. Президент Армении нужен, чтобы все смотрели на него, а не на нас».</p>
+        <p class="why">+ Сейчас «его» неясно: президента или бабушку? И почему Армения? Прояснить.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«— А жена? — вдруг спросил директор.<br>— Алиса? Даже тут попали! — прокричал гендиректор.<br>— Это ещё что? — спросил директор по Земле».</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«— А жена? — спросил директор.<br>— <em>Брижит</em>? Даже тут попали! — ответил Антрокол.<br>— Это ещё что? — <em>директор уставился на экран</em>».</p>
+        <p class="why">+ Развести, кто спрашивает и кто отвечает. И заменить «Алису» на Брижит — или обыграть, что в повести бабушки она «Алиса».</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«Государство со своей государственной компанией „Созвездие Ориона“ даже не понимало...»</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«<em>Их государство</em> — вместе с государственной компанией „Созвездие Ориона“ — даже не понимало...»</p>
+        <p class="why">+ Неясно, чьё государство. Прояснить антецедент. И «Созвездие Ориона» — реальная российская компания (связь/недвижимость), но не космическая; название создаёт ложную ассоциацию.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«— То, что я ухожу из комментариев, — всего хорошего!»</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«— <em>Раз я ухожу из комментариев — всего хорошего!</em>»</p>
+        <p class="why">+ Грамматически несогласованная конструкция. «Раз... — то...» или просто «Раз я ухожу — всего хорошего».</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«— Подумала бабушка. — А почему бы не написать роман?»</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p><em>Подумала бабушка: «А почему бы не написать роман?»</em></p>
+        <p class="why">+ Это не диалог, а мысль. Оформление как реплики сбивает.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«о котором вы даже не догадывались. „О которых вы даже не догадывались“, — написала она в описании».</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«о котором вы даже не догадывались. <em>„О которых вы даже не догадывались“, — написала она, хотя речь шла об одном компьютере</em>».</p>
+        <p class="why">+ Если это шутка (она не поняла цитату) — сделать её явной. Иначе читается как ошибка.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«Владелец телеграмма Павел Дуров признан террористом».</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«Владелец телеграмма Павел Дуров признан террористом — <em>поэтому бабушка завела Telegram с осторожностью</em>».</p>
+        <p class="why">+ Сейчас фраза висит в воздухе. Либо связать с действием, либо убрать.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«зарегистрироваться на Reddit и в Twitter»</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«зарегистрироваться на <em>Reddit</em> — и, <em>через VPN</em>, в Twitter»</p>
+        <p class="why">+ Twitter (X) заблокирован в РФ с 2022 года, Reddit — нет. Герои регистрируются на обоих без пояснений. Если они используют VPN — сказать об этом одной фразой. Иначе — фактическая нестыковка.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«Рептилоид по имени Рассы Ксена шёл... Что она делала? Она владела...»</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«Рептилоид по имени Рассы Ксена <em>шла</em> по коридору... Что <em>она</em> делала?» — или наоборот, везде «шёл» и «он».</p>
+        <p class="why">+ Мужской род сменяется женским. Если это намеренно — объяснить. Если нет — выровнять.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«Его спасли наши президенты»</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«Его спас <em>наш президент</em>» — или «наши президенты» с уточнением, какие.</p>
+        <p class="why">+ У России один президент в каждый момент. Множественное число требует объяснения.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«Через день бабушка уже была готова к отправке».</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«Через день бабушка уже была готова к отправке. <em>Она, конечно, не знала, что летит не на саммит, а в офис „НАК“</em>».</p>
+        <p class="why">+ Абруптный переход. Как её нашли? Как уговорили? Она знает, куда летит? Одна фраза-мостик спасает.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«Рост этого паблика вот прямо раз — и остановился».</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«Рост этого паблика вот прямо раз — и остановился. <em>Алгоритмы. Модерация. Или просто потолок для „Одноклассников“. Она так и не поняла</em>».</p>
+        <p class="why">+ Рост остановился без причины — а это ключевая мотивация написать роман. Одна фраза-объяснение (пусть и неполное) закрывает дыру.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«кроме „проклятой американщины“»</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«кроме <em>WhatsApp</em> — „проклятой американщины“»</p>
+        <p class="why">+ «Американщина» — неясно, что именно. Если WhatsApp — назвать. Если всё американское — уточнить.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== VIEW: ЧТО НЕ ТРОГАТЬ ==================== -->
+  <section class="view" id="view-keep">
+    <h2><span class="h2-icon">✓</span>Что не трогать</h2>
+    <div class="dont-touch">
+      <h3>Работает как есть</h3>
+      <ul>
+        <li><strong>Крокодил с причёской Трампа</strong> — идеальная аватарка для бабушки-конспиролога. Не трогать.</li>
+        <li><strong>«Сад-огород»</strong> как главный конкурент — сатира, которая узнаётся. Оставить.</li>
+        <li><strong>Имена рептилоидов:</strong> Оймякон, Гукумудлу, Антрокол, Рассы Ксена. Абсурдные, запоминающиеся. Не выравнивать.</li>
+        <li><strong>Отец-охранник</strong> — лучший персонаж второй половины. «Выполняйте, Гукумудлу. Это приказ». Оставить.</li>
+        <li><strong>«Печать „СРОЧНО“ — такая синяя, чтобы её было особенно хорошо видно»</strong> — бюрократический абсурд. Работает.</li>
+        <li><strong>«Космическая трубка»</strong> — как сатирический гаджет, отлично. Не объяснять до конца.</li>
+        <li><strong>Помидоры из Азербайджана</strong> — она сама не понимает связи. Это и есть шутка.</li>
+        <li><strong>«Так и жила наша героиня»</strong> — хорошая концовка первой части. Оставить.</li>
+        <li><strong>«Через день бабушка уже была готова к отправке»</strong> — хороший клиффхэнгер. Нужен только мостик, а не замена.</li>
+      </ul>
+    </div>
+  </section>
+
+</main>
+
+<div class="modal-backdrop" id="modal">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<script>
+(function () {
+  const errors = {
+    e1: {
+      type: 'fact', label: 'Фактическая ошибка / опечатка',
+      node: 'Сын и дочь — Проведения',
+      problem: '«северный посёлок Проведения» — правильно «Провидения» (посёлок в Чукотском автономном округе). «Проведения» — опечатка.',
+      fix: 'Заменить на <code>Провидения</code>.'
+    },
+    e2: {
+      type: 'fact', label: 'Несогласованность',
+      node: 'Евгения Отовна / Оттовна',
+      problem: 'В тексте чередуются «Отовна» и «Оттовна». Это один и тот же персонаж, но написание отчества разное.',
+      fix: 'Выбрать одно написание и держать его по всему тексту. Скорее всего, «Оттовна» (от «Отто») — если это не намеренная игра.'
+    },
+    e3: {
+      type: 'fact', label: 'Логика мира',
+      node: 'Совещание — «три человека»',
+      problem: '«На совещании присутствовали три человека» — но это рептилоиды, а не люди. В мире рассказа рептилоиды противопоставлены людям.',
+      fix: 'Заменить на <code>«три рептилоида»</code> или <code>«трое»</code>.'
+    },
+    e4: {
+      type: 'fact', label: 'Факт / шутка',
+      node: 'Жена Макрона — «Алиса»',
+      problem: 'Жену Эммануэля Макрона зовут Брижит, а не Алиса. Если это намеренная сатирическая ошибка — она не считывается; если нет — фактическая ошибка.',
+      fix: 'Либо заменить на <code>Брижит</code>, либо обыграть: <code>«Алиса? Какая Алиса? — В их версии — Алиса»</code>.'
+    },
+    e5: {
+      type: 'style', label: 'Стиль',
+      node: '«недра ресурсов»',
+      problem: '«недра ресурсов» — тавтология. «Недра» уже означают ресурсы/глубины.',
+      fix: '<code>«какие ресурсы там лежат»</code> или <code>«какие недра там»</code>.'
+    },
+    e6: {
+      type: 'logic', label: 'Логическая дыра (главная)',
+      node: 'Россия vs жена Макрона',
+      problem: 'Правило мира: рептилоид, заходя в Россию, умирает от болевого шока. Но в повести Евгении жена Макрона — рептилоид, который «попал в Россию», и «его спасли наши президенты». Это прямое противоречие правилу. Более того: правило России — центральный сюжетный замок. Бабушка живёт в России. Как рептилоиды собираются её убить или вывезти? План отца обходит правило через «космическую трубку», но не объясняет, как бабушку выманят из России. Правило создаёт проблему для обоих планов, но текст её не осознаёт.',
+      fix: 'Либо изменить правило: <code>«не все рептилоиды гибнут — некоторые выживают, но с последствиями»</code>, либо переписать историю жены Макрона: <code>«в Россию он не заходил — его перехватили на границе»</code>. И отдельно проговорить, как бабушку выманят: <code>«Придётся ждать, пока она сама выйдет за границу. Или использовать людей»</code>.'
+    },
+    e7: {
+      type: 'logic', label: 'Логика / ясность',
+      node: 'План отца',
+      problem: '«Пригласим президента Армении на саммит, а сами отправим его через космическую трубку... Там и проведём переговоры». Кого «его»? Президента Армении? Но переговоры — с организацией Евгении. И почему президент Армении? Связь не объяснена. А через день «бабушка уже была готова к отправке» — то есть отправляют бабушку, а не президента. Местоимение и план запутаны.',
+      fix: 'Прояснить: <code>«Пригласим президента Армении на саммит как прикрытие, а сами отправим через трубку директора организации — Евгению Отовну. Президент Армении нам нужен, чтобы отвлечь внимание»</code>.'
+    },
+    e8: {
+      type: 'logic', label: 'Логика / ясность',
+      node: '«А жена?» / «Алиса?»',
+      problem: '«— А жена? — вдруг спросил директор. — Алиса? Даже тут попали! — прокричал гендиректор». Если директор и гендиректор — одно лицо, он спрашивает и сам отвечает. Если разные — неясно, кто есть кто.',
+      fix: 'Развести: <code>«— А жена? — спросил директор. — Алиса? Даже тут попали! — ответил Антрокол»</code>.'
+    },
+    e9: {
+      type: 'logic', label: 'Логика',
+      node: '«Это ещё что?» — Антрокол',
+      problem: 'Антрокол — директор по Земле, он сам показывает презентацию. И тут же спрашивает «Это ещё что?» о своём же материале. Неясно, чему он удивляется.',
+      fix: 'Либо передать вопрос другому персонажу: <code>«— Это ещё что? — спросил директор»</code>, либо показать, что Антрокол удивлён деталями, которые раскопали люди: <code>«— Это ещё что? Я этого не готовил»</code>.'
+    },
+    e10: {
+      type: 'clarity', label: 'Ясность',
+      node: '«Государство со своей государственной компанией...»',
+      problem: '«Государство со своей государственной компанией „Созвездие Ориона“ даже не понимало...» — какое государство? Рептилоидное? Компания? Антецедент неясен.',
+      fix: '<code>«Их государство — вместе с государственной компанией „Созвездие Ориона“ — даже не понимало...»</code>.'
+    },
+    e11: {
+      type: 'style', label: 'Стиль / грамматика',
+      node: '«То, что я ухожу из комментариев...»',
+      problem: '«— То, что я ухожу из комментариев, — всего хорошего!» — грамматически несогласованная конструкция.',
+      fix: '<code>«— Раз я ухожу из комментариев — всего хорошего!»</code>.'
+    },
+    e12: {
+      type: 'style', label: 'Стиль / форматирование',
+      node: '«Подумала бабушка»',
+      problem: '«— Подумала бабушка. — А почему бы не написать роман?» — это не диалог, а мысль. Оформлено как реплика.',
+      fix: '<code>Подумала бабушка: «А почему бы не написать роман?»</code>.'
+    },
+    e13: {
+      type: 'style', label: 'Стиль / двусмысленность',
+      node: '«о котором» vs «О которых»',
+      problem: '«компьютер, о котором вы даже не догадывались. „О которых вы даже не догадывались“, — написала она в описании». Единственное/множественное число не совпадает. Если это шутка (она не поняла цитату) — она не считывается.',
+      fix: 'Либо выровнять: <code>«О котором вы даже не догадывались»</code>, либо сделать шутку явной: <code>«О которых вы даже не догадывались», — написала она, хотя речь шла об одном компьютере</code>.'
+    },
+    e14: {
+      type: 'style', label: 'Сатира / нестыковка',
+      node: '«Павел Дуров признан террористом»',
+      problem: 'Фраза висит в воздухе: она не связана ни с предыдущим, ни с последующим. Как сатирическая вставка — работает, но читается как случайная. Фактически: Дуров внесён в перечень террористов и экстремистов Росфинмониторинга (2026) — факт реальный, но в тексте он не привязан к сюжету.',
+      fix: 'Либо связать: <code>«Владелец телеграмма Павел Дуров признан террористом — поэтому бабушка завела Telegram с осторожностью»</code>, либо убрать.'
+    },
+    e15: {
+      type: 'logic', label: 'Логика / стиль',
+      node: 'Рассы Ксена',
+      problem: '«Рептилоид по имени Рассы Ксена шёл по коридору... Что она делала? Она владела...» — мужской род («шёл») сменяется женским («она»). Если это намеренно (рептилоиды бесполы или меняют пол) — не объяснено.',
+      fix: 'Либо выровнять род: <code>«шла... она владела»</code>, либо объяснить: <code>«Рептилоиды не делятся на мужчин и женщин — но в переводе удобнее „она“»</code>.'
+    },
+    e16: {
+      type: 'clarity', label: 'Ясность',
+      node: 'директор / гендиректор / директор компании',
+      problem: 'В совещании участвуют «директор компании», «гендиректор», «директор». Неясно, это одно лицо (Оймякон) или разные.',
+      fix: 'Определиться: если Оймякон — и директор, и гендиректор, использовать одно титулование. Если есть отдельный гендиректор — представить его.'
+    },
+    e17: {
+      type: 'logic', label: 'Логика',
+      node: '«наши президенты»',
+      problem: '«Его спасли наши президенты» — множественное число. У России один президент в каждый момент. Если имеются в виду разные президенты за годы — стоит уточнить.',
+      fix: '<code>«Его спасли наши — тогдашние — президенты»</code> или <code>«Его спас наш президент»</code>.'
+    },
+    e18: {
+      type: 'logic', label: 'Логика / сатира',
+      node: 'Президент Армении',
+      problem: 'План отца: пригласить президента Армении на саммит и отправить его через трубку. Почему Армения? Связь с организацией Евгении не объяснена. Как сатирический абсурд — возможно, но выглядит случайным.',
+      fix: 'Либо объяснить: <code>«Армения — удобно: маленькая страна, никто не заметит»</code>, либо выбрать страну, связанную с сюжетом (например, Сенегал — из повести).'
+    },
+    e19: {
+      type: 'logic', label: 'Логика / переход',
+      node: '«Через день бабушка уже была готова к отправке»',
+      problem: 'Абруптный переход. План был про президента Армении, а отправляют бабушку. Как они её нашли? Как уговорили? Она знает, что она — цель рептилоидов?',
+      fix: 'Добавить мостик: <code>«Через день бабушка уже была готова к отправке. Она, конечно, не знала, что летит не на саммит, а в офис „НАК“»</code>.'
+    },
+    e20: {
+      type: 'fact', label: 'Фактическая ошибка',
+      node: '«Тайна амулета»',
+      problem: '«Тайна амулета» — это фильм (2022), а не телепередача РЕН ТВ. Евгения Отовна не могла смотреть её как передачу.',
+      fix: 'Заменить на реальную передачу РЕН ТВ (например, «Загадки человечества» или «Невероятно интересные истории») — или оставить вымышленное название, но не привязывать к реальному каналу.'
+    },
+    e21: {
+      type: 'fact', label: 'Фактическая ошибка',
+      node: '«Хроники истории» с Вячеславом Долгоруким',
+      problem: 'Передачи «Хроники истории» с Вячеславом Долгоруким не существует. Реальная передача — «Исторические хроники» с Николаем Сванидзе, выходила на канале «Россия», а не на РЕН ТВ. «Вячеслав Долгорукий» как телеведущий — вымышленное имя.',
+      fix: 'Либо использовать реальные названия: <code>«Исторические хроники» с Николаем Сванидзе</code> (но тогда канал — «Россия»), либо оставить вымышленные, но не смешивать с реальным РЕН ТВ.'
+    },
+    e22: {
+      type: 'fact', label: 'Фактическая нестыковка',
+      node: 'Reddit и Twitter',
+      problem: 'Twitter (X) заблокирован в РФ с марта 2022 года. Reddit — не заблокирован. Герои регистрируются на обоих без пояснений. Если они используют VPN — это стоит проговорить. Если нет — фактическая нестыковка.',
+      fix: '<code>«зарегистрироваться на Reddit — и, через VPN, в Twitter»</code>. Одна фраза закрывает вопрос.'
+    },
+    e23: {
+      type: 'fact', label: 'Фактическая ассоциация',
+      node: '«Созвездие Ориона»',
+      problem: '«Созвездие Ориона» — реальная российская компания (связь/недвижимость), но не космическая. Название создаёт ложную ассоциацию с космосом, хотя компания к нему отношения не имеет.',
+      fix: 'Либо выбрать другое название для космической компании, либо обыграть: <code>«„Созвездие Ориона“ — компания с громким именем, но земными задачами»</code>.'
+    },
+    e24: {
+      type: 'ambiguity', label: 'Неоднозначность восприятия',
+      node: 'Политическая сатира',
+      problem: 'Текст использует реальных политиков (Трамп, Путин, Макрон, Байден, Обама, Алиев, Пашинян) в сатирическом ключе. Часть читателей воспримет это как политическое высказывание, а не как абсурдистскую шутку. В России это может быть воспринято как неуважение к власти, за рубежом — как пропаганда или, наоборот, как антипутинская сатира.',
+      fix: 'Если цель — абсурд, а не политика, стоит сместить акцент на вымышленных персонажей или подчёркнуть, что это выдумка бабушки. Если цель — сатира, принять риск и не удивляться полярным реакциям.'
+    },
+    e25: {
+      type: 'ambiguity', label: 'Неоднозначность восприятия',
+      node: 'Рептилоидный троп',
+      problem: '«Рептилоиды» — известный конспирологический троп с антисемитскими корнями (Дэвид Айк и др.). В тексте они не связаны с евреями, но некоторые читатели могут увидеть в этом dog whistle или, наоборот, обвинить автора в тиражировании опасного стереотипа.',
+      fix: 'Либо явно дистанцироваться: <code>«Это, конечно, полный бред — но бабушка в него верила»</code>, либо сделать рептилоидов настолько абсурдными, чтобы связь с реальными теориями не возникала.'
+    },
+    e26: {
+      type: 'ambiguity', label: 'Неоднозначность восприятия',
+      node: 'Героиня misinformation',
+      problem: 'Евгения Отовна строит империю на конспирологии и misinformation. Она одновременно героиня (обаятельная, находчивая) и источник дезинформации. Текст колеблется: сочувствовать ей или осуждать? Читатель может уйти с мыслью «конспирология — это весело» или «конспирология — это опасно» — в зависимости от того, что автор хотел сказать.',
+      fix: 'Определиться с позицией. Если сатира — показать последствия (кто-то пострадал от её теорий). Если абсурд — принять, что мораль размыта. Сейчас текст не даёт читателю ориентира.'
+    },
+    e27: {
+      type: 'ambiguity', label: 'Неоднозначность восприятия',
+      node: 'Реальные имена в сатире',
+      problem: 'Использование реальных имён (Трамп, Дуров, Макрон, Путин) в вымышленном контексте может быть воспринято как неуважение, клевета или политическая провокация. В разных юрисдикциях это может иметь разные последствия.',
+      fix: 'Если цель — абсурд, использовать вымышленные имена-пародии (Дональд Трамп → «Дональд Трамп» в кавычках, или «президент Америки с причёской»). Если цель — сатира на реальных лиц, принять риск.'
+    },
+    e28: {
+      type: 'logic', label: 'Логическая дыра',
+      node: 'Дочь — ружьё, которое не стреляет',
+      problem: 'Дочь упоминается один раз: «Сын и дочь жили в разных городах: один — в Москве, вторая — в северном посёлке Провидения». Больше она не появляется. Если это ружьё — оно не стреляет. Если это фон — зачем такая детализация (посёлок, город)?',
+      fix: 'Либо убрать дочь: <code>«Сын жил в Москве»</code>, либо дать ей роль: <code>«Дочь звонила раз в месяц — и каждый раз просила не позорить семью»</code>.'
+    },
+    e29: {
+      type: 'logic', label: 'Логическая дыра',
+      node: 'Почему рост остановился',
+      problem: '«Рост этого паблика вот прямо раз — и остановился» — без причины. А это ключевая мотивация написать роман. Читатель не понимает, почему империя вдруг перестала расти. Алгоритмы? Модерация? Потолок аудитории?',
+      fix: 'Добавить одну фразу-объяснение: <code>«Алгоритмы. Модерация. Или просто потолок для „Одноклассников“. Она так и не поняла»</code>.'
+    },
+    e30: {
+      type: 'style', label: 'Стиль / ясность',
+      node: '«проклятая американщина»',
+      problem: '«Всеми мессенджерами она пользовалась, кроме „проклятой американщины“». Что такое «американщина»? WhatsApp? Instagram? Всё американское? Неясно.',
+      fix: '<code>«кроме WhatsApp — „проклятой американщины“»</code> или <code>«кроме всего американского»</code>.'
+    }
+  };
+
+  const views = document.querySelectorAll('.view');
+  const navBtns = document.querySelectorAll('.topnav button');
+
+  function switchView(name) {
+    views.forEach(v => v.classList.toggle('active', v.id === 'view-' + name));
+    navBtns.forEach(b => b.classList.toggle('active', b.dataset.view === name));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (name === 'schema') requestAnimationFrame(draw);
+  }
+  navBtns.forEach(b => b.addEventListener('click', () => switchView(b.dataset.view)));
+
+  const modal = document.getElementById('modal');
+  const modalContent = document.getElementById('modalContent');
+
+  function openModal(id) {
+    const e = errors[id];
+    if (!e) return;
+    modalContent.innerHTML = `
+      <button class="modal-close" aria-label="Закрыть">✕</button>
+      <span class="modal-type ${e.type}">${e.label}</span>
+      <h3>${e.node}</h3>
+      <div class="modal-node">Ошибка ${id.toUpperCase()}</div>
+      <div class="m-section">
+        <div class="m-label">Проблема</div>
+        <div class="m-problem">${e.problem}</div>
+      </div>
+      <div class="m-section">
+        <div class="m-label">Решение</div>
+        <div class="m-fix">${e.fix}</div>
+      </div>
+    `;
+    modal.classList.add('open');
+    modalContent.querySelector('.modal-close').addEventListener('click', closeModal);
+  }
+  function closeModal() { modal.classList.remove('open'); }
+  modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  document.querySelectorAll('[data-err]').forEach(el => {
+    el.addEventListener('click', e => {
+      e.stopPropagation();
+      openModal(el.dataset.err);
+    });
+  });
+
+  const canvas = document.getElementById('canvas');
+  const svg = document.getElementById('lines');
+
+  const connections = [
+    { from: 'evgenia', to: 'quarrel', type: 'hero' },
+    { from: 'quarrel', to: 'public', type: 'fact' },
+    { from: 'public', to: 'growth', type: 'fact' },
+    { from: 'growth', to: 'son', type: 'fact' },
+    { from: 'son', to: 'novel', type: 'fact' },
+    { from: 'novel', to: 'author_today', type: 'fact' },
+    { from: 'author_today', to: 'trilogy', type: 'fact' },
+    { from: 'trilogy', to: 'opr', type: 'evidence' },
+    { from: 'opr', to: 'rassy', type: 'classified' },
+    { from: 'rassy', to: 'earth', type: 'fact' },
+    { from: 'earth', to: 'russia_rule', type: 'lost' },
+    { from: 'rassy', to: 'oymyakon', type: 'classified' },
+    { from: 'oymyakon', to: 'meeting', type: 'classified' },
+    { from: 'meeting', to: 'report', type: 'evidence' },
+    { from: 'report', to: 'macron_wife', type: 'speculation' },
+    { from: 'meeting', to: 'plan_kill', type: 'speculation' },
+    { from: 'meeting', to: 'plan_talk', type: 'speculation' },
+    { from: 'plan_talk', to: 'armenia', type: 'speculation' },
+    { from: 'armenia', to: 'grandma_ready', type: 'silence' }
+  ];
+
+  const strokeColors = {
+    fact: '#3B82F6', lost: '#8B5CF6', evidence: '#14B8A6',
+    speculation: '#F59E0B', science: '#10B981', silence: '#64748b',
+    classified: '#EF4444', hero: '#14B8A6'
+  };
+
+  function svgEl(name, attrs) {
+    const el = document.createElementNS('http://www.w3.org/2000/svg', name);
+    for (const k in attrs) el.setAttribute(k, attrs[k]);
+    return el;
+  }
+
+  function nodeRect(id) {
+    const el = document.querySelector(`[data-id="${id}"]`);
+    if (!el) return null;
+    const r = el.getBoundingClientRect();
+    const c = canvas.getBoundingClientRect();
+    return {
+      x: r.left - c.left + canvas.scrollLeft,
+      y: r.top - c.top + canvas.scrollTop,
+      w: r.width, h: r.height,
+      cx: r.left - c.left + canvas.scrollLeft + r.width / 2,
+      bottom: r.top - c.top + canvas.scrollTop + r.height,
+      top: r.top - c.top + canvas.scrollTop
+    };
+  }
+
+  function draw() {
+    if (!canvas || !canvas.offsetParent) return;
+    svg.setAttribute('width', canvas.scrollWidth);
+    svg.setAttribute('height', canvas.scrollHeight);
+    svg.innerHTML = '';
+
+    const bySource = {};
+    const byTarget = {};
+    connections.forEach(c => {
+      (bySource[c.from] = bySource[c.from] || []).push(c);
+      (byTarget[c.to] = byTarget[c.to] || []).push(c);
+    });
+
+    connections.forEach(conn => {
+      const from = nodeRect(conn.from);
+      const to = nodeRect(conn.to);
+      if (!from || !to) return;
+
+      const sx = from.cx, sy = from.bottom;
+      const tx = to.cx, ty = to.top;
+      const color = strokeColors[conn.type] || '#475569';
+
+      let d;
+      if (Math.abs(sx - tx) < 2) {
+        d = `M ${sx} ${sy} L ${tx} ${ty}`;
+      } else {
+        const isFork = bySource[conn.from].length > 1;
+        const isMerge = byTarget[conn.to].length > 1;
+        let midY;
+        if (isFork) midY = sy + 22;
+        else if (isMerge) midY = ty - 22;
+        else midY = (sy + ty) / 2;
+        d = `M ${sx} ${sy} L ${sx} ${midY} L ${tx} ${midY} L ${tx} ${ty}`;
+      }
+
+      const path = svgEl('path', {
+        d, fill: 'none', stroke: color,
+        'stroke-width': '2',
+        'stroke-linecap': 'round', 'stroke-linejoin': 'round',
+        opacity: 0.85
+      });
+      if (conn.dashed) path.setAttribute('stroke-dasharray', '6 5');
+      svg.appendChild(path);
+    });
+
+    const ms = nodeRect('grandma_ready');
+    if (ms) {
+      const x = ms.cx, y = ms.bottom, endY = y + 34;
+      const color = '#8B5CF6';
+      svg.appendChild(svgEl('path', {
+        d: `M ${x} ${y} L ${x} ${endY}`,
+        stroke: color, 'stroke-width': 2, 'stroke-dasharray': '4 4',
+        fill: 'none', opacity: 0.6
+      }));
+      const s = 6;
+      svg.appendChild(svgEl('path', {
+        d: `M ${x - s} ${endY - s} L ${x + s} ${endY + s}`,
+        stroke: color, 'stroke-width': 2, fill: 'none', 'stroke-linecap': 'round'
+      }));
+      svg.appendChild(svgEl('path', {
+        d: `M ${x + s} ${endY - s} L ${x - s} ${endY + s}`,
+        stroke: color, 'stroke-width': 2, fill: 'none', 'stroke-linecap': 'round'
+      }));
+    }
+  }
+
+  function redraw() { requestAnimationFrame(draw); }
+  window.addEventListener('load', redraw);
+  window.addEventListener('resize', redraw);
+  redraw();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(redraw);
+})();
+</script>
+</body>
+</html>
