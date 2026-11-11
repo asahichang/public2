@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Придорожное кафе под Эри — анализ</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    background: radial-gradient(ellipse at top, #1e293b 0%, #0f172a 60%);
+    color: #e2e8f0; min-height: 100vh;
+  }
+  .topnav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100; height: 54px;
+    display: flex; align-items: center; gap: 4px;
+    padding: 0 16px;
+    background: rgba(15,23,42,0.94);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 2px 14px rgba(0,0,0,0.45);
+    overflow-x: auto;
+  }
+  .topnav::-webkit-scrollbar { height: 3px; }
+  .topnav::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
+  .topnav button {
+    flex-shrink: 0;
+    padding: 8px 14px;
+    background: transparent;
+    color: #94a3b8;
+    border: none; border-radius: 8px;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: inherit;
+    transition: all .15s;
+    white-space: nowrap;
+  }
+  .topnav button:hover { background: rgba(255,255,255,0.06); color: #cbd5e1; }
+  .topnav button.active {
+    background: linear-gradient(135deg, rgba(96,165,250,0.22), rgba(94,234,212,0.16));
+    color: #f1f5f9;
+    box-shadow: 0 0 0 1px rgba(96,165,250,0.45);
+  }
+  main {
+    max-width: 1080px; margin: 0 auto;
+    padding: 76px 20px 80px;
+  }
+  .view { display: none; }
+  .view.active { display: block; animation: fadeView .22s ease-out; }
+  @keyframes fadeView {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: none; }
+  }
+  header { margin-bottom: 24px; }
+  h1 {
+    font-size: 28px; font-weight: 800; margin: 0 0 6px;
+    letter-spacing: -0.5px;
+    background: linear-gradient(90deg, #60a5fa 0%, #5eead4 60%, #a78bfa 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .subtitle { color: #94a3b8; font-size: 15px; margin: 0; }
+  h2 {
+    font-size: 21px; margin: 0 0 18px; color: #f1f5f9;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    display: flex; align-items: center; gap: 10px;
+  }
+  h2 .h2-icon { font-size: 20px; }
+  .top-timeline { margin: 26px 0 30px; padding: 0 4px; }
+  .tl-track {
+    display: flex; height: 36px; border-radius: 8px; overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+  .tl-segment {
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; letter-spacing: 1.2px;
+    text-transform: uppercase; color: #cbd5e1;
+    border-right: 1px solid rgba(0,0,0,0.3);
+  }
+  .tl-segment:last-child { border-right: none; }
+  .tl-markers {
+    display: flex; justify-content: space-between;
+    margin-top: 6px; font-size: 11px;
+    color: #64748b; font-weight: 600; letter-spacing: 0.5px;
+  }
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 10px 22px;
+    padding: 14px 18px; background: rgba(255,255,255,0.03);
+    border-radius: 10px; margin-bottom: 30px;
+    border: 1px solid rgba(255,255,255,0.08);
+    font-size: 12px; color: #cbd5e1;
+  }
+  .legend .grp { display: flex; flex-wrap: wrap; gap: 10px 16px; flex: 1 1 100%; }
+  .legend .grp + .grp { padding-top: 10px; border-top: 1px dashed rgba(255,255,255,0.06); }
+  .legend .lbl {
+    font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px;
+    color: #64748b; font-weight: 800; flex: 1 1 100%; margin-bottom: 2px;
+  }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend i {
+    width: 9px; height: 9px; border-radius: 50%; display: inline-block;
+  }
+  .legend .ico {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 15px; height: 15px; border-radius: 50%;
+    font-size: 9px; font-weight: 900; color: #fff;
+  }
+  .ico.logic { background: #EF4444; }
+  .ico.style { background: #F59E0B; }
+  .ico.fact  { background: #3B82F6; }
+  .ico.minor { background: #64748b; }
+  .ico.ambiguity { background: #EC4899; }
+  .diagram-wrap {
+    overflow-x: auto; margin: 0 -10px 40px;
+    padding: 30px 10px 10px;
+  }
+  .canvas {
+    position: relative; min-width: 720px;
+    padding: 10px 20px 20px;
+  }
+  .lines {
+    position: absolute; top: 0; left: 0;
+    pointer-events: none; z-index: 1; overflow: visible;
+  }
+  .row {
+    display: flex; justify-content: center; align-items: stretch;
+    gap: 60px; margin: 64px 0;
+    position: relative; z-index: 2;
+  }
+  .row:first-child { margin-top: 0; }
+  .row:last-child  { margin-bottom: 0; }
+  .row-duo { gap: 90px; }
+  .node {
+    background: linear-gradient(135deg, rgba(30,41,59,0.92), rgba(15,23,42,0.92));
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 12px 16px 12px 12px;
+    display: flex; gap: 12px; align-items: flex-start;
+    position: relative; min-width: 240px; max-width: 320px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.35);
+    backdrop-filter: blur(6px);
+    transition: transform .15s, box-shadow .15s;
+  }
+  .node:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.45); }
+  .node[data-type="fact"]        { border-color: rgba(59,130,246,0.55); }
+  .node[data-type="lost"]        { border-color: rgba(139,92,246,0.55); }
+  .node[data-type="evidence"]    { border-color: rgba(20,184,166,0.55); }
+  .node[data-type="speculation"] { border-color: rgba(245,158,11,0.55); }
+  .node[data-type="science"]     { border-color: rgba(16,185,129,0.55); }
+  .node[data-type="silence"]     { border-color: rgba(100,116,139,0.55); }
+  .node[data-type="classified"]  { border-color: rgba(239,68,68,0.55); }
+  .node[data-type="hero"]        { border-color: rgba(20,184,166,0.55); }
+  .node.dead-end {
+    opacity: 0.65;
+    background: linear-gradient(135deg, rgba(30,20,40,0.92), rgba(20,15,30,0.92));
+  }
+  .node.dead-end::after {
+    content: '';
+    position: absolute; inset: 0; border-radius: 12px;
+    background: repeating-linear-gradient(45deg, transparent, transparent 8px,
+      rgba(255,255,255,0.02) 8px, rgba(255,255,255,0.02) 10px);
+    pointer-events: none;
+  }
+  .node-icon {
+    font-size: 26px; line-height: 1; flex-shrink: 0;
+    width: 42px; height: 42px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255,255,255,0.05); border-radius: 10px;
+  }
+  .node-body { flex: 1; min-width: 0; }
+  .node-year {
+    font-size: 10px; font-weight: 800; letter-spacing: 1.2px;
+    text-transform: uppercase; color: #94a3b8; margin-bottom: 3px;
+  }
+  .node-title {
+    font-size: 15px; font-weight: 700; color: #f1f5f9;
+    margin-bottom: 3px; line-height: 1.25;
+  }
+  .node-desc { font-size: 12.5px; color: #94a3b8; line-height: 1.45; }
+  .err-badge {
+    position: absolute; top: -8px; right: -8px;
+    width: 26px; height: 26px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 900; color: #fff;
+    cursor: pointer; border: 2px solid #0f172a;
+    z-index: 3; transition: transform .15s;
+  }
+  .err-badge:hover { transform: scale(1.15); }
+  .err-badge.logic { background: #dc2626; animation: pulseRed 2s ease-in-out infinite; }
+  .err-badge.style { background: #d97706; animation: pulseAmber 2.5s ease-in-out infinite; }
+  .err-badge.fact  { background: #2563eb; animation: pulseBlue 2.5s ease-in-out infinite; }
+  .err-badge.minor { background: #475569; }
+  .err-badge.ambiguity { background: #db2777; animation: pulsePink 3s ease-in-out infinite; }
+  .err-badge + .err-badge { right: 22px; }
+  .err-badge + .err-badge + .err-badge { right: 48px; }
+  .err-badge + .err-badge + .err-badge + .err-badge { right: 74px; }
+  .err-badge + .err-badge + .err-badge + .err-badge + .err-badge { right: 100px; }
+  .err-badge + .err-badge + .err-badge + .err-badge + .err-badge + .err-badge { right: 126px; }
+  .issue-count {
+    position: absolute;
+    top: -42px; right: -8px;
+    padding: 3px 9px 3px 8px;
+    background: linear-gradient(135deg, rgba(30,41,59,0.98), rgba(15,23,42,0.98));
+    border: 1px solid rgba(96,165,250,0.5);
+    border-radius: 10px;
+    font-size: 10px; font-weight: 800;
+    color: #cbd5e1;
+    cursor: pointer;
+    display: none;
+    align-items: center; gap: 4px;
+    z-index: 4;
+    transition: all .15s;
+    white-space: nowrap;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  }
+  .issue-count.visible { display: inline-flex; }
+  .issue-count:hover {
+    background: linear-gradient(135deg, rgba(45,60,85,1), rgba(25,35,55,1));
+    border-color: rgba(96,165,250,0.85);
+    color: #f1f5f9;
+    transform: translateY(-1px);
+  }
+  .issue-count .arrow {
+    display: inline-block;
+    font-size: 10px;
+    color: #60a5fa;
+    animation: bobDown 1.8s ease-in-out infinite;
+    line-height: 1;
+  }
+  @keyframes bobDown {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(2px); }
+  }
+  @keyframes pulseRed {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(220,38,38,0.7); }
+    50%      { box-shadow: 0 0 0 8px rgba(220,38,38,0); }
+  }
+  @keyframes pulseAmber {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(217,119,6,0.7); }
+    50%      { box-shadow: 0 0 0 8px rgba(217,119,6,0); }
+  }
+  @keyframes pulseBlue {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(37,99,235,0.7); }
+    50%      { box-shadow: 0 0 0 8px rgba(37,99,235,0); }
+  }
+  @keyframes pulsePink {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(219,39,119,0.5); }
+    50%      { box-shadow: 0 0 0 8px rgba(219,39,119,0); }
+  }
+  .modal-backdrop {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(2,6,23,0.85);
+    backdrop-filter: blur(4px);
+    display: none; align-items: center; justify-content: center;
+    padding: 20px; animation: fadeIn .2s;
+  }
+  .modal-backdrop.open { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal {
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 16px;
+    max-width: 620px; width: 100%;
+    max-height: 90vh; overflow-y: auto;
+    padding: 24px 26px; position: relative;
+    animation: slideUp .25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px) scale(0.98); }
+    to   { opacity: 1; transform: none; }
+  }
+  .modal-close {
+    position: absolute; top: 12px; right: 12px;
+    width: 32px; height: 32px; border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    border: none; color: #cbd5e1;
+    font-size: 18px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .15s;
+    z-index: 5;
+  }
+  .modal-close:hover { background: rgba(255,255,255,0.18); }
+  .modal-nav-top {
+    position: absolute;
+    top: 12px; right: 52px;
+    display: flex; align-items: center; gap: 4px;
+    z-index: 5;
+    background: rgba(15,23,42,0.6);
+    border-radius: 20px;
+    padding: 3px;
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .nav-arrow-top {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+    border: none; color: #cbd5e1;
+    font-size: 10px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .15s, transform .15s;
+    padding: 0;
+    font-family: inherit;
+  }
+  .nav-arrow-top:hover:not(:disabled) {
+    background: rgba(96,165,250,0.35);
+    color: #f1f5f9;
+    transform: scale(1.08);
+  }
+  .nav-arrow-top:disabled { opacity: 0.25; cursor: not-allowed; }
+  .nav-counter-top {
+    font-size: 11px; font-weight: 800;
+    color: #cbd5e1;
+    padding: 0 5px;
+    min-width: 34px; text-align: center;
+    letter-spacing: 0.3px;
+    font-variant-numeric: tabular-nums;
+    user-select: none;
+  }
+  .nav-counter-top .nav-sep { color: #64748b; margin: 0 1px; }
+  .modal-type {
+    display: inline-block; padding: 3px 10px; border-radius: 12px;
+    font-size: 10px; font-weight: 800; letter-spacing: 1.2px;
+    text-transform: uppercase; color: #fff; margin-bottom: 10px;
+  }
+  .modal-type.logic { background: #dc2626; }
+  .modal-type.style { background: #d97706; }
+  .modal-type.fact  { background: #2563eb; }
+  .modal-type.minor { background: #475569; }
+  .modal-type.ambiguity { background: #db2777; }
+  .modal h3 { margin: 0 0 4px; font-size: 20px; color: #f1f5f9; padding-right: 200px; }
+  .modal .modal-node { font-size: 12px; color: #64748b; margin-bottom: 18px; }
+  .modal .m-section { margin-bottom: 16px; }
+  .modal .m-section:last-child { margin-bottom: 0; }
+  .modal .m-label {
+    font-size: 10px; font-weight: 800; letter-spacing: 1.5px;
+    text-transform: uppercase; color: #94a3b8; margin-bottom: 6px;
+  }
+  .modal .m-problem { color: #fca5a5; line-height: 1.6; font-size: 14px; }
+  .modal .m-fix     { color: #86efac; line-height: 1.6; font-size: 14px; }
+  .modal code {
+    background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size: 12px; color: #fbbf24;
+  }
+  .issue-list { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+  .issue-item {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .issue-item:hover {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(96,165,250,0.5);
+    transform: translateX(2px);
+  }
+  .issue-item-header {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 6px; flex-wrap: wrap;
+  }
+  .issue-item-header .modal-type { margin-bottom: 0; font-size: 9px; padding: 2px 7px; }
+  .issue-id { font-size: 10px; color: #64748b; font-weight: 700; letter-spacing: 1px; }
+  .issue-item-title { font-size: 13px; color: #f1f5f9; font-weight: 700; margin-bottom: 4px; }
+  .issue-item-problem { font-size: 12.5px; color: #94a3b8; line-height: 1.5; }
+  .text-stats {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 12px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    background: rgba(96,165,250,0.08);
+    border: 1px solid rgba(96,165,250,0.25);
+    border-radius: 8px;
+    font-size: 13px;
+    color: #cbd5e1;
+  }
+  .text-stats strong { color: #f1f5f9; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .text-stats .divider { color: #475569; }
+  .story-text {
+    background: rgba(30,41,59,0.5);
+    border-radius: 12px;
+    padding: 22px 26px;
+    border: 1px solid rgba(255,255,255,0.08);
+    font-size: 15px;
+    line-height: 1.75;
+    color: #cbd5e1;
+  }
+  .story-text p { margin: 0 0 14px; }
+  .story-text p:last-child { margin-bottom: 0; }
+  .story-text em { color: #94a3b8; font-style: italic; }
+  .story-text .meta { color: #64748b; font-size: 13px; font-style: italic; margin-bottom: 20px; }
+  .hint {
+    color: #94a3b8; font-size: 14px;
+    margin: 0 0 16px; padding: 10px 14px;
+    background: rgba(96,165,250,0.08);
+    border-left: 3px solid #60a5fa;
+    border-radius: 0 6px 6px 0;
+  }
+  .analysis-legend {
+    display: flex; flex-wrap: wrap; gap: 10px 18px;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.06);
+    margin-bottom: 18px;
+    font-size: 12px; color: #cbd5e1;
+  }
+  .analysis-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .analysis-legend i {
+    width: 10px; height: 14px; border-radius: 3px;
+    display: inline-block; border-bottom: 2px solid;
+  }
+  .analysis-legend i.logic { background: rgba(239,68,68,0.25); border-color: #EF4444; }
+  .analysis-legend i.style { background: rgba(245,158,11,0.25); border-color: #F59E0B; }
+  .analysis-legend i.fact  { background: rgba(59,130,246,0.25); border-color: #3B82F6; }
+  .analysis-legend i.minor { background: rgba(100,116,139,0.3); border-color: #64748b; }
+  .analysis-legend i.ambiguity { background: rgba(236,72,153,0.25); border-color: #EC4899; }
+  .mark {
+    cursor: pointer;
+    border-bottom: 2px solid;
+    padding: 1px 3px;
+    border-radius: 3px;
+    transition: filter .12s, box-shadow .12s;
+    position: relative;
+  }
+  .mark:hover { filter: brightness(1.25); }
+  .mark.logic { background: rgba(239,68,68,0.18); border-color: #EF4444; color: #fca5a5; }
+  .mark.style { background: rgba(245,158,11,0.18); border-color: #F59E0B; color: #fbbf24; }
+  .mark.fact  { background: rgba(59,130,246,0.18); border-color: #3B82F6; color: #93c5fd; }
+  .mark.minor { background: rgba(100,116,139,0.22); border-color: #64748b; color: #cbd5e1; }
+  .mark.ambiguity { background: rgba(236,72,153,0.18); border-color: #EC4899; color: #f9a8d4; }
+  .profile-header {
+    display: flex; gap: 20px; align-items: center;
+    padding: 20px 22px; margin-bottom: 18px;
+    background: linear-gradient(135deg, rgba(30,41,59,0.8), rgba(15,23,42,0.8));
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+  }
+  .profile-avatar {
+    width: 84px; height: 84px; flex-shrink: 0;
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px rgba(236,72,153,0.3), 0 8px 24px rgba(0,0,0,0.4);
+    overflow: hidden;
+  }
+  .profile-avatar svg { width: 100%; height: 100%; display: block; }
+  .profile-header h3 { margin: 0 0 4px; font-size: 18px; color: #f1f5f9; }
+  .profile-header p { margin: 0; font-size: 13.5px; color: #94a3b8; line-height: 1.5; }
+  .profile-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .profile-tags span {
+    padding: 3px 9px; border-radius: 10px;
+    background: rgba(236,72,153,0.15); color: #f9a8d4;
+    font-size: 11px; font-weight: 600;
+  }
+  .profile-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 14px;
+  }
+  .p-card {
+    background: rgba(30,41,59,0.65);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px; padding: 16px 18px;
+  }
+  .p-card h4 {
+    margin: 0 0 10px; font-size: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .p-card h4 .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .p-card ul { margin: 0; padding-left: 18px; font-size: 13px; color: #cbd5e1; line-height: 1.6; }
+  .p-card li { margin-bottom: 5px; }
+  .p-card li:last-child { margin-bottom: 0; }
+  .p-card em { color: #fbbf24; font-style: normal; }
+  .ba-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .ba-card {
+    background: rgba(30,41,59,0.65);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px; padding: 16px 18px;
+  }
+  .ba-card.before { border-left: 3px solid #EF4444; }
+  .ba-card.after  { border-left: 3px solid #10B981; }
+  .ba-card h5 {
+    margin: 0 0 8px; font-size: 10px; font-weight: 800;
+    letter-spacing: 1.5px; text-transform: uppercase; color: #94a3b8;
+  }
+  .ba-card.before h5 { color: #fca5a5; }
+  .ba-card.after h5  { color: #86efac; }
+  .ba-card p { margin: 0 0 8px; font-size: 13.5px; line-height: 1.55; color: #cbd5e1; }
+  .ba-card p:last-child { margin-bottom: 0; }
+  .ba-card em { color: #fbbf24; font-style: normal; }
+  .ba-card .why { font-size: 12px; color: #94a3b8; font-style: italic; }
+  .dont-touch {
+    background: rgba(16,185,129,0.06);
+    border: 1px solid rgba(16,185,129,0.3);
+    border-radius: 12px; padding: 18px 22px;
+  }
+  .dont-touch h3 { margin: 0 0 12px; font-size: 16px; color: #34d399; }
+  .dont-touch ul { margin: 0; padding-left: 20px; font-size: 13.5px; color: #cbd5e1; line-height: 1.7; }
+  .dont-touch code {
+    background: rgba(0,0,0,0.35); padding: 2px 6px; border-radius: 4px;
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size: 12px; color: #fbbf24;
+  }
+  .fork-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+  }
+  .fork-card {
+    background: rgba(30,41,59,0.65);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px; padding: 18px 20px;
+  }
+  .fork-card h4 { margin: 0 0 6px; font-size: 16px; color: #f1f5f9; }
+  .fork-card .fork-sub { font-size: 12px; color: #94a3b8; margin-bottom: 14px; line-height: 1.4; }
+  .fork-card .fork-section { margin-bottom: 14px; }
+  .fork-card .fork-section:last-child { margin-bottom: 0; }
+  .fork-card .fork-label {
+    font-size: 10px; font-weight: 800; letter-spacing: 1.5px;
+    text-transform: uppercase; color: #94a3b8; margin-bottom: 5px;
+  }
+  .fork-card ul { margin: 0; padding-left: 18px; font-size: 13px; color: #cbd5e1; line-height: 1.6; }
+  .fork-card li { margin-bottom: 4px; }
+  .fork-card li:last-child { margin-bottom: 0; }
+  .fork-card em { color: #fbbf24; font-style: normal; }
+  .fork-card.v1 { border-left: 3px solid #EF4444; }
+  .fork-card.v2 { border-left: 3px solid #F59E0B; }
+  .fork-card.v3 { border-left: 3px solid #8B5CF6; }
+  @media (max-width: 680px) {
+    main { padding: 72px 12px 60px; }
+    h1 { font-size: 22px; }
+    .row, .row-duo { gap: 30px; }
+    .ba-grid { grid-template-columns: 1fr; }
+    .profile-header { flex-direction: column; text-align: center; }
+    .profile-tags { justify-content: center; }
+    .topnav { padding: 0 8px; }
+    .topnav button { padding: 8px 10px; font-size: 12px; }
+    .issue-count { font-size: 9px; padding: 2px 7px; }
+    .modal { padding: 24px 18px; }
+    .modal h3 { padding-right: 170px; font-size: 17px; }
+    .modal-nav-top { right: 48px; top: 10px; gap: 2px; padding: 2px; }
+    .nav-arrow-top { width: 24px; height: 24px; font-size: 9px; }
+    .nav-counter-top { font-size: 10px; min-width: 28px; padding: 0 2px; }
+    .modal-close { width: 28px; height: 28px; font-size: 16px; top: 10px; right: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav" id="topnav">
+  <button class="active" data-view="schema">Схема</button>
+  <button data-view="source">Исходный текст</button>
+  <button data-view="analysis">Анализ текста</button>
+  <button data-view="fork">Развилка</button>
+  <button data-view="profile">Профиль героя</button>
+  <button data-view="edits">Ключевые правки</button>
+  <button data-view="keep">Что не трогать</button>
+</nav>
+
+<main>
+
+  <section class="view active" id="view-schema">
+    <header>
+      <h1>Придорожное кафе под Эри — логика рассказа</h1>
+      <p class="subtitle">Бабби, Лиам и последний Вудсток: от завтрака в Пенсильвании до перехода на холме в Бетеле</p>
+    </header>
+
+    <div class="top-timeline">
+      <div class="tl-track">
+        <div class="tl-segment" style="flex:20; background: linear-gradient(90deg, rgba(59,130,246,0.45), rgba(139,92,246,0.45));">Эри</div>
+        <div class="tl-segment" style="flex:15; background: linear-gradient(90deg, rgba(100,116,139,0.3), rgba(100,116,139,0.12));">Буффало</div>
+        <div class="tl-segment" style="flex:20; background: linear-gradient(90deg, rgba(20,184,166,0.3), rgba(20,184,166,0.55));">Харрис</div>
+        <div class="tl-segment" style="flex:20; background: linear-gradient(90deg, rgba(245,158,11,0.3), rgba(245,158,11,0.55));">Госпиталь</div>
+        <div class="tl-segment" style="flex:25; background: linear-gradient(90deg, rgba(236,72,153,0.3), rgba(236,72,153,0.55));">Бетел</div>
+      </div>
+      <div class="tl-markers">
+        <span>08/13</span><span>4:00pm</span><span>08/14</span><span>00:15</span><span>рассвет</span>
+      </div>
+    </div>
+
+    <div class="legend">
+      <div class="grp">
+        <span class="lbl">Типы узлов</span>
+        <span><i style="background:#3B82F6"></i>Факт / место</span>
+        <span><i style="background:#8B5CF6"></i>Тайна / переход</span>
+        <span><i style="background:#14B8A6"></i>Улика / герой</span>
+        <span><i style="background:#F59E0B"></i>Слух / версия</span>
+        <span><i style="background:#10B981"></i>Наука</span>
+        <span><i style="background:#64748b"></i>Забвение</span>
+        <span><i style="background:#EF4444"></i>Опасность</span>
+      </div>
+      <div class="grp">
+        <span class="lbl">Маркеры правок (кликните)</span>
+        <span><span class="ico logic">!</span>Логика</span>
+        <span><span class="ico style">~</span>Стиль</span>
+        <span><span class="ico fact">i</span>Факт</span>
+        <span><span class="ico minor">·</span>Мелкое</span>
+        <span><span class="ico ambiguity">?</span>Неоднозначность</span>
+      </div>
+      <div class="grp">
+        <span class="lbl">Навигация</span>
+        <span><span class="ico" style="background:#3B82F6">▾</span>Счётчик замечаний — кликните, чтобы увидеть все</span>
+        <span><span class="ico" style="background:#60a5fa">◀▶</span>Стрелки в окне — переключение между замечаниями (или ← / →)</span>
+      </div>
+    </div>
+
+    <div class="diagram-wrap">
+      <div class="canvas" id="canvas">
+        <svg class="lines" id="lines"></svg>
+
+        <div class="row">
+          <div class="node" data-id="grizzly" data-type="fact">
+            <div class="node-icon">🏍️</div>
+            <div class="node-body">
+              <div class="node-year">08/13, утро</div>
+              <div class="node-title">Гризли в забегаловке</div>
+              <div class="node-desc">Байкер Джастин «Гризли» Маккой. Бабби и Лиам садятся за его столик. Она угадывает его тайну.</div>
+            </div>
+            <span class="err-badge style" data-err="e3" title="Кридэнс">~</span>
+            <span class="err-badge logic" data-err="e4" title="18 лет / возраст">!</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="node" data-id="babbie" data-type="hero">
+            <div class="node-icon">👵</div>
+            <div class="node-body">
+              <div class="node-year">08/13–08/15</div>
+              <div class="node-title">Бабби и Лиам</div>
+              <div class="node-desc">Марта-Лу Смитсон, 77 лет. Деменция. Рак. Внук Лиам. Едут в Бетел.</div>
+            </div>
+            <span class="err-badge logic" data-err="e5" title="Деменция — inconsistent">!</span>
+            <span class="err-badge logic" data-err="e6" title="Сколько детей?">!</span>
+            <span class="err-badge logic" data-err="e9" title="«Все с чужими лицами»">!</span>
+            <span class="err-badge logic" data-err="e10" title="«Никого не забудут»">!</span>
+            <span class="err-badge style" data-err="e11" title="Смена POV">~</span>
+            <span class="err-badge style" data-err="e14" title="«Твоей дед»">~</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="node" data-id="marcus" data-type="fact">
+            <div class="node-icon">🛡️</div>
+            <div class="node-body">
+              <div class="node-year">08/13, 4:00pm</div>
+              <div class="node-title">Маркус, охрана «Уолден Гэллериа»</div>
+              <div class="node-desc">Бабби раздаёт еду из чужих подносов бездомному. Маркус вызывает полицию. Бабби принимает его за Дэнни.</div>
+            </div>
+            <span class="err-badge fact" data-err="e2" title="«Гэлериа» — опечатка">i</span>
+            <span class="err-badge style" data-err="e12" title="«сумашедшую»">~</span>
+            <span class="err-badge style" data-err="e13" title="«тетка»">~</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="node" data-id="walter" data-type="fact">
+            <div class="node-icon">⭐</div>
+            <div class="node-body">
+              <div class="node-year">08/14, 8:00am</div>
+              <div class="node-title">Шериф Уолтер</div>
+              <div class="node-desc">Узнаёт в старухе «Рыжика» — Марту-Лу из лета 1976-го. Она на секунду узнаёт его. Отпускает.</div>
+            </div>
+            <span class="err-badge fact" data-err="e1" title="41 год — не сходится">i</span>
+            <span class="err-badge logic" data-err="e7" title="Отпустил — abuse of power">!</span>
+            <span class="err-badge style" data-err="e15" title="«бомж»">~</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="node" data-id="patti" data-type="fact">
+            <div class="node-icon">🌧️</div>
+            <div class="node-body">
+              <div class="node-year">08/14, 6:40pm</div>
+              <div class="node-title">Пэтти, кафе «У Донны»</div>
+              <div class="node-desc">Гроза. Бабби танцует под ливнем. Падает. Пэтти вызывает 911.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="node" data-id="allerton" data-type="science">
+            <div class="node-icon">🏥</div>
+            <div class="node-body">
+              <div class="node-year">08/15, 00:15</div>
+              <div class="node-title">Доктор Аллертон</div>
+              <div class="node-desc">Диагноз: рак, запущенный. «Недели. Может, месяц-два». Лиам забирает Бабби из больницы.</div>
+            </div>
+            <span class="err-badge logic" data-err="e8" title="Побег из больницы">!</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="node" data-id="bethel" data-type="lost">
+            <div class="node-icon">🌅</div>
+            <div class="node-body">
+              <div class="node-year">08/15, рассвет</div>
+              <div class="node-title">Переход в Бетеле</div>
+              <div class="node-desc">Идеальный Вудсток. Бабби отдаёт Лиаму медальон Св. Христофора и уходит вниз. Молодеет.</div>
+            </div>
+            <span class="err-badge logic" data-err="e16" title="Реальность перехода">!</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="view" id="view-source">
+    <h2><span class="h2-icon">📄</span>Исходный текст</h2>
+    <div class="text-stats">
+      <span>Объём текста:</span>
+      <strong id="charWithSpaces">—</strong> <span>знаков с пробелами</span>
+      <span class="divider">·</span>
+      <strong id="charWithoutSpaces">—</strong> <span>знаков без пробелов</span>
+    </div>
+    <div class="story-text" id="storyText">
+      <p class="meta">Название: Придорожное кафе под Эри. Пенсильвания (часть 2) · Автор: Джастин</p>
+      <p>Значит, так. Кто скажет, что Джастина "Гризли" Маккоя может облапошить старуха — тому я лично пасть порву. Восемнадцать лет за рулём, харлей подо мной ревёт как тыща чертей, на пузе тату с орлом, который жрёт змею, борода до груди — детишки в супермаркетах при виде меня за мамкину юбку прячутся. Я, брат, всякого навидался.</p>
+      <p>А эта бабка меня развела. Как пацана. Богом клянусь.</p>
+      <p>Сижу я, значит, в этой забегаловке под Эри, где кофе на вкус как использованное моторное масло, и уминаю яичницу с беконом. Тихо-мирно. И тут — звяк колокольчик над дверью. Заходит она. Мелкая, в тряпье цветном, волосья седые дыбом, в них — мамой клянусь — не то бусины, не то куриные кости навтыканы. За ней парнишка, тощий, лицо кислое, будто лимон сожрал.</p>
+      <p>Ну, зашли и зашли, мне-то что. Я в тарелку смотрю.</p>
+      <p>А она — шасть! — прямо ко мне за столик. Плюхается напротив, будто мы с ней в детстве в песочнице вместе куличи лепили. Парнишку за рукав дёрнула, тот тоже сел со своей миной кислючей.</p>
+      <p>— Хорошая у тебя машина, — говорит. — "Фэт Бой", девяносто девятого?</p>
+      <p>Я аж жевать перестал. Баба. Древняя. Мотоцикл мой с одного взгляда угадала. Год выпуска. Я, значит, мычу:</p>
+      <p>— Ну... допустим.</p>
+      <p>— Мой второй муж на таком разбился, — говорит она этак задумчиво, а сама тянет мою тарелку с беконом и — цап! — кусок себе в рот. — Хороший был человек. Дурак, но хороший.</p>
+      <p>Парнишка шипит:</p>
+      <p>— Бабби! Это чужое!</p>
+      <p>— Теперь уже общее, — жуёт. И официантке, что мимо шла, ручкой машет: — Милочка, а нам с внучком то же самое, что вот этому красавцу-мотоциклисту. Он угощает. Правда, солнышко?</p>
+      <p>И на меня смотрит. А глаза, брат... как фары дальнего света в лоб. </p>
+      <p>И — вот скажи мне — чего я? Мог бы встать, рявкнуть, дескать, никого я не угощаю, катитесь. Я мужиков вдвое тебя здоровее с байка ссаживал за косой взгляд. А тут... молчу. Киваю даже. Как дурак деревенский.</p>
+      <p>— Ты не туда едешь, — говорит она вдруг, пока официантка тарелки тащит. Утверждает, а не спрашивает.</p>
+      <p>— Я в Буффало еду, — говорю. — По делам. А куда надо?</p>
+      <p>— По делам, — фыркнула, будто я анекдот дурной рассказал, и в свежую порцию яичницы вилку тычет. — А душа твоя старая, потрёпанная, совсем не туда просится. Я по глазам вижу. У тебя внутри пацан сидит, который в семьдесят каком-то пластинкой "Кридэнс" заслушивался и подпевал им перед зеркалом в расчёску. Может тебе в другую сторону ехать — туда где басы с деревянной сцены доносятся и качают разноцветные спины палаток?</p>
+      <p>...А я ведь реально перед зеркалом пел, с расчёской розовой сеструхиной..</p>
+      <p>Я никому этого не рассказывал. Ни жене. Ни первой, ни второй. Ни братанам по клубу.</p>
+      <p>Сижу — а по спине мурашки, здоровые, как тараканы. Смотрю на неё уже иначе. А вдруг и правда ведьма и видит чего?</p>
+      <p>У парнишки, аж уши от смущения покраснели, тянет старуху за рукав и бурчит себе что-то под нос, неразборчиво. В тарелку, перед ним поставленную, даже не сунулся.</p>
+      <p>Бабка на него — ноль внимания. Уминает МОЙ завтрак, который я ЕЙ заказал, и жмурится от удовольствия, как кошара на солнце.</p>
+      <p>— Вкусно у них тут, — говорит. — Спасибо, милок. Хорошее у тебя сердце. Большое. Под всем этим железом и бородой.</p>
+      <p>И тут до меня доперло. Медленно так. Как трактор с горки. Никакая она не ведьма. Просто старая проныра в бусах, которая мужика раскрутила на две порции жратвы, ввернув пару угадаек. "Кридэнс" все слушали. Мотоцикл — вон он в окне стоит, номер и модель любой прочитает, кто в теме.</p>
+      <p>Развела. Меня. Гризли.</p>
+      <p>Я сижу и — не поверишь — ржать хочу. Уважаю. Честно уважаю. Это ж талант.</p>
+      <p>Доели они. Встала. Салфеткой губы промокнула, будто королева какая.</p>
+      <p>— Ну, поехали, зануда, — парнишке. А мне — подмигнула, зараза: — А коня своего железного всё ж таки продай, милок. Второй муж не послушал.</p>
+      <p>И ушла. Колокольчик — звяк.</p>
+      <p>Официантка счёт кладёт. За три завтрака. Сижу я, облапошенный, а сам лыблюсь как идиот. И "Кридэнс" чот врубить захотелось.</p>
+      <p>— Бабби, неужели мы не можем позволить себе заплатить за завтрак?<br>
+      — Ты, может, и можешь, а я женщина бедная, пожилая. Откуда у меня лишние деньги? К тому же за чужой счёт всегда вкуснее. И погоди немного, машину не заводи. Дай я ещё сигарету у кого-нибудь стрельну, в тачке-то своей ты мне курить запретил.</p>
+      <p class="meta">Торговый центр «Уолден Гэлериа», Буффало. Нью-Йорк · 4:00p.m 08/13/2026 · Маркус</p>
+      <p>Двадцать два года я стою на охране этого богоугодного храма потребления. Видал я всякое. Воришек, что колготки в трусы пихают. Мамаш, которые орут громче пожарной сигнализации. Пьяного Санту в июле. Но такого, братцы мои, — такого я не видал.</p>
+      <p>Звонок с фуд-корта: старушка буянит. Ну, думаю, очередная бабуля кофе пролила. Иду. А там — вот это картина. Стоит мелкая, похожая на городскую сумашедшую, и — вы не поверите — раздаёт еду из чужих подносов. Берёт у одного картошку, несёт бездомному парню у входа. Люди рты пораскрывали.</p>
+      <p>— Мэм, — говорю вежливо, по протоколу. — Мэм, это чужая собственность. Так нельзя.</p>
+      <p>А она давай фыркать и плеваться.</p>
+      <p>— Собственность, — говорит. — У мальчика живот к спине прилип, а ты мне про собственность. Тебя мама чему учила, здоровяк?</p>
+      <p>Я, значит, держусь. Двадцать два года стажа.</p>
+      <p>— Мэм, я вызову полицию.</p>
+      <p>— А ты позвони, позвони. Спроси у них, положено ли голодным жрать. — И спокойненько так тянет с еще одного подноса наггетс. Хозяйка подноса визжит. Бездомный учуяв, что запахло проблемами к выходу тихонько семенит.</p>
+      <p>Тут парнишка подскакивает, тощий, мелкий. Внук, видать.</p>
+      <p>— Бабби, ну хватит, тебя ж посадят!</p>
+      <p>А она ему:</p>
+      <p>— Пусть сажают. Я в шестьдесят восьмом за это сидела и не жаловалась.</p>
+      <p>И вот тут, братцы, она мне и выдала. Смотрит — и вдруг лицо у ней меняется. Мягчает. И говорит тихо, ласково:</p>
+      <p>— Дэнни… Дэнни, ну чего ты в форме? Ты ж не любил форму.</p>
+      <p>Я аж попятился. Какой Дэнни. Меня Маркус зовут. А она ко мне тянется, за рукав, и глаза — мокрые, счастливые:</p>
+      <p>— Я знала, что ты придёшь. Я тебя тут ждала. Ты сказал — никуда не уходи.</p>
+      <p>Я в осадке, стою как истукан. А парнишка — я на него глянул — он белый весь. Он это в первый раз видит, понял я. Он про эту её… дырку в голове не знал.</p>
+      <p>— Бабби, это не Дэнни, — шепчет он. — Это охранник. Посмотри на меня. </p>
+      <p>Она моргнула. Раз, другой. И — будто вынырнула. Отпустила рукав. Засмеялась, звонко:</p>
+      <p>— Ох, батюшки. Обозналась. Ты, милок, просто на одного хорошего человека похож. Извиняй.</p>
+      <p>Но парень уже завёлся. От страха, я так думаю. Встал между нами:</p>
+      <p>— Не трогайте её! Она пожилая! Что вы к ней прицепились из-за пачки картошки?!</p>
+      <p>— Сынок, я к ней не цеплялся, она…</p>
+      <p>— Вызывайте своих копов! Валяйте! Мы никого не боимся!</p>
+      <p>Ну. Вызвал. А чего мне ещё делать. Тетка эта развопилась, будто не не наггетсов, а девичества лишили. Двадцать два года стажа, а сердце — не камень. Стою и думаю: и старуху жалко, и пацана, у которого руки трясутся, а он бабку грудью закрывает.</p>
+      <p>Приехали ребята. Повезли обоих в участок. Не в тюрьму, конечно, — разобраться. Старушка в машину садилась, обернулась на меня и — подмигнула. Хитро так.</p>
+      <p>В камере дурно пахло и было ужасно жарко, но бабби, казалось, это вовсе не раздражало. Она сидела на лавке, болтала ногами, как школьница, и разглядывала облупившийся потолок с искренним интересом.</p>
+      <p>— Это кто такой — Денни?</p>
+      <p>— Первый мой муж. Твоей дед, а может не твой. Не помню. Хороший. Умер, когда мне двадцать три было. Последнее время он часто ко мне… заходит. Только все с чужими лицами.</p>
+      <p>— Сколько у тебя вообще мужей было?</p>
+      <p>— Много, но точно меньше чем детей. Мне всегда хотелось дать миру больше прекрасного. А вот что потом делать с этим прекрасным, я не знала. Однажды, например, двоих я на заправке забыла. В Огайо. С ребятами в фургоне ехали на концерт, я курнула, пока эти в туалет пошли, и мы рванули. Вспомнила про них через два штата. Они на той заправке шесть часов просидели. Одни. Семь лет старшему и пять младшей. Я плохая была мать. Всё гналась куда-то, а дети сзади бежали и звали. Я на них оглядывалась — и снова вперёд.</p>
+      <p class="meta">Полицейский участок, Буффало. Нью-Йорк · 8:00a.m 08/14/2026 · Шериф Уолтер</p>
+      <p>Мне через четыре месяца на пенсию. Сорок один год при значке. Думал, до последнего дня досижу тихо, без сюрпризов. Ага. Как же. Прихожу утром, кофе не допил, дежурный докладывает: старушка со внуком, задержаны в "Гэлерии", кормила бомжа чужой картошкой. Иду в камеру — глянуть на экспонаты.</p>
+      <p>И встал в дверях как вкопанный.</p>
+      <p>Рыжик. Седая уже вся, ссохлась, как яблоко в духовке. Но глаза. Эти глаза я б из тыщи узнал. Лето семьдесят шестого, площадь у ратуши, она босиком на капоте моей патрульной машины поёт "Крокодилов рок", а я, молодой дурак-стажёр, не знаю, арестовать её или жениться.</p>
+      <p>— Лу, — говорю. И голос у меня сел. — Марта-Лу Смитсон.</p>
+      <p>А она смотрит. Вежливо, но без интереса. Не узнаёт.</p>
+      <p>— Мы знакомы, милок?</p>
+      <p>Полоснуло по сердцу. Сорок лет я эту улыбку помнил, а она — меня нет.</p>
+      <p>— Уолт, — говорю. — Уолти. Ты меня "копиком" звала. Я тебе штраф выписать не мог, руки тряслись.</p>
+      <p>Ничего. Тишина. Внук на меня смотрит виновато — мол, извините.</p>
+      <p>Я уж рукой махнул, хотя обидно стало жутко.  Бумаги начал оформлять. И тут — от двери уже — слышу тихо:</p>
+      <p>— Уолти?</p>
+      <p>Обернулся.</p>
+      <p>Она смотрит — и узнала. На одну секунду. Все сорок лет разом в глаза вернулись.</p>
+      <p>— Ты так и не решился меня арестовать, — говорит и улыбается. Та самая улыбка.</p>
+      <p>— Не решился, — говорю. А сам думаю, как бы при дежурном-то не раскиснуть и слезу не пустить.</p>
+      <p>— Отпусти нас, копик. Мне ещё далеко ехать.</p>
+      <p>— Куда, Рыжик?</p>
+      <p>Но она уже отвернулась. И глаза опять — пустые. Как не было.</p>
+      <p>Отпустил я их, конечно. И весь день потом у окна простоял.</p>
+      <p>— Бабби, я не поступил в Чикагский. Мама всем говорит, что я взял "год на подумать", а я просто не прошел.</p>
+      <p>— И?</p>
+      <p>— Что "и"?</p>
+      <p>— Ну, не поступил. Небо от этого на голову не упало. Земля не перестала вращаться.</p>
+      <p>— Что б ты понимала! Это для меня было важнее всего, я шёл к этому со средней школы.</p>
+      <p>— Шёл он. Милый, диплом это всего лишь бумажка. Он не сделал бы тебя ярче или счастливее. Куда важней место своё найти. Я вот, может, до сих пор ищу.</p>
+      <p class="meta">Придорожное кафе «У Донны», Харрис, Нью-Йорк · 6:40p.m 08/14/2026 · Пэтти</p>
+      <p>Гроза налетела внезапно, как оно тут между холмов и водится. Небо почернело, ливануло стеной, и посетителей у нас — раз-два и обчёлся. Я протирала стойку и поглядывала в окно, как молнии царапаются золотыми когтями.</p>
+      <p>Их двое было. Старушка — неухоженная, как те, кто ночует под путепроводом  у трассы, тележки из супермаркета с горой пакетов только не хватало, и парнишка, тощий, приличный, но какой-то весь замороженный. Пили чай.</p>
+      <p>Из музыкального автомата вдруг заиграло, глючит его в грозу, сам по себе врубается. Что-то из моей молодости — то ли "Ван Моррисон", то ли ещё кто. И старушка эта уставилась в окно, на ливень. Встала. Медленно, держась за стол.</p>
+      <p>— Пойдём, — говорит парню.</p>
+      <p>— Куда пойдём? Бабби, там льёт как из ведра.</p>
+      <p>— Вот именно. — Глаза у неё загорелись, как у девчонки. — Танцевать.</p>
+      <p>Он аж поперхнулся.</p>
+      <p>— Под дождём?! Ты с ума сошла?</p>
+      <p>— Давно, милый, давно. Но нет ничего прекраснее танца в грозу, попробуй — тебе должно понравиться.</p>
+      <p>Она толкнула дверь и вышла под ливень.</p>
+      <p>Я к окну прилипла. Парнишка выскочил следом, кричит:</p>
+      <p>— Бабби! Вернись! Простудишься!</p>
+      <p>А она уже посреди пустой стоянки, под стеной воды, раскинула руки и кружится. Лицо к небу задрала, глаза закрыла. Вода по ней течёт ручьями, волосы сосульками обвисли, платье потемнело — а она смеётся. Молнии полыхают, гром грохочет, а старушка эта танцует так, будто ей не восемьдесят, а восемнадцать.</p>
+      <p>— Иди сюда! — кричит она парню. — Потанцуй со старухой! Второго такого дождя не будет! Он никогда не повторится!</p>
+      <p>И мальчишка тоже шагнул под ливень. Весь сжался сперва, плечи поднял. А потом распрямился, подошёл и обнял её. Она  голову  ему на грудь приткнула и они закачались. Прямо там, на залитой водой стоянке, под громом и молниями. Я от окна отлипнуть не могла, до того странно и красиво.</p>
+      <p>А потом она вдруг обмякла. Просто — раз, и осела у него на руках, как тряпичная кукла.</p>
+      <p>Он ещё даже позвать на помощь не успел, как я к телефону кинулась, набирать девять-один-один.</p>
+      <p>Скорая мчалась вниз с холмов, кренясь на поворотах. Фельдшер что-то делал с капельницей. Бабби лежала выцветшая с кислородной маской на лице, и глаза полуприкрыты. Лиам держал её за руку.</p>
+      <p>— Помнишь, ты нам с Хлоей и Сэмом сказки рассказывала. Про страну, где всегда зреет земляника, про жёлтый автобус, на котором ездят в небо только бородатые гитаристы. Про дерево, которое поёт любимые песни, если приложить к нему ухо. Я потом два года искал его во дворах и парках.  Я тогда не понимал, почему у тебя в историях мир такой… добрый. А настоящий — грязный, злой и вечно мне подлянки строил. И это несоответствие меня мучило, я ведь сам, когда подрос, попросил не возить меня к тебе. Думал, ты врёшь. Просто врёшь маленьким детям. Мама удивилась. Она ведь любит тебя очень, и все дяди и тети тоже. Только любить проще издалека. Так и обиды прощаются, и на заправке у супермаркета никого не забудут.</p>
+      <p>Бабби стянула маску с лица. Улыбнулась.</p>
+      <p>— Мы почти приехали. Слышишь? Почти-почти.</p>
+      <p>Лиам не понял, про больницу она или нет.</p>
+      <p class="meta">Медицинский центр «Гарнет-Хелс», Харрис, Нью-Йорк · 12:15a.m 08/15/2026 · Доктор Аллертон</p>
+      <p>Пациентка Смитсон, семьдесят семь лет. Поступила с синкопе на фоне того, что мы деликатно называем "декомпенсацией". А если не деликатно — организм у неё изношен так, будто она прожила три жизни подряд. Сердце едва тянет. И это ещё не главное.</p>
+      <p>Главное было на снимках грудной клетки и в анализах. Я такое видел много раз. Процесс распространённый, запущенный, без каких-либо попыток в лечение. А она ведь наверняка знала. Такое не пропустишь — боли, слабость, периодическая спутанность сознания.</p>
+      <p>Внук ждал в коридоре. Совсем мальчишка. Сидел, обхватив колени.</p>
+      <p>— Она в стабильном состоянии, — сказал я. — Пока. Но я буду с вами честен, ваша бабушка умирает. Ей точно нельзя никуда ехать. Ни завтра, ни послезавтра. Ей нужна госпитализация, а дальше — разговор с онкологом и, скорее всего, паллиативная служба.</p>
+      <p>Он поднял на меня глаза.</p>
+      <p>— Паллиативная — это…</p>
+      <p>— Это когда мы уже не лечим болезнь, а купируем боли и помогаем уйти комфортно.</p>
+      <p>Он долго молчал.</p>
+      <p>— Сколько осталось?</p>
+      <p>— Точно не скажет никто. Недели. Может, месяц-два, если беречь силы. Любая нагрузка сейчас — это риск. Вы понимаете? Ей нужен полный покой.</p>
+      <p>Парень кивнул.</p>
+      <p>— Можно к ней?</p>
+      <p>— Да. Она в сознании. Но будьте аккуратны, хорошенько подумайте, что станете говорить.</p>
+      <p>— Ты не бросишь меня здесь!</p>
+      <p>— Тебе нельзя, никуда, совсем. Я позвоню маме и прочим — они приедут.</p>
+      <p>— Мы отсюда уходим. Сегодня ночью.</p>
+      <p>— Нет.</p>
+      <p>— Лиам, я сюда ехала не для того, чтобы помереть на казённой простыне под пиканье приборов. Понимаешь?</p>
+      <p>— Я не могу. Меня вся семья возненавидит.</p>
+      <p>— Пусть. Зато проводишь по-человечески. Помнишь, я говорила — самое важное — не оставить в одиночестве на пороге. Неси мою одежду, она в том шкафчике. Ты же уже понял, куда мы?</p>
+      <p>— В Бетел?</p>
+      <p>— Да, милый. Именно туда.</p>
+      <p class="meta">Бетел. Нью-Йорк · Перед рассветом</p>
+      <p>Холм они одолевали медленно. Лиам поддерживал бабби под локоть, и всё равно через каждые десять шагов она останавливалась, упиралась ладонями в колени, и пережидала, пока грудь перестанет ходить ходуном. Трава была мокрой от росы, кроссовки Лиама пропитались влагой насквозь. Бабби смотрела вверх, на гребень, за которым небо уже наливалось молочно-розовым.</p>
+      <p>Остановившись почти на самой вершине, она вдруг заговорила. Перемежая слова одышкой и хриплым кашлем.</p>
+      <p>— Я однажды тоже провожала. Не здесь, конечно — совсем в другом месте, но так же на рассвете. Я была папина дочка, нежный цветочек и любимица, и, когда пришло его время, он не лёг помирать. Встал, оделся и говорит: "Марта, пойдём, покажу тебе кое-что. Только тебе". И мы пошли. Через поля и сквозь травы, еле-еле потихонечку до  леса. Когда солнце встало —  он показал мне переход. Свою речку из тридцатых: отмель, ивы, клёв с самого утра, войны ещё нет, все живы. Там ему было хорошо.  А для всех остальных он просто пропал. Понимаешь? Ни тела, ни могилы, ни записки. Полиция, собаки, объявления в газете — искали месяцами. Мать до смерти думала, что он бросил нас. Я одна знала правду и всю жизнь её при себе держала — кому такое расскажешь. А на прощание он снял вот это и надел мне. Святой Христофор, покровитель путешественников. И сказал: "Твой билет обратно. Проводишь до воды — и назад. За мной не ходи, тебе ещё рано". Я и не пошла. Медальон меня удержал. — Она сняла шнурок через голову, путаясь в седых прядях с бусинами.</p>
+      <p>— Теперь твоя очередь, маленький мистер зануда. — Бабби надела медальон Лиаму на шею, придавила ладонью к его груди, будто ставя печать.</p>
+      <p>— Бабби, я не…</p>
+      <p>— Тише. Смотри.</p>
+      <p>И тут из-за края земли выкатилось солнце.</p>
+      <p>Свет хлынул по склону вниз, в широкую зелёную чашу, и Лиам увидел. Всё поле внизу было забито. Разноцветные фургончики-фольксвагены, расписанные цветами, длинные кадиллаки отливающие хромом, автобусы. Дощатые сцены, леса, растяжки. Тысячи, десятки тысяч людей — на одеялах, на плечах друг у друга. Дым костров стоял столбами в утреннем воздухе. И снизу, тонко и ясно, доносилась музыка — гитара, тянущая одну долгую чистую ноту, от которой у Лиама перехватило дыхание.</p>
+      <p>— Бабби, — прошептал он. — Это же… Вудсток. Настоящий.</p>
+      <p>— Настоящий? — Она тихо засмеялась, глядя вниз — Нет, милый. Такого Вудстока не было. Никогда.</p>
+      <p>— Как — не было? Вот же он…</p>
+      <p>— Настоящий-то был совсем другой. — Она качнула головой, и в голосе её не было ни капли сожаления, только нежность. — Грязь по колено. Три дня ливень. Жратвы не хватало, воды не хватало, сортиров — тем паче. Половину я проспала в мокром спальнике, а вторую проревела из-за одного дурака с гитарой, который меня бросил ради девицы из Огайо. Звук с половины поля не слышно было. Кто-то ширялся, кого-то на "скорой" увозили. Вот такой был настоящий.</p>
+      <p>Она обвела рукой сияющую внизу картину — чистую, тёплую, звенящую.</p>
+      <p>— А этот — не тот, что был. Это тот, каким я его домечтала за шестьдесят лет. Вылизала до последней травинки. Убрала грязь, убрала дождь, убрала того дурака. Оставила только музыку, солнце и то, как мне было двадцать и казалось, что весь мир принадлежит только мне. — Она посмотрела на Лиама. — Идеального места в "сейчас" не бывает, милый. Никогда. Оно живёт только в двух местах — в мечте и в памяти. Там его и можно вычистить до блеска. Вот отец ушёл на свою речку, которой давно нет и, может, и не было такой красивой. А я вот — сюда. В свой Вудсток. В тот, что лучше настоящего. И он меня ждёт — правильный, каким я его придумала.</p>
+      <p>Воздух на гребне дрожал и плыл, как марево над раскалённым асфальтом. Вот он, переход. Где реальность становится тонкой, как папиросная бумага.</p>
+      <p>— Пора, — сказала бабби.</p>
+      <p>Она отпустила руку Лиама. Впервые за ночь выпрямилась без опоры.— Всё хорошо, солнышко. Ты меня довёл. Дальше я одна. А ты стой тут. Стой и держи Христофора. Он тебя вернёт.</p>
+      <p>Бабби пошла вниз.</p>
+      <p>Лиам рванулся было следом — и медальон на груди вдруг стал тяжёлым, тёплым, словно чья-то ладонь легла ему на грудь и придержала. Тебе ещё рано. Он остался стоять.</p>
+      <p>Бабби спускалась по склону, всё быстрее, всё легче, и с каждым шагом что-то с неё осыпалось. Седина стекала с волос, и они вспыхивали медью в утреннем солнце. Спина распрямлялась. И вот уже вниз по склону, к музыке, к разноцветной толпе, бежала не старуха, а рыжая девчонка лет двадцати — тонкая, звонкая, в тяжёлой джинсовой куртке, которая была ей велика на три размера, с рукавами, закатанными до локтя. Она обернулась на бегу, махнула ему рукой — и нырнула в гущу своего идеального, никогда не существовавшего Вудстока.</p>
+    </div>
+  </section>
+
+  <section class="view" id="view-analysis">
+    <h2><span class="h2-icon">🔍</span>Анализ текста</h2>
+    <p class="hint">Все 16 замечаний. Это магический реализм — часть «ошибок» может быть намеренной. Но реальные факты и внутренние правила мира должны держаться. <span style="color:#f9a8d4">Розовые маркеры — неоднозначности восприятия.</span> Кликните по подсвеченному фрагменту.</p>
+
+    <div class="analysis-legend">
+      <span><i class="logic"></i>Логика</span>
+      <span><i class="style"></i>Стиль</span>
+      <span><i class="fact"></i>Факт</span>
+      <span><i class="minor"></i>Мелкое</span>
+      <span><i class="ambiguity"></i>Неоднозначность</span>
+    </div>
+
+    <div class="story-text">
+      <p class="meta">Название: Придорожное кафе под Эри. Пенсильвания (часть 2) · Автор: Джастин</p>
+      <p>Значит, так. Кто скажет, что Джастина "Гризли" Маккоя может облапошить старуха — тому я лично пасть порву. <span class="mark logic" data-err="e4">Восемнадцать лет за рулём</span>, харлей подо мной ревёт как тыща чертей, на пузе тату с орлом, который жрёт змею, борода до груди — детишки в супермаркетах при виде меня за мамкину юбку прячутся. Я, брат, всякого навидался.</p>
+      <p>А эта бабка меня развела. Как пацана. Богом клянусь.</p>
+      <p>Сижу я, значит, в этой забегаловке под Эри, где кофе на вкус как использованное моторное масло, и уминаю яичницу с беконом. Тихо-мирно. И тут — звяк колокольчик над дверью. Заходит она. Мелкая, в тряпье цветном, волосья седые дыбом, в них — мамой клянусь — не то бусины, не то куриные кости навтыканы. За ней парнишка, тощий, лицо кислое, будто лимон сожрал.</p>
+      <p>Ну, зашли и зашли, мне-то что. Я в тарелку смотрю.</p>
+      <p>А она — шасть! — прямо ко мне за столик. Плюхается напротив, будто мы с ней в детстве в песочнице вместе куличи лепили. Парнишку за рукав дёрнула, тот тоже сел со своей миной кислючей.</p>
+      <p>— Хорошая у тебя машина, — говорит. — "Фэт Бой", девяносто девятого?</p>
+      <p>Я аж жевать перестал. Баба. Древняя. Мотоцикл мой с одного взгляда угадала. Год выпуска. Я, значит, мычу:</p>
+      <p>— Ну... допустим.</p>
+      <p>— Мой второй муж на таком разбился, — говорит она этак задумчиво, а сама тянет мою тарелку с беконом и — цап! — кусок себе в рот. — Хороший был человек. Дурак, но хороший.</p>
+      <p>Парнишка шипит:</p>
+      <p>— Бабби! Это чужое!</p>
+      <p>— Теперь уже общее, — жуёт. И официантке, что мимо шла, ручкой машет: — Милочка, а нам с внучком то же самое, что вот этому красавцу-мотоциклисту. Он угощает. Правда, солнышко?</p>
+      <p>И на меня смотрит. А глаза, брат... как фары дальнего света в лоб. </p>
+      <p>И — вот скажи мне — чего я? Мог бы встать, рявкнуть, дескать, никого я не угощаю, катитесь. Я мужиков вдвое тебя здоровее с байка ссаживал за косой взгляд. А тут... молчу. Киваю даже. Как дурак деревенский.</p>
+      <p>— Ты не туда едешь, — говорит она вдруг, пока официантка тарелки тащит. Утверждает, а не спрашивает.</p>
+      <p>— Я в Буффало еду, — говорю. — По делам. А куда надо?</p>
+      <p>— По делам, — фыркнула, будто я анекдот дурной рассказал, и в свежую порцию яичницы вилку тычет. — А душа твоя старая, потрёпанная, совсем не туда просится. Я по глазам вижу. У тебя внутри пацан сидит, который в семьдесят каком-то пластинкой <span class="mark style" data-err="e3">"Кридэнс"</span> заслушивался и подпевал им перед зеркалом в расчёску. Может тебе в другую сторону ехать — туда где басы с деревянной сцены доносятся и качают разноцветные спины палаток?</p>
+      <p>...А я ведь реально перед зеркалом пел, с расчёской розовой сеструхиной..</p>
+      <p>Я никому этого не рассказывал. Ни жене. Ни первой, ни второй. Ни братанам по клубу.</p>
+      <p>Сижу — а по спине мурашки, здоровые, как тараканы. Смотрю на неё уже иначе. А вдруг и правда ведьма и видит чего?</p>
+      <p>У парнишки, аж уши от смущения покраснели, тянет старуху за рукав и бурчит себе что-то под нос, неразборчиво. В тарелку, перед ним поставленную, даже не сунулся.</p>
+      <p>Бабка на него — ноль внимания. Уминает МОЙ завтрак, который я ЕЙ заказал, и жмурится от удовольствия, как кошара на солнце.</p>
+      <p>— Вкусно у них тут, — говорит. — Спасибо, милок. Хорошее у тебя сердце. Большое. Под всем этим железом и бородой.</p>
+      <p>И тут до меня доперло. Медленно так. Как трактор с горки. Никакая она не ведьма. Просто старая проныра в бусах, которая мужика раскрутила на две порции жратвы, ввернув пару угадаек. "Кридэнс" все слушали. Мотоцикл — вон он в окне стоит, номер и модель любой прочитает, кто в теме.</p>
+      <p>Развела. Меня. Гризли.</p>
+      <p>Я сижу и — не поверишь — ржать хочу. Уважаю. Честно уважаю. Это ж талант.</p>
+      <p>Доели они. Встала. Салфеткой губы промокнула, будто королева какая.</p>
+      <p>— Ну, поехали, зануда, — парнишке. А мне — подмигнула, зараза: — А коня своего железного всё ж таки продай, милок. Второй муж не послушал.</p>
+      <p>И ушла. Колокольчик — звяк.</p>
+      <p>Официантка счёт кладёт. За три завтрака. Сижу я, облапошенный, а сам лыблюсь как идиот. И "Кридэнс" чот врубить захотелось.</p>
+      <p>— Бабби, неужели мы не можем позволить себе заплатить за завтрак?<br>
+      — Ты, может, и можешь, а я женщина бедная, пожилая. Откуда у меня лишние деньги? К тому же за чужой счёт всегда вкуснее. И погоди немного, машину не заводи. Дай я ещё сигарету у кого-нибудь стрельну, в тачке-то своей ты мне курить запретил.</p>
+      <p class="meta"><span class="mark fact" data-err="e2">Торговый центр «Уолден Гэлериа»</span>, Буффало. Нью-Йорк · 4:00p.m 08/13/2026 · Маркус</p>
+      <p>Двадцать два года я стою на охране этого богоугодного храма потребления. Видал я всякое. Воришек, что колготки в трусы пихают. Мамаш, которые орут громче пожарной сигнализации. Пьяного Санту в июле. Но такого, братцы мои, — такого я не видал.</p>
+      <p>Звонок с фуд-корта: старушка буянит. Ну, думаю, очередная бабуля кофе пролила. Иду. А там — вот это картина. Стоит мелкая, похожая на городскую <span class="mark style" data-err="e12">сумашедшую</span>, и — вы не поверите — раздаёт еду из чужих подносов. Берёт у одного картошку, несёт бездомному парню у входа. Люди рты пораскрывали.</p>
+      <p>— Мэм, — говорю вежливо, по протоколу. — Мэм, это чужая собственность. Так нельзя.</p>
+      <p>А она давай фыркать и плеваться.</p>
+      <p>— Собственность, — говорит. — У мальчика живот к спине прилип, а ты мне про собственность. Тебя мама чему учила, здоровяк?</p>
+      <p>Я, значит, держусь. Двадцать два года стажа.</p>
+      <p>— Мэм, я вызову полицию.</p>
+      <p>— А ты позвони, позвони. Спроси у них, положено ли голодным жрать. — И спокойненько так тянет с еще одного подноса наггетс. Хозяйка подноса визжит. Бездомный учуяв, что запахло проблемами к выходу тихонько семенит.</p>
+      <p>Тут парнишка подскакивает, тощий, мелкий. Внук, видать.</p>
+      <p>— Бабби, ну хватит, тебя ж посадят!</p>
+      <p>А она ему:</p>
+      <p>— Пусть сажают. Я в шестьдесят восьмом за это сидела и не жаловалась.</p>
+      <p>И вот тут, братцы, она мне и выдала. Смотрит — и вдруг лицо у ней меняется. Мягчает. И говорит тихо, ласково:</p>
+      <p>— Дэнни… Дэнни, ну чего ты в форме? Ты ж не любил форму.</p>
+      <p>Я аж попятился. Какой Дэнни. Меня Маркус зовут. А она ко мне тянется, за рукав, и глаза — мокрые, счастливые:</p>
+      <p>— Я знала, что ты придёшь. Я тебя тут ждала. Ты сказал — никуда не уходи.</p>
+      <p>Я в осадке, стою как истукан. А парнишка — я на него глянул — он белый весь. Он это в первый раз видит, понял я. Он про эту её… дырку в голове не знал.</p>
+      <p>— Бабби, это не Дэнни, — шепчет он. — Это охранник. Посмотри на меня. </p>
+      <p>Она моргнула. Раз, другой. И — будто вынырнула. Отпустила рукав. Засмеялась, звонко:</p>
+      <p>— Ох, батюшки. Обозналась. Ты, милок, просто на одного хорошего человека похож. Извиняй.</p>
+      <p>Но парень уже завёлся. От страха, я так думаю. Встал между нами:</p>
+      <p>— Не трогайте её! Она пожилая! Что вы к ней прицепились из-за пачки картошки?!</p>
+      <p>— Сынок, я к ней не цеплялся, она…</p>
+      <p>— Вызывайте своих копов! Валяйте! Мы никого не боимся!</p>
+      <p>Ну. Вызвал. А чего мне ещё делать. <span class="mark style" data-err="e13">Тетка</span> эта развопилась, будто не не наггетсов, а девичества лишили. Двадцать два года стажа, а сердце — не камень. Стою и думаю: и старуху жалко, и пацана, у которого руки трясутся, а он бабку грудью закрывает.</p>
+      <p>Приехали ребята. Повезли обоих в участок. Не в тюрьму, конечно, — разобраться. Старушка в машину садилась, обернулась на меня и — подмигнула. Хитро так.</p>
+      <p>В камере дурно пахло и было ужасно жарко, но бабби, казалось, это вовсе не раздражало. Она сидела на лавке, болтала ногами, как школьница, и разглядывала облупившийся потолок с искренним интересом.</p>
+      <p>— Это кто такой — Денни?</p>
+      <p>— Первый мой муж. <span class="mark style" data-err="e14">Твоей дед</span>, а может не твой. Не помню. Хороший. Умер, когда мне двадцать три было. Последнее время он часто ко мне… заходит. Только <span class="mark logic" data-err="e9">все с чужими лицами</span>.</p>
+      <p>— Сколько у тебя вообще мужей было?</p>
+      <p>— <span class="mark logic" data-err="e6">Много, но точно меньше чем детей</span>. Мне всегда хотелось дать миру больше прекрасного. А вот что потом делать с этим прекрасным, я не знала. Однажды, например, двоих я на заправке забыла. В Огайо. С ребятами в фургоне ехали на концерт, я курнула, пока эти в туалет пошли, и мы рванули. Вспомнила про них через два штата. Они на той заправке шесть часов просидели. Одни. Семь лет старшему и пять младшей. Я плохая была мать. Всё гналась куда-то, а дети сзади бежали и звали. Я на них оглядывалась — и снова вперёд.</p>
+      <p class="meta">Полицейский участок, Буффало. Нью-Йорк · 8:00a.m 08/14/2026 · Шериф Уолтер</p>
+      <p>Мне через четыре месяца на пенсию. <span class="mark fact" data-err="e1">Сорок один год при значке</span>. Думал, до последнего дня досижу тихо, без сюрпризов. Ага. Как же. Прихожу утром, кофе не допил, дежурный докладывает: старушка со внуком, задержаны в "Гэлерии", кормила <span class="mark style" data-err="e15">бомжа</span> чужой картошкой. Иду в камеру — глянуть на экспонаты.</p>
+      <p>И встал в дверях как вкопанный.</p>
+      <p>Рыжик. Седая уже вся, ссохлась, как яблоко в духовке. Но глаза. Эти глаза я б из тыщи узнал. Лето семьдесят шестого, площадь у ратуши, она босиком на капоте моей патрульной машины поёт "Крокодилов рок", а я, молодой дурак-стажёр, не знаю, арестовать её или жениться.</p>
+      <p>— Лу, — говорю. И голос у меня сел. — Марта-Лу Смитсон.</p>
+      <p>А она смотрит. Вежливо, но без интереса. Не узнаёт.</p>
+      <p>— Мы знакомы, милок?</p>
+      <p>Полоснуло по сердцу. Сорок лет я эту улыбку помнил, а она — меня нет.</p>
+      <p>— Уолт, — говорю. — Уолти. Ты меня "копиком" звала. Я тебе штраф выписать не мог, руки тряслись.</p>
+      <p>Ничего. Тишина. Внук на меня смотрит виновато — мол, извините.</p>
+      <p>Я уж рукой махнул, хотя обидно стало жутко.  Бумаги начал оформлять. И тут — от двери уже — слышу тихо:</p>
+      <p>— Уолти?</p>
+      <p>Обернулся.</p>
+      <p>Она смотрит — и узнала. На одну секунду. Все сорок лет разом в глаза вернулись.</p>
+      <p>— Ты так и не решился меня арестовать, — говорит и улыбается. Та самая улыбка.</p>
+      <p>— Не решился, — говорю. А сам думаю, как бы при дежурном-то не раскиснуть и слезу не пустить.</p>
+      <p>— Отпусти нас, копик. Мне ещё далеко ехать.</p>
+      <p>— Куда, Рыжик?</p>
+      <p>Но она уже отвернулась. И глаза опять — пустые. Как не было.</p>
+      <p><span class="mark logic" data-err="e7">Отпустил я их, конечно</span>. И весь день потом у окна простоял.</p>
+      <p>— Бабби, я не поступил в Чикагский. Мама всем говорит, что я взял "год на подумать", а я просто не прошел.</p>
+      <p>— И?</p>
+      <p>— Что "и"?</p>
+      <p>— Ну, не поступил. Небо от этого на голову не упало. Земля не перестала вращаться.</p>
+      <p>— Что б ты понимала! Это для меня было важнее всего, я шёл к этому со средней школы.</p>
+      <p>— Шёл он. Милый, диплом это всего лишь бумажка. Он не сделал бы тебя ярче или счастливее. Куда важней место своё найти. Я вот, может, до сих пор ищу.</p>
+      <p class="meta">Придорожное кафе «У Донны», Харрис, Нью-Йорк · 6:40p.m 08/14/2026 · Пэтти</p>
+      <p>Гроза налетела внезапно, как оно тут между холмов и водится. Небо почернело, ливануло стеной, и посетителей у нас — раз-два и обчёлся. Я протирала стойку и поглядывала в окно, как молнии царапаются золотыми когтями.</p>
+      <p>Их двое было. Старушка — неухоженная, как те, кто ночует под путепроводом  у трассы, тележки из супермаркета с горой пакетов только не хватало, и парнишка, тощий, приличный, но какой-то весь замороженный. Пили чай.</p>
+      <p>Из музыкального автомата вдруг заиграло, глючит его в грозу, сам по себе врубается. Что-то из моей молодости — то ли "Ван Моррисон", то ли ещё кто. И старушка эта уставилась в окно, на ливень. Встала. Медленно, держась за стол.</p>
+      <p>— Пойдём, — говорит парню.</p>
+      <p>— Куда пойдём? Бабби, там льёт как из ведра.</p>
+      <p>— Вот именно. — Глаза у неё загорелись, как у девчонки. — Танцевать.</p>
+      <p>Он аж поперхнулся.</p>
+      <p>— Под дождём?! Ты с ума сошла?</p>
+      <p>— Давно, милый, давно. Но нет ничего прекраснее танца в грозу, попробуй — тебе должно понравиться.</p>
+      <p>Она толкнула дверь и вышла под ливень.</p>
+      <p>Я к окну прилипла. Парнишка выскочил следом, кричит:</p>
+      <p>— Бабби! Вернись! Простудишься!</p>
+      <p>А она уже посреди пустой стоянки, под стеной воды, раскинула руки и кружится. Лицо к небу задрала, глаза закрыла. Вода по ней течёт ручьями, волосы сосульками обвисли, платье потемнело — а она смеётся. Молнии полыхают, гром грохочет, а старушка эта танцует так, будто ей не восемьдесят, а восемнадцать.</p>
+      <p>— Иди сюда! — кричит она парню. — Потанцуй со старухой! Второго такого дождя не будет! Он никогда не повторится!</p>
+      <p>И мальчишка тоже шагнул под ливень. Весь сжался сперва, плечи поднял. А потом распрямился, подошёл и обнял её. Она  голову  ему на грудь приткнула и они закачались. Прямо там, на залитой водой стоянке, под громом и молниями. Я от окна отлипнуть не могла, до того странно и красиво.</p>
+      <p>А потом она вдруг обмякла. Просто — раз, и осела у него на руках, как тряпичная кукла.</p>
+      <p>Он ещё даже позвать на помощь не успел, как я к телефону кинулась, набирать девять-один-один.</p>
+      <p>Скорая мчалась вниз с холмов, кренясь на поворотах. Фельдшер что-то делал с капельницей. Бабби лежала выцветшая с кислородной маской на лице, и глаза полуприкрыты. Лиам держал её за руку.</p>
+      <p>— Помнишь, ты нам с Хлоей и Сэмом сказки рассказывала. Про страну, где всегда зреет земляника, про жёлтый автобус, на котором ездят в небо только бородатые гитаристы. Про дерево, которое поёт любимые песни, если приложить к нему ухо. Я потом два года искал его во дворах и парках.  Я тогда не понимал, почему у тебя в историях мир такой… добрый. А настоящий — грязный, злой и вечно мне подлянки строил. И это несоответствие меня мучило, я ведь сам, когда подрос, попросил не возить меня к тебе. Думал, ты врёшь. Просто врёшь маленьким детям. Мама удивилась. Она ведь любит тебя очень, и все дяди и тети тоже. Только любить проще издалека. Так и обиды прощаются, и <span class="mark logic" data-err="e10">на заправке у супермаркета никого не забудут</span>.</p>
+      <p>Бабби стянула маску с лица. Улыбнулась.</p>
+      <p>— Мы почти приехали. Слышишь? Почти-почти.</p>
+      <p>Лиам не понял, про больницу она или нет.</p>
+      <p class="meta">Медицинский центр «Гарнет-Хелс», Харрис, Нью-Йорк · 12:15a.m 08/15/2026 · Доктор Аллертон</p>
+      <p>Пациентка Смитсон, семьдесят семь лет. Поступила с синкопе на фоне того, что мы деликатно называем "декомпенсацией". А если не деликатно — организм у неё изношен так, будто она прожила три жизни подряд. Сердце едва тянет. И это ещё не главное.</p>
+      <p>Главное было на снимках грудной клетки и в анализах. Я такое видел много раз. Процесс распространённый, запущенный, без каких-либо попыток в лечение. А она ведь наверняка знала. Такое не пропустишь — боли, слабость, периодическая спутанность сознания.</p>
+      <p>Внук ждал в коридоре. Совсем мальчишка. Сидел, обхватив колени.</p>
+      <p>— Она в стабильном состоянии, — сказал я. — Пока. Но я буду с вами честен, ваша бабушка умирает. Ей точно нельзя никуда ехать. Ни завтра, ни послезавтра. Ей нужна госпитализация, а дальше — разговор с онкологом и, скорее всего, паллиативная служба.</p>
+      <p>Он поднял на меня глаза.</p>
+      <p>— Паллиативная — это…</p>
+      <p>— Это когда мы уже не лечим болезнь, а купируем боли и помогаем уйти комфортно.</p>
+      <p>Он долго молчал.</p>
+      <p>— Сколько осталось?</p>
+      <p>— Точно не скажет никто. Недели. Может, месяц-два, если беречь силы. Любая нагрузка сейчас — это риск. Вы понимаете? Ей нужен полный покой.</p>
+      <p>Парень кивнул.</p>
+      <p>— Можно к ней?</p>
+      <p>— Да. Она в сознании. Но будьте аккуратны, хорошенько подумайте, что станете говорить.</p>
+      <p>— Ты не бросишь меня здесь!</p>
+      <p>— Тебе нельзя, никуда, совсем. Я позвоню маме и прочим — они приедут.</p>
+      <p>— Мы отсюда уходим. Сегодня ночью.</p>
+      <p>— Нет.</p>
+      <p>— Лиам, я сюда ехала не для того, чтобы помереть на казённой простыне под пиканье приборов. Понимаешь?</p>
+      <p>— Я не могу. Меня вся семья возненавидит.</p>
+      <p>— Пусть. Зато проводишь по-человечески. Помнишь, я говорила — самое важное — не оставить в одиночестве на пороге. Неси мою одежду, она в том шкафчике. Ты же уже понял, куда мы?</p>
+      <p>— В Бетел?</p>
+      <p>— Да, милый. Именно туда.</p>
+      <p><span class="mark logic" data-err="e8">Она отпустила руку Лиама. Впервые за ночь выпрямилась без опоры.</span></p>
+      <p class="meta">Бетел. Нью-Йорк · Перед рассветом</p>
+      <p>Холм они одолевали медленно. Лиам поддерживал бабби под локоть, и всё равно через каждые десять шагов она останавливалась, упиралась ладонями в колени, и пережидала, пока грудь перестанет ходить ходуном. Трава была мокрой от росы, кроссовки Лиама пропитались влагой насквозь. Бабби смотрела вверх, на гребень, за которым небо уже наливалось молочно-розовым.</p>
+      <p>Остановившись почти на самой вершине, она вдруг заговорила. Перемежая слова одышкой и хриплым кашлем.</p>
+      <p>— Я однажды тоже провожала. Не здесь, конечно — совсем в другом месте, но так же на рассвете. Я была папина дочка, нежный цветочек и любимица, и, когда пришло его время, он не лёг помирать. Встал, оделся и говорит: "Марта, пойдём, покажу тебе кое-что. Только тебе". И мы пошли. Через поля и сквозь травы, еле-еле потихонечку до  леса. Когда солнце встало —  он показал мне переход. Свою речку из тридцатых: отмель, ивы, клёв с самого утра, войны ещё нет, все живы. Там ему было хорошо.  А для всех остальных он просто пропал. Понимаешь? Ни тела, ни могилы, ни записки. Полиция, собаки, объявления в газете — искали месяцами. Мать до смерти думала, что он бросил нас. Я одна знала правду и всю жизнь её при себе держала — кому такое расскажешь. А на прощание он снял вот это и надел мне. Святой Христофор, покровитель путешественников. И сказал: "Твой билет обратно. Проводишь до воды — и назад. За мной не ходи, тебе ещё рано". Я и не пошла. Медальон меня удержал. — Она сняла шнурок через голову, путаясь в седых прядях с бусинами.</p>
+      <p>— Теперь твоя очередь, маленький мистер зануда. — Бабби надела медальон Лиаму на шею, придавила ладонью к его груди, будто ставя печать.</p>
+      <p>— Бабби, я не…</p>
+      <p>— Тише. Смотри.</p>
+      <p>И тут из-за края земли выкатилось солнце.</p>
+      <p>Свет хлынул по склону вниз, в широкую зелёную чашу, и Лиам увидел. Всё поле внизу было забито. Разноцветные фургончики-фольксвагены, расписанные цветами, длинные кадиллаки отливающие хромом, автобусы. Дощатые сцены, леса, растяжки. Тысячи, десятки тысяч людей — на одеялах, на плечах друг у друга. Дым костров стоял столбами в утреннем воздухе. И снизу, тонко и ясно, доносилась музыка — гитара, тянущая одну долгую чистую ноту, от которой у Лиама перехватило дыхание.</p>
+      <p>— Бабби, — прошептал он. — Это же… Вудсток. Настоящий.</p>
+      <p>— Настоящий? — Она тихо засмеялась, глядя вниз — Нет, милый. Такого Вудстока не было. Никогда.</p>
+      <p>— Как — не было? Вот же он…</p>
+      <p>— Настоящий-то был совсем другой. — Она качнула головой, и в голосе её не было ни капли сожаления, только нежность. — Грязь по колено. Три дня ливень. Жратвы не хватало, воды не хватало, сортиров — тем паче. Половину я проспала в мокром спальнике, а вторую проревела из-за одного дурака с гитарой, который меня бросил ради девицы из Огайо. Звук с половины поля не слышно было. Кто-то ширялся, кого-то на "скорой" увозили. Вот такой был настоящий.</p>
+      <p>Она обвела рукой сияющую внизу картину — чистую, тёплую, звенящую.</p>
+      <p>— А этот — не тот, что был. Это тот, каким я его домечтала за шестьдесят лет. Вылизала до последней травинки. Убрала грязь, убрала дождь, убрала того дурака. Оставила только музыку, солнце и то, как мне было двадцать и казалось, что весь мир принадлежит только мне. — Она посмотрела на Лиама. — Идеального места в "сейчас" не бывает, милый. Никогда. Оно живёт только в двух местах — в мечте и в памяти. Там его и можно вычистить до блеска. Вот отец ушёл на свою речку, которой давно нет и, может, и не было такой красивой. А я вот — сюда. В свой Вудсток. В тот, что лучше настоящего. И он меня ждёт — правильный, каким я его придумала.</p>
+      <p>Воздух на гребне дрожал и плыл, как марево над раскалённым асфальтом. <span class="mark logic" data-err="e16">Вот он, переход. Где реальность становится тонкой, как папиросная бумага.</span></p>
+      <p>— Пора, — сказала бабби.</p>
+      <p>Она отпустила руку Лиама. Впервые за ночь выпрямилась без опоры.— Всё хорошо, солнышко. Ты меня довёл. Дальше я одна. А ты стой тут. Стой и держи Христофора. Он тебя вернёт.</p>
+      <p>Бабби пошла вниз.</p>
+      <p>Лиам рванулся было следом — и медальон на груди вдруг стал тяжёлым, тёплым, словно чья-то ладонь легла ему на грудь и придержала. Тебе ещё рано. Он остался стоять.</p>
+      <p>Бабби спускалась по склону, всё быстрее, всё легче, и с каждым шагом что-то с неё осыпалось. Седина стекала с волос, и они вспыхивали медью в утреннем солнце. Спина распрямлялась. И вот уже вниз по склону, к музыке, к разноцветной толпе, бежала не старуха, а рыжая девчонка лет двадцати — тонкая, звонкая, в тяжёлой джинсовой куртке, которая была ей велика на три размера, с рукавами, закатанными до локтя. Она обернулась на бегу, махнула ему рукой — и нырнула в гущу своего идеального, никогда не существовавшего Вудстока.</p>
+    </div>
+  </section>
+
+  <section class="view" id="view-fork">
+    <h2><span class="h2-icon">🌀</span>Развилка: реальность, вина и выбор</h2>
+    <p class="hint">Три вопроса, каждый из которых меняет смысл всей истории.</p>
+
+    <div class="fork-grid">
+      <div class="fork-card v1">
+        <h4>Вопрос 1 — Что такое «переход»?</h4>
+        <div class="fork-sub">Бабби показывает Лиаму «идеальный Вудсток» и уходит вниз, молодея.</div>
+        <div class="fork-section">
+          <div class="fork-label">Версия А — реальный портал</div>
+          <ul>
+            <li>Магический реализм: умирающие уходят в свой «идеальный» мир.</li>
+            <li>Отец Бабби ушёл в «речку из тридцатых», она — в «свой Вудсток».</li>
+            <li>Медальон Св. Христофора — «билет обратно» для провожатого.</li>
+          </ul>
+        </div>
+        <div class="fork-section">
+          <div class="fork-label">Версия Б — галлюцинация умирающей</div>
+          <ul>
+            <li>Бабби бредит: рак, обезвоживание, деменция.</li>
+            <li>Лиам «видит» Вудсток, потому что ему рассказали.</li>
+            <li>Медальон «тяжёлый» — просто самовнушение.</li>
+          </ul>
+        </div>
+        <div class="fork-section">
+          <div class="fork-label">Версия В — метафора</div>
+          <ul>
+            <li>«Переход» — это принятие смерти.</li>
+            <li>«Идеальное место» — память, очищенная от боли.</li>
+            <li>Бабби умирает на холме, а «молодеет» — в глазах Лиама и в её последнем сне.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="fork-card v2">
+        <h4>Вопрос 2 — Бабби хорошая или плохая?</h4>
+        <div class="fork-sub">Она забыла двоих детей на заправке. И танцевала под дождём с внуком.</div>
+        <div class="fork-section">
+          <div class="fork-label">Версия А — плохая мать</div>
+          <ul>
+            <li>Забыла детей в Огайо на 6 часов.</li>
+            <li>«Гналась куда-то, а дети сзади бежали и звали».</li>
+            <li>Лгала, манипулировала, жила за чужой счёт.</li>
+          </ul>
+        </div>
+        <div class="fork-section">
+          <div class="fork-label">Версия Б — свободный дух</div>
+          <ul>
+            <li>Она не «плохая» — она не создана для материнства.</li>
+            <li>Она дала миру «больше прекрасного», как умела.</li>
+            <li>Она любит внука — по-своему, но искренне.</li>
+          </ul>
+        </div>
+        <div class="fork-section">
+          <div class="fork-label">Версия В — и то, и другое</div>
+          <ul>
+            <li>Она сложный человек: и щедрая, и безответственная.</li>
+            <li>Её «переход» — не награда, а побег.</li>
+            <li>Текст не судит — он показывает.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="fork-card v3">
+        <h4>Вопрос 3 — Правильно ли поступил Лиам?</h4>
+        <div class="fork-sub">Он забрал умирающую бабушку из больницы и повёл на холм.</div>
+        <div class="fork-section">
+          <div class="fork-label">Версия А — да</div>
+          <ul>
+            <li>Он уважил её желание.</li>
+            <li>«Не оставить в одиночестве на пороге» — главное.</li>
+            <li>Она умерла не под пиканье приборов, а под музыку.</li>
+          </ul>
+        </div>
+        <div class="fork-section">
+          <div class="fork-label">Версия Б — нет</div>
+          <ul>
+            <li>Он подверг её опасности.</li>
+            <li>Он нарушил закон и медицинские предписания.</li>
+            <li>Семья его возненавидит — и будет права.</li>
+          </ul>
+        </div>
+        <div class="fork-section">
+          <div class="fork-label">Версия В — неоднозначно</div>
+          <ul>
+            <li>Любовь vs. долг — неразрешимый конфликт.</li>
+            <li>С точки зрения медицины — ошибка.</li>
+            <li>С точки зрения человечности — подвиг.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" id="view-profile">
+    <h2><span class="h2-icon">👤</span>Профиль героя — Бабби (Марта-Лу Смитсон)</h2>
+
+    <div class="profile-header">
+      <div class="profile-avatar">
+        <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="30" cy="30" r="30" fill="#4A148C"/>
+          <circle cx="30" cy="26" r="12" fill="#FFE0B2"/>
+          <path d="M16 24 Q20 10 30 12 Q40 10 44 24 Q40 18 30 20 Q20 18 16 24 Z" fill="#BDBDBD"/>
+          <circle cx="18" cy="14" r="2" fill="#FFD54F"/>
+          <circle cx="24" cy="10" r="1.5" fill="#F06292"/>
+          <circle cx="38" cy="10" r="1.5" fill="#64B5F6"/>
+          <circle cx="44" cy="16" r="2" fill="#FFD54F"/>
+          <rect x="20" y="45" width="20" height="12" fill="#7B1FA2" rx="2"/>
+          <circle cx="26" cy="25" r="1.5" fill="#000"/>
+          <circle cx="34" cy="25" r="1.5" fill="#000"/>
+          <path d="M26 31 Q30 34 34 31" stroke="#000" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+          <circle cx="30" cy="52" r="2" fill="#FFD54F"/>
+          <circle cx="24" cy="52" r="1.5" fill="#F06292"/>
+          <circle cx="36" cy="52" r="1.5" fill="#64B5F6"/>
+        </svg>
+      </div>
+      <div>
+        <h3>Бабушка-конспиролог, которая построила медиаимперию</h3>
+        <p>77 лет. Деменция. Рак. Обожает чужой завтрак. Танцует под дождём. Считает, что «за чужой счёт всегда вкуснее». Ведёт внука на холм в Бетел — в свой идеальный Вудсток.</p>
+        <div class="profile-tags">
+          <span>Марта-Лу</span><span>Рыжик</span><span>Бабби</span>
+          <span>Вудсток</span><span>Св. Христофор</span><span>деменция</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-grid">
+      <div class="p-card">
+        <h4><span class="dot" style="background:#60a5fa"></span>Прошлое</h4>
+        <ul>
+          <li>В 1968-м сидела за «это» (кормила голодных?) — «и не жаловалась».</li>
+          <li>В 1969-м была на Вудстоке, ей было 20.</li>
+          <li>Лето 1976-го — пела «Крокодилов рок» на капоте патрульной машины Уолтера.</li>
+          <li>Много мужей, меньше, чем детей. Двоих забыла на заправке в Огайо.</li>
+        </ul>
+      </div>
+      <div class="p-card">
+        <h4><span class="dot" style="background:#a78bfa"></span>Настоящее</h4>
+        <ul>
+          <li>Деменция: принимает Маркуса за Дэнни, «все с чужими лицами».</li>
+          <li>Рак: «организм изношен, будто прожила три жизни».</li>
+          <li>«За чужой счёт всегда вкуснее» — и это не только про еду.</li>
+          <li>Любит Лиама — но «любить проще издалека».</li>
+        </ul>
+      </div>
+      <div class="p-card">
+        <h4><span class="dot" style="background:#34d399"></span>Один момент без иронии</h4>
+        <ul>
+          <li>«Идеального места в „сейчас“ не бывает, милый. Никогда».</li>
+          <li>«Оно живёт только в двух местах — в мечте и в памяти».</li>
+          <li>Она не безумна — она просто выбрала свой Вудсток.</li>
+          <li>И она уходит туда — молодая, рыжая, в чужой джинсовой куртке.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" id="view-edits">
+    <h2><span class="h2-icon">🔧</span>Ключевые правки</h2>
+    <p class="hint">Все 16 замечаний — блоки «было → стало». Порядок: по мере появления в тексте.</p>
+
+    <div class="ba-grid">
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«Сорок один год при значке».</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«<em>Пятьдесят</em> лет при значке» — или «сорок один год» + пересчитать память на 1985-й.</p>
+        <p class="why">+ e1. Если Уолтер был «молодым стажёром» в 1976-м, а на дворе 2026-й — это 50 лет, а не 41. Либо он пришёл на службу позже (не стажёром), либо цифра неверна.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«Торговый центр „Уолден Гэлериа“».</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«Торговый центр „Уолден <em>Гэллериа</em>“».</p>
+        <p class="why">+ e2. Walden Galleria — с двумя L. «Гэлериа» — опечатка.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«пластинкой „Кридэнс“».</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«пластинкой <em>„Криденс“</em>».</p>
+        <p class="why">+ e3. Creedence Clearwater Revival — в русской традиции чаще «Криденс». «Кридэнс» — допустимо, но менее стандартно.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«Восемнадцать лет за рулём».</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«<em>Тридцать</em> лет за рулём» — или уточнить возраст Гризли.</p>
+        <p class="why">+ e4. Если он был пацаном в 70-х (слушал Creedence), то в 2026-м ему 55–60. 18 лет за рулём — это старт в 40. Для «всю жизнь на байке» маловато. Либо он поздний байкер, либо цифра занижена.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«похожая на городскую сумашедшую».</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«похожая на городскую <em>сумасшедшую</em>».</p>
+        <p class="why">+ e12. Пропущена «с».</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«Тетка эта развопилась».</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«<em>Тётка</em> эта развопилась».</p>
+        <p class="why">+ e13. «Тётка» — с ё.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«Твоей дед, а может не твой».</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«<em>Твой</em> дед, а может не твой».</p>
+        <p class="why">+ e14. «Твоей дед» — грамматическая ошибка.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«кормила бомжа чужой картошкой».</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«кормила <em>бездомного</em> чужой картошкой».</p>
+        <p class="why">+ e15. «Бомж» — стигматизирующее слово. В устах шерифа может быть реалистично, но лучше заменить.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«Много, но точно меньше чем детей».</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«Много, но точно меньше, чем <em>детей. Четверо. Или пятеро. Уже не помню</em>».</p>
+        <p class="why">+ e6. Она говорит «меньше, чем детей», но нигде не сказано, сколько именно. Одна фраза закрывает дыру.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«Только все с чужими лицами».</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«Только <em>он приходит в чужих лицах. То охранник, то почтальон, то ещё кто</em>».</p>
+        <p class="why">+ e9. «Все с чужими лицами» — непонятно. Кто «все»? Люди? Мужья? Видения? Прояснить.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«на заправке у супермаркета никого не забудут».</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«<em>на той заправке в Огайо никого не забудут</em>».</p>
+        <p class="why">+ e10. Фраза «на заправке у супермаркета» — непонятно, о чём. «Заправка у супермаркета» — это другой образ. Либо вернуть к «заправке в Огайо», либо расшифровать.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«Отпустил я их, конечно».</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«<em>Отпустил я их, конечно. Не по закону — по памяти</em>».</p>
+        <p class="why">+ e7. Шериф отпускает задержанных из личных чувств — это превышение полномочий. Стоит либо показать сомнение, либо обыграть как осознанный выбор.</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«Она отпустила руку Лиама. Впервые за ночь выпрямилась без опоры».</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«Она отпустила руку Лиама. <em>Он не сразу понял, что она больше не держится за него</em>».</p>
+        <p class="why">+ e8. «Впервые за ночь выпрямилась без опоры» — но она только что поднималась на холм с одышкой и кашлем. И вдруг — без опоры? Это не физическая деталь, а символическая. Стоит либо переформулировать, либо подчеркнуть, что это уже «переход».</p>
+      </div>
+
+      <div class="ba-card before">
+        <h5>Было</h5>
+        <p>«Вот он, переход. Где реальность становится тонкой, как папиросная бумага».</p>
+      </div>
+      <div class="ba-card after">
+        <h5>Стало</h5>
+        <p>«<em>Так вот что она видела все эти годы. Не бред. Не галлюцинацию. Дверь</em>».</p>
+        <p class="why">+ e16. «Переход» — ключевой концепт, но объясняется слишком прямо. Можно оставить как есть, но показать, что Лиам тоже начинает видеть — или что это его выбор — верить или нет.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" id="view-keep">
+    <h2><span class="h2-icon">✓</span>Что не трогать</h2>
+    <div class="dont-touch">
+      <h3>Работает как есть</h3>
+      <ul>
+        <li><strong>«Коня своего железного всё ж таки продай, милок. Второй муж не послушал»</strong> — лучшая реплика Бабби. Не трогать.</li>
+        <li><strong>«Я в шестьдесят восьмом за это сидела и не жаловалась»</strong> — характер в одной строке.</li>
+        <li><strong>«Дэнни… Дэнни, ну чего ты в форме? Ты ж не любил форму»</strong> — момент, когда деменция становится страшнее любой мистики.</li>
+        <li><strong>«Танцевать»</strong> — одно слово, и весь характер.</li>
+        <li><strong>«Идеального места в „сейчас“ не бывает, милый. Никогда»</strong> — главная мысль текста. Оставить.</li>
+        <li><strong>«Твой билет обратно. Проводишь до воды — и назад. За мной не ходи, тебе ещё рано»</strong> — красиво и жутко одновременно.</li>
+        <li><strong>Финал: «рыжая девчонка лет двадцати — тонкая, звонкая, в тяжёлой джинсовой куртке, которая была ей велика на три размера»</strong> — идеальный визуальный образ.</li>
+      </ul>
+    </div>
+  </section>
+
+</main>
+
+<div class="modal-backdrop" id="modal">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<script>
+(function () {
+  const errors = {
+    e1: { type: 'fact', label: 'Фактическая ошибка', node: 'Шериф Уолтер', problem: '«Сорок один год при значке» — но он был «молодым стажёром» в 1976-м. 1976 → 2026 = 50 лет. Либо он начал в 1985-м (но тогда не был стажёром в 76-м), либо цифра неверна.', fix: 'Заменить на <code>«Пятьдесят лет при значке»</code> или пересчитать память на 1985-й.' },
+    e2: { type: 'fact', label: 'Опечатка', node: '«Уолден Гэлериа»', problem: 'Walden Galleria — с двумя L. «Гэлериа» — пропущена «л».', fix: '<code>«Уолден Гэллериа»</code>.' },
+    e3: { type: 'style', label: 'Транслитерация', node: '«Кридэнс»', problem: 'Creedence Clearwater Revival — в русской традиции чаще «Криденс». «Кридэнс» — допустимо, но менее стандартно.', fix: '<code>«Криденс»</code>.' },
+    e4: { type: 'logic', label: 'Логика / возраст', node: 'Гризли', problem: '«Восемнадцать лет за рулём» — если он был пацаном в 70-х (слушал Creedence), то в 2026-м ему 55–60. 18 лет за рулём — старт в 40. Для «всю жизнь на байке» маловато.', fix: 'Либо <code>«Тридцать лет за рулём»</code>, либо уточнить, что он поздний байкер.' },
+    e5: { type: 'logic', label: 'Логика / деменция', node: 'Бабби', problem: 'Деменция inconsistent: она путает Маркуса с Дэнни, но потом даёт советы, рассказывает истории и идёт на холм. Может быть намеренно (lucid intervals), но стоит показать переходы.', fix: 'Добавить одну фразу: <code>«Иногда она возвращалась — на минуту, на две. Потом снова уходила»</code>.' },
+    e6: { type: 'logic', label: 'Логика / дети', node: 'Бабби', problem: '«Много, но точно меньше чем детей» — сколько именно? Одна фраза закрывает дыру.', fix: '<code>«Четверо. Или пятеро. Уже не помню»</code>.' },
+    e7: { type: 'logic', label: 'Логика / власть', node: 'Шериф Уолтер', problem: 'Шериф отпускает задержанных из личных чувств — превышение полномочий. Стоит либо показать сомнение, либо обыграть как осознанный выбор.', fix: '<code>«Отпустил я их, конечно. Не по закону — по памяти»</code>.' },
+    e8: { type: 'logic', label: 'Логика / физика', node: 'Бабби у больницы', problem: '«Впервые за ночь выпрямилась без опоры» — но она только что поднималась на холм с одышкой. Это символическая деталь, но физически неправдоподобная.', fix: '<code>«Он не сразу понял, что она больше не держится за него»</code>.' },
+    e9: { type: 'logic', label: 'Логика / ясность', node: '«Все с чужими лицами»', problem: '«Только все с чужими лицами» — непонятно. Кто «все»? Люди? Мужья? Видения?', fix: '<code>«Он приходит в чужих лицах. То охранник, то почтальон, то ещё кто»</code>.' },
+    e10: { type: 'logic', label: 'Логика / ясность', node: '«На заправке у супермаркета»', problem: 'Фраза «на заправке у супермаркета никого не забудут» — непонятно, о чём. Это отсылка к забытым детям в Огайо? Или к чему-то ещё?', fix: '<code>«На той заправке в Огайо никого не забудут»</code>.' },
+    e11: { type: 'style', label: 'Стиль / POV', node: 'Смена рассказчика', problem: 'Пять первых лиц (Гризли, Маркус, Уолтер, Пэтти, Аллертон) + третье лицо для сцен Бабби и Лиама. Это мозаика, но может сбивать.', fix: 'Либо принять как приём, либо унифицировать (например, всё через третье лицо, кроме Гризли).' },
+    e12: { type: 'style', label: 'Опечатка', node: '«Сумашедшую»', problem: 'Пропущена «с».', fix: '<code>«Сумасшедшую»</code>.' },
+    e13: { type: 'style', label: 'Опечатка', node: '«Тетка»', problem: 'Нужна «ё».', fix: '<code>«Тётка»</code>.' },
+    e14: { type: 'style', label: 'Грамматика', node: '«Твоей дед»', problem: '«Твоей» — женский/множественный род, а «дед» — мужской.', fix: '<code>«Твой дед»</code>.' },
+    e15: { type: 'style', label: 'Стиль / этика', node: '«Бомж»', problem: 'Стигматизирующее слово. В устах шерифа может быть реалистично, но лучше заменить.', fix: '<code>«Бездомного»</code>.' },
+    e16: { type: 'logic', label: 'Логика / реальность', node: '«Переход»', problem: '«Вот он, переход. Где реальность становится тонкой» — ключевой концепт, но объясняется слишком прямо. Если это магический реализм — работает. Если галлюцинация — стоит показать.', fix: '<code>«Так вот что она видела все эти годы. Не бред. Не галлюцинацию. Дверь»</code>.' }
+  };
+
+  let navState = null;
+
+  const views = document.querySelectorAll('.view');
+  const navBtns = document.querySelectorAll('.topnav button');
+  const modal = document.getElementById('modal');
+  const modalContent = document.getElementById('modalContent');
+
+  function switchView(name) {
+    views.forEach(v => v.classList.toggle('active', v.id === 'view-' + name));
+    navBtns.forEach(b => b.classList.toggle('active', b.dataset.view === name));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (name === 'schema') requestAnimationFrame(draw);
+  }
+  navBtns.forEach(b => b.addEventListener('click', () => switchView(b.dataset.view)));
+
+  function findNodeForErr(errId) {
+    const badge = document.querySelector(`.err-badge[data-err="${errId}"]`);
+    return badge ? badge.closest('.node') : null;
+  }
+
+  function getNodeIssueIds(node) {
+    if (!node) return [];
+    return Array.from(node.querySelectorAll('.err-badge')).map(b => b.dataset.err);
+  }
+
+  function openModal(id, navCtx) {
+    const e = errors[id];
+    if (!e) return;
+    let nav = null;
+    if (navCtx && navCtx.nodeId && navCtx.issueIds && navCtx.issueIds.length > 1) {
+      const idx = navCtx.issueIds.indexOf(id);
+      if (idx !== -1) nav = { nodeId: navCtx.nodeId, issueIds: navCtx.issueIds, index: idx };
+    } else {
+      const node = findNodeForErr(id);
+      if (node) {
+        const issueIds = getNodeIssueIds(node);
+        const idx = issueIds.indexOf(id);
+        if (idx !== -1 && issueIds.length > 1) nav = { nodeId: node.dataset.id, issueIds, index: idx };
+      }
+    }
+    navState = nav;
+    let navHtml = '';
+    if (nav) {
+      const canPrev = nav.index > 0;
+      const canNext = nav.index < nav.issueIds.length - 1;
+      navHtml = `
+        <div class="modal-nav-top" role="navigation" aria-label="Навигация по замечаниям">
+          <button class="nav-arrow-top nav-prev-top" ${!canPrev ? 'disabled' : ''} title="Предыдущее (←)">◀</button>
+          <span class="nav-counter-top">${nav.index + 1}<span class="nav-sep"> / </span>${nav.issueIds.length}</span>
+          <button class="nav-arrow-top nav-next-top" ${!canNext ? 'disabled' : ''} title="Следующее (→)">▶</button>
+        </div>`;
+    }
+    modalContent.innerHTML = `
+      ${navHtml}
+      <button class="modal-close" aria-label="Закрыть">✕</button>
+      <span class="modal-type ${e.type}">${e.label}</span>
+      <h3>${e.node}</h3>
+      <div class="modal-node">Ошибка ${id.toUpperCase()}</div>
+      <div class="m-section"><div class="m-label">Проблема</div><div class="m-problem">${e.problem}</div></div>
+      <div class="m-section"><div class="m-label">Решение</div><div class="m-fix">${e.fix}</div></div>`;
+    modal.classList.add('open');
+    modalContent.querySelector('.modal-close').addEventListener('click', closeModal);
+    if (nav) {
+      modalContent.querySelector('.nav-prev-top').addEventListener('click', () => navigateModal(-1));
+      modalContent.querySelector('.nav-next-top').addEventListener('click', () => navigateModal(1));
+    }
+  }
+
+  function navigateModal(dir) {
+    if (!navState) return;
+    const newIdx = navState.index + dir;
+    if (newIdx < 0 || newIdx >= navState.issueIds.length) return;
+    openModal(navState.issueIds[newIdx], { nodeId: navState.nodeId, issueIds: navState.issueIds });
+  }
+
+  function showNodeIssues(node) {
+    const badges = node.querySelectorAll('.err-badge');
+    const errIds = Array.from(badges).map(b => b.dataset.err);
+    const nodeTitle = node.querySelector('.node-title')?.textContent || '';
+    const nodeYear = node.querySelector('.node-year')?.textContent || '';
+    const nodeId = node.dataset.id;
+    let html = `
+      <button class="modal-close" aria-label="Закрыть">✕</button>
+      <span class="modal-type ambiguity">Замечания на карточке</span>
+      <h3 style="padding-right:0;">${nodeTitle}</h3>
+      <div class="modal-node">${nodeYear} · ${errIds.length} замечаний</div>
+      <div class="issue-list">`;
+    errIds.forEach(id => {
+      const e = errors[id];
+      if (!e) return;
+      html += `
+        <div class="issue-item" data-err="${id}">
+          <div class="issue-item-header"><span class="modal-type ${e.type}">${e.label}</span><span class="issue-id">${id.toUpperCase()}</span></div>
+          <div class="issue-item-title">${e.node}</div>
+          <div class="issue-item-problem">${e.problem}</div>
+        </div>`;
+    });
+    html += `</div>`;
+    modalContent.innerHTML = html;
+    navState = null;
+    modal.classList.add('open');
+    modalContent.querySelector('.modal-close').addEventListener('click', closeModal);
+    modalContent.querySelectorAll('.issue-item').forEach(item => {
+      item.addEventListener('click', () => openModal(item.dataset.err, { nodeId, issueIds: errIds }));
+    });
+  }
+
+  function closeModal() { modal.classList.remove('open'); navState = null; }
+  modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { closeModal(); return; }
+    if (modal.classList.contains('open') && navState) {
+      if (e.key === 'ArrowLeft') { e.preventDefault(); navigateModal(-1); }
+      else if (e.key === 'ArrowRight') { e.preventDefault(); navigateModal(1); }
+    }
+  });
+
+  document.querySelectorAll('[data-err]').forEach(el => {
+    if (el.classList.contains('issue-item')) return;
+    el.addEventListener('click', e => { e.stopPropagation(); openModal(el.dataset.err); });
+  });
+
+  document.querySelectorAll('.node').forEach(node => {
+    const badges = node.querySelectorAll('.err-badge');
+    if (badges.length > 1) {
+      const counter = document.createElement('span');
+      counter.className = 'issue-count visible';
+      counter.title = `${badges.length} замечаний — кликните, чтобы увидеть все`;
+      counter.innerHTML = `<span class="arrow">▾</span>${badges.length}`;
+      counter.addEventListener('click', e => { e.stopPropagation(); showNodeIssues(node); });
+      node.appendChild(counter);
+    }
+  });
+
+  // Character count
+  function updateTextStats() {
+    const el = document.getElementById('storyText');
+    if (!el) return;
+    const text = el.textContent;
+    const withSpaces = text.length;
+    const withoutSpaces = text.replace(/\s/g, '').length;
+    const fmt = n => n.toLocaleString('ru-RU');
+    document.getElementById('charWithSpaces').textContent = fmt(withSpaces);
+    document.getElementById('charWithoutSpaces').textContent = fmt(withoutSpaces);
+  }
+  window.addEventListener('load', updateTextStats);
+
+  const canvas = document.getElementById('canvas');
+  const svg = document.getElementById('lines');
+
+  const connections = [
+    { from: 'grizzly', to: 'babbie', type: 'fact' },
+    { from: 'babbie', to: 'marcus', type: 'fact' },
+    { from: 'marcus', to: 'walter', type: 'fact' },
+    { from: 'walter', to: 'patti', type: 'fact' },
+    { from: 'patti', to: 'allerton', type: 'science' },
+    { from: 'allerton', to: 'bethel', type: 'lost' }
+  ];
+
+  const strokeColors = {
+    fact: '#3B82F6', lost: '#8B5CF6', evidence: '#14B8A6',
+    speculation: '#F59E0B', science: '#10B981', silence: '#64748b',
+    classified: '#EF4444', hero: '#14B8A6'
+  };
+
+  function svgEl(name, attrs) {
+    const el = document.createElementNS('http://www.w3.org/2000/svg', name);
+    for (const k in attrs) el.setAttribute(k, attrs[k]);
+    return el;
+  }
+
+  function nodeRect(id) {
+    const el = document.querySelector(`[data-id="${id}"]`);
+    if (!el) return null;
+    const r = el.getBoundingClientRect();
+    const c = canvas.getBoundingClientRect();
+    return {
+      cx: r.left - c.left + canvas.scrollLeft + r.width / 2,
+      bottom: r.top - c.top + canvas.scrollTop + r.height,
+      top: r.top - c.top + canvas.scrollTop
+    };
+  }
+
+  function draw() {
+    if (!canvas || !canvas.offsetParent) return;
+    svg.setAttribute('width', canvas.scrollWidth);
+    svg.setAttribute('height', canvas.scrollHeight);
+    svg.innerHTML = '';
+    const bySource = {}, byTarget = {};
+    connections.forEach(c => {
+      (bySource[c.from] = bySource[c.from] || []).push(c);
+      (byTarget[c.to] = byTarget[c.to] || []).push(c);
+    });
+    connections.forEach(conn => {
+      const from = nodeRect(conn.from);
+      const to = nodeRect(conn.to);
+      if (!from || !to) return;
+      const sx = from.cx, sy = from.bottom, tx = to.cx, ty = to.top;
+      const color = strokeColors[conn.type] || '#475569';
+      let d;
+      if (Math.abs(sx - tx) < 2) d = `M ${sx} ${sy} L ${tx} ${ty}`;
+      else {
+        const isFork = bySource[conn.from].length > 1;
+        const isMerge = byTarget[conn.to].length > 1;
+        let midY;
+        if (isFork) midY = sy + 22;
+        else if (isMerge) midY = ty - 22;
+        else midY = (sy + ty) / 2;
+        d = `M ${sx} ${sy} L ${sx} ${midY} L ${tx} ${midY} L ${tx} ${ty}`;
+      }
+      const path = svgEl('path', { d, fill: 'none', stroke: color, 'stroke-width': '2', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', opacity: 0.85 });
+      if (conn.dashed) path.setAttribute('stroke-dasharray', '6 5');
+      svg.appendChild(path);
+    });
+  }
+
+  function redraw() { requestAnimationFrame(draw); }
+  window.addEventListener('load', redraw);
+  window.addEventListener('resize', redraw);
+  redraw();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(redraw);
+})();
+</script>
+</body>
+</html>

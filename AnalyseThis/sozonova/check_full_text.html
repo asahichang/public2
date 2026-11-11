@@ -1,0 +1,1548 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Дорога домой</title>
+<style>
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: Georgia, "Times New Roman", serif;
+    background: #fafafa; color: #222; line-height: 1.65;
+    padding: 0 16px 60px;
+  }
+
+  /* ============ Легенда ============ */
+  .legend-strip {
+    position: sticky; top: 0; z-index: 30;
+    height: 42px; display: flex; align-items: center; gap: 6px;
+    padding: 0 8px; margin: 0 -16px;
+    background: #fff; border-bottom: 1px solid #ddd;
+    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    overflow-x: auto; white-space: nowrap;
+  }
+  .legend-strip::-webkit-scrollbar { height: 4px; }
+  .legend-strip::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
+
+  .legend-strip .item {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px 3px 3px;
+    background: #f2f2f2; border-radius: 14px;
+    font-size: 12px; cursor: pointer; flex-shrink: 0;
+    transition: background .12s, box-shadow .12s;
+  }
+  .legend-strip .item:hover { background: #eaeaea; }
+  .legend-strip .item.active {
+    background: #ffe066; outline: 2px solid #d4a017; font-weight: bold;
+  }
+  .legend-strip .item .avatar { width: 24px; height: 24px; flex-shrink: 0; }
+  .legend-strip .item .avatar svg { display: block; width: 100%; height: 100%; }
+  .legend-strip .count {
+    background: rgba(0,0,0,.14); color: #000;
+    padding: 0 6px; border-radius: 8px;
+    font-size: 10px; font-weight: bold; min-width: 14px; text-align: center;
+  }
+  .legend-strip .sep { width: 1px; height: 22px; background: #ddd; margin: 0 4px; flex-shrink: 0; }
+
+  /* ============ Тулбар ============ */
+  .toolbar {
+    position: sticky; top: 42px; z-index: 25;
+    background: #fafafa; display: flex; flex-wrap: wrap; gap: 8px;
+    align-items: center; padding: 8px 0; margin-bottom: 14px;
+    border-bottom: 1px solid #eee;
+  }
+  .toolbar button {
+    padding: 6px 12px; border: 2px solid #ccc; background: #fff;
+    border-radius: 6px; cursor: pointer; font: inherit; font-size: 13px;
+    transition: all .12s;
+  }
+  .toolbar button:hover { border-color: #888; }
+  .toolbar button[data-mark="verbs"].active    { background:#000; color:#fff; border-color:#000; }
+  .toolbar button[data-mark="pronouns"].active { background:#ccc; color:#000; font-weight:bold; border-color:#999; }
+  .toolbar button[data-mark="terms"].active    { background:#ffc2c2; color:#900; border-color:#900; font-weight:bold; }
+  .toolbar .clear-btn { background:#fee; border-color:#e88; color:#900; }
+  .toolbar .clear-btn:hover { background:#fdd; border-color:#c66; }
+
+  .search-box { display: flex; gap: 4px; margin-left: auto; }
+  .search-box input {
+    padding: 6px 10px; border: 1px solid #ccc; border-radius: 6px;
+    font: inherit; font-size: 13px; width: 180px;
+  }
+  .search-box input:focus { outline: 2px solid #88c; border-color: transparent; }
+  .search-box button {
+    background: #333; color: #fff; border-color: #333;
+  }
+  .search-box button:hover { background: #000; border-color: #000; }
+
+  /* ============ Хайлайты ============ */
+  .show-verbs .verb      { background:#000; color:#fff; padding:0 3px; border-radius:3px; }
+  .show-pronouns .pronoun{ background:#cfcfcf; color:#000; font-weight:bold; padding:0 3px; border-radius:3px; }
+  .show-terms .term      { background:#ffc2c2; color:#900; font-weight:bold; padding:0 3px; border-radius:3px; }
+
+  /* ============ Макет ============ */
+  .layout { display: flex; gap: 24px; align-items: flex-start; }
+  .main-text { flex: 1; min-width: 0; }
+
+  /* ============ Блоки ============ */
+  .block { display: flex; gap: 14px; margin: 0 0 12px; align-items: flex-start; }
+  .block .avatar { width: 52px; height: 52px; flex-shrink: 0; cursor: pointer; transition: transform .12s, filter .12s; border-radius: 50%; }
+  .block .avatar:hover { transform: scale(1.08); }
+  .block .avatar.active { box-shadow: 0 0 0 3px #d4a017; }
+  .block .avatar svg { display: block; width: 100%; height: 100%; }
+  .block .text { flex: 1; padding: 6px 12px; border-radius: 8px; }
+
+  .text.bg-babbi     { background-color: #E6C2FF; }
+  .text.bg-liam      { background-color: #A8D8FF; }
+  .text.bg-mama      { background-color: #FFD9A8; }
+  .text.bg-maguer    { background-color: #FFE066; }
+  .text.bg-daisy     { background-color: #FFB3D9; }
+  .text.bg-margo     { background-color: #FFC2C2; }
+  .text.bg-justin    { background-color: #E6C079; }
+  .text.bg-marcus    { background-color: #B8E6B8; }
+  .text.bg-walter    { background-color: #C2D9FF; }
+  .text.bg-patti     { background-color: #B8E6D9; }
+  .text.bg-allerton  { background-color: #D9E6E6; }
+  .text.bg-narration { background: transparent; padding-left: 0; }
+
+  /* ============ Дневниковые заголовки ============ */
+  .diary-heading {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
+    color: #666; margin-bottom: 8px; padding-bottom: 4px;
+    border-bottom: 1px solid rgba(0,0,0,.12);
+  }
+  .diary-heading strong { font-size: 13px; color: #222; }
+
+  /* ============ Badge «new» ============ */
+  .new-badge {
+    display: inline-block; position: relative;
+    background:#e53935; color:#fff; font-weight: bold;
+    font-size: 9px; line-height: 1;
+    padding: 2px 5px; border-radius: 8px;
+    margin-left: 5px; vertical-align: super;
+    cursor: help; letter-spacing: .3px;
+  }
+  .new-badge::after {
+    content: attr(data-tip);
+    position: absolute; bottom: calc(100% + 6px); left: 50%;
+    transform: translateX(-50%);
+    background: #222; color: #fff; padding: 4px 8px;
+    border-radius: 4px; font-size: 11px; font-weight: normal;
+    white-space: nowrap; opacity: 0; pointer-events: none;
+    transition: opacity .15s;
+  }
+  .new-badge:hover::after { opacity: 1; }
+
+  b.first-appearance { font-weight: 700; }
+
+  /* ============ Инфо-панель ============ */
+  .info-panel {
+    width: 320px; flex-shrink: 0;
+    display: none;
+    position: sticky; top: 110px;
+    max-height: calc(100vh - 130px);
+    overflow-y: auto;
+    background: #fff; border-radius: 12px;
+    padding: 16px 18px;
+    box-shadow: 0 4px 16px rgba(0,0,0,.1);
+    font-size: 14px;
+  }
+  .info-panel.visible { display: block; }
+  .info-panel h3 { margin: 0 0 2px; font-size: 18px; }
+  .info-panel .panel-sub {
+    margin: 0 0 14px; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 1px; color: #999;
+  }
+  .info-section { margin-bottom: 12px; }
+  .info-label {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
+    color: #666; font-weight: bold; margin-bottom: 2px;
+  }
+  .info-text { line-height: 1.5; }
+
+  /* ============ Поиск-хит ============ */
+  .block.search-hit .text {
+    animation: searchPulse 0.55s ease-in-out 5;
+  }
+  @keyframes searchPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255,193,7,0); }
+    50%      { box-shadow: 0 0 0 6px rgba(255,193,7,0.7); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ SVG-символы ============ -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <symbol id="p-babbi" viewBox="0 0 60 60">
+    <circle cx="30" cy="30" r="28" fill="#E6C2FF"/>
+    <path d="M10 26 Q6 16 14 10 Q20 4 26 10 Q30 2 36 8 Q42 4 48 12 Q54 18 50 28" stroke="#BDBDBD" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <circle cx="30" cy="32" r="13" fill="#FFE0B2"/>
+    <circle cx="25" cy="30" r="1.5" fill="#000"/>
+    <circle cx="35" cy="30" r="1.5" fill="#000"/>
+    <path d="M25 38 Q30 41 35 38" stroke="#000" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+    <circle cx="14" cy="18" r="2" fill="#FF4081"/>
+    <circle cx="46" cy="16" r="2" fill="#FFD700"/>
+    <circle cx="20" cy="12" r="2" fill="#00E676"/>
+    <circle cx="40" cy="10" r="2" fill="#FF6D00"/>
+    <circle cx="48" cy="24" r="2" fill="#448AFF"/>
+    <path d="M16 46 Q30 40 44 46 L46 56 Q30 50 14 56 Z" fill="#8E24AA"/>
+    <path d="M20 50 Q30 47 40 50" stroke="#FFD700" stroke-width="1.5" fill="none"/>
+    <rect x="38" y="42" width="10" height="2" fill="#fff" rx="1"/>
+    <circle cx="48" cy="43" r="2" fill="#FF5722"/>
+  </symbol>
+  <symbol id="p-liam" viewBox="0 0 60 60">
+    <circle cx="30" cy="30" r="28" fill="#A8D8FF"/>
+    <circle cx="30" cy="30" r="13" fill="#FFE0B2"/>
+    <path d="M17 26 Q30 12 43 26 L43 28 Q30 22 17 28 Z" fill="#5D4037"/>
+    <circle cx="25" cy="30" r="1.5" fill="#000"/>
+    <circle cx="35" cy="30" r="1.5" fill="#000"/>
+    <path d="M26 37 Q30 39 34 37" stroke="#000" stroke-width="1" fill="none"/>
+    <rect x="20" y="46" width="20" height="10" fill="#1976D2" rx="2"/>
+    <path d="M28 46 L30 42 L32 46" fill="#fff"/>
+  </symbol>
+  <symbol id="p-mama" viewBox="0 0 60 60">
+    <circle cx="30" cy="30" r="28" fill="#FFD9A8"/>
+    <circle cx="30" cy="30" r="13" fill="#FFE0B2"/>
+    <path d="M17 24 Q30 14 43 24 L43 28 Q30 24 17 28 Z" fill="#6D4C41"/>
+    <circle cx="30" cy="10" r="4" fill="#6D4C41"/>
+    <circle cx="25" cy="30" r="1.5" fill="#000"/>
+    <circle cx="35" cy="30" r="1.5" fill="#000"/>
+    <path d="M26 37 Q30 39 34 37" stroke="#000" stroke-width="1" fill="none"/>
+    <rect x="20" y="46" width="20" height="10" fill="#E91E63" rx="2"/>
+  </symbol>
+  <symbol id="p-narration" viewBox="0 0 60 60">
+    <rect x="8" y="8" width="44" height="44" rx="6" fill="#F5F5DC" stroke="#8B6914" stroke-width="2"/>
+    <polygon points="42,8 52,8 52,18" fill="#fafafa"/>
+    <line x1="42" y1="8" x2="52" y2="18" stroke="#8B6914" stroke-width="1"/>
+    <line x1="14" y1="22" x2="44" y2="22" stroke="#8B6914" stroke-width="1.5"/>
+    <line x1="14" y1="28" x2="46" y2="28" stroke="#8B6914" stroke-width="1.5"/>
+    <line x1="14" y1="34" x2="42" y2="34" stroke="#8B6914" stroke-width="1.5"/>
+    <line x1="14" y1="40" x2="44" y2="40" stroke="#8B6914" stroke-width="1.5"/>
+    <line x1="14" y1="46" x2="38" y2="46" stroke="#8B6914" stroke-width="1.5"/>
+  </symbol>
+  <symbol id="p-maguer" viewBox="0 0 60 60">
+    <circle cx="30" cy="30" r="28" fill="#FFE066"/>
+    <circle cx="30" cy="30" r="13" fill="#FFE0B2"/>
+    <path d="M17 24 Q30 14 43 24 L43 28 Q30 24 17 28 Z" fill="#9E9E9E"/>
+    <circle cx="30" cy="16" r="5" fill="#9E9E9E"/>
+    <circle cx="25" cy="30" r="1.5" fill="#000"/>
+    <circle cx="35" cy="30" r="1.5" fill="#000"/>
+    <circle cx="25" cy="30" r="5" fill="none" stroke="#333" stroke-width="1"/>
+    <circle cx="35" cy="30" r="5" fill="none" stroke="#333" stroke-width="1"/>
+    <path d="M26 38 Q30 39 34 38" stroke="#000" stroke-width="1" fill="none"/>
+    <rect x="20" y="46" width="20" height="10" fill="#795548" rx="2"/>
+  </symbol>
+  <symbol id="p-daisy" viewBox="0 0 60 60">
+    <circle cx="30" cy="30" r="28" fill="#FFB3D9"/>
+    <circle cx="30" cy="30" r="12" fill="#FFE0B2"/>
+    <circle cx="16" cy="24" r="6" fill="#FFD54F"/>
+    <circle cx="44" cy="24" r="6" fill="#FFD54F"/>
+    <path d="M18 22 Q30 10 42 22 L42 26 Q30 20 18 26 Z" fill="#FFD54F"/>
+    <circle cx="25" cy="30" r="2" fill="#000"/>
+    <circle cx="35" cy="30" r="2" fill="#000"/>
+    <path d="M25 38 Q30 40 35 38" stroke="#000" stroke-width="1.2" fill="none"/>
+    <rect x="20" y="46" width="20" height="10" fill="#E91E63" rx="2"/>
+  </symbol>
+  <symbol id="p-margo" viewBox="0 0 60 60">
+    <circle cx="30" cy="30" r="28" fill="#FFC2C2"/>
+    <circle cx="30" cy="30" r="13" fill="#FFE0B2"/>
+    <path d="M17 26 Q30 12 43 26 L43 28 Q30 22 17 28 Z" fill="#3E2723"/>
+    <circle cx="25" cy="30" r="1.5" fill="#000"/>
+    <circle cx="35" cy="30" r="1.5" fill="#000"/>
+    <path d="M27 38 Q30 39 33 38" stroke="#000" stroke-width="1" fill="none"/>
+    <circle cx="38" cy="34" r="3" fill="#B71C1C" opacity="0.5"/>
+    <rect x="20" y="46" width="20" height="10" fill="#7B1FA2" rx="2"/>
+  </symbol>
+  <symbol id="p-justin" viewBox="0 0 60 60">
+    <circle cx="30" cy="30" r="28" fill="#E6C079"/>
+    <circle cx="30" cy="30" r="13" fill="#FFE0B2"/>
+    <path d="M17 22 Q30 12 43 22 L43 26 Q30 20 17 26 Z" fill="#D32F2F"/>
+    <circle cx="25" cy="30" r="1.5" fill="#000"/>
+    <circle cx="35" cy="30" r="1.5" fill="#000"/>
+    <path d="M20 38 Q30 50 40 38" fill="#5D4037"/>
+    <path d="M26 37 Q30 39 34 37" stroke="#000" stroke-width="1" fill="none"/>
+    <rect x="20" y="48" width="20" height="8" fill="#333" rx="2"/>
+  </symbol>
+  <symbol id="p-marcus" viewBox="0 0 60 60">
+    <circle cx="30" cy="30" r="28" fill="#B8E6B8"/>
+    <circle cx="30" cy="30" r="13" fill="#FFE0B2"/>
+    <path d="M17 24 Q30 14 43 24 L43 28 Q30 24 17 28 Z" fill="#1B5E20"/>
+    <ellipse cx="30" cy="18" rx="14" ry="4" fill="#1B5E20"/>
+    <rect x="24" y="10" width="12" height="8" fill="#1B5E20" rx="2"/>
+    <circle cx="25" cy="30" r="1.5" fill="#000"/>
+    <circle cx="35" cy="30" r="1.5" fill="#000"/>
+    <path d="M26 37 Q30 39 34 37" stroke="#000" stroke-width="1" fill="none"/>
+    <rect x="20" y="46" width="20" height="10" fill="#2E7D32" rx="2"/>
+    <rect x="26" y="48" width="8" height="4" fill="#FFD700" rx="1"/>
+  </symbol>
+  <symbol id="p-walter" viewBox="0 0 60 60">
+    <circle cx="30" cy="30" r="28" fill="#C2D9FF"/>
+    <circle cx="30" cy="32" r="13" fill="#FFE0B2"/>
+    <ellipse cx="30" cy="18" rx="18" ry="5" fill="#5D4037"/>
+    <rect x="20" y="10" width="20" height="10" fill="#5D4037" rx="2"/>
+    <circle cx="30" cy="14" r="2" fill="#FFD700"/>
+    <circle cx="25" cy="32" r="1.5" fill="#000"/>
+    <circle cx="35" cy="32" r="1.5" fill="#000"/>
+    <path d="M24 38 Q30 36 36 38" stroke="#5D4037" stroke-width="2" fill="none"/>
+    <path d="M26 40 Q30 41 34 40" stroke="#000" stroke-width="1" fill="none"/>
+    <rect x="20" y="48" width="20" height="8" fill="#5D4037" rx="2"/>
+  </symbol>
+  <symbol id="p-patti" viewBox="0 0 60 60">
+    <circle cx="30" cy="30" r="28" fill="#B8E6D9"/>
+    <circle cx="30" cy="30" r="13" fill="#FFE0B2"/>
+    <path d="M17 24 Q30 14 43 24 L43 28 Q30 24 17 28 Z" fill="#FF8F00"/>
+    <path d="M18 20 Q30 10 42 20" stroke="#FF8F00" stroke-width="1" fill="none" stroke-dasharray="2,2"/>
+    <circle cx="25" cy="30" r="1.5" fill="#000"/>
+    <circle cx="35" cy="30" r="1.5" fill="#000"/>
+    <path d="M26 37 Q30 39 34 37" stroke="#000" stroke-width="1" fill="none"/>
+    <rect x="20" y="46" width="20" height="10" fill="#fff" rx="2"/>
+    <path d="M26 46 L30 42 L34 46" fill="#fff"/>
+  </symbol>
+  <symbol id="p-allerton" viewBox="0 0 60 60">
+    <circle cx="30" cy="30" r="28" fill="#D9E6E6"/>
+    <circle cx="30" cy="30" r="13" fill="#FFE0B2"/>
+    <path d="M17 24 Q30 14 43 24 L43 28 Q30 24 17 28 Z" fill="#455A64"/>
+    <circle cx="25" cy="30" r="4" fill="none" stroke="#333" stroke-width="1"/>
+    <circle cx="35" cy="30" r="4" fill="none" stroke="#333" stroke-width="1"/>
+    <circle cx="25" cy="30" r="1.5" fill="#000"/>
+    <circle cx="35" cy="30" r="1.5" fill="#000"/>
+    <path d="M26 38 Q30 39 34 38" stroke="#000" stroke-width="1" fill="none"/>
+    <rect x="18" y="44" width="24" height="12" fill="#fff" rx="2" stroke="#BDBDBD" stroke-width="1"/>
+    <path d="M22 46 Q18 52 22 56" stroke="#333" stroke-width="1.5" fill="none"/>
+    <circle cx="22" cy="56" r="2" fill="#333"/>
+  </symbol>
+</svg>
+
+<!-- ============ Легенда ============ -->
+<div class="legend-strip" id="legendStrip">
+  <div class="item" data-char="babbi"><div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div><span>Бабби</span><span class="count">0</span></div>
+  <div class="item" data-char="liam"><div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div><span>Лиам</span><span class="count">0</span></div>
+  <div class="item" data-char="mama"><div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-mama"/></svg></div><span>Мама</span><span class="count">0</span></div>
+  <div class="sep"></div>
+  <div class="item" data-char="maguer"><div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-maguer"/></svg></div><span>Миссис Магуэр</span><span class="count">0</span></div>
+  <div class="item" data-char="daisy"><div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-daisy"/></svg></div><span>Дейзи</span><span class="count">0</span></div>
+  <div class="item" data-char="margo"><div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-margo"/></svg></div><span>Марго</span><span class="count">0</span></div>
+  <div class="item" data-char="justin"><div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-justin"/></svg></div><span>Джастин</span><span class="count">0</span></div>
+  <div class="item" data-char="marcus"><div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-marcus"/></svg></div><span>Маркус</span><span class="count">0</span></div>
+  <div class="item" data-char="walter"><div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-walter"/></svg></div><span>Шериф Уолтер</span><span class="count">0</span></div>
+  <div class="item" data-char="patti"><div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-patti"/></svg></div><span>Пэтти</span><span class="count">0</span></div>
+  <div class="item" data-char="allerton"><div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-allerton"/></svg></div><span>Доктор Аллертон</span><span class="count">0</span></div>
+  <div class="sep"></div>
+  <div class="item" data-char="narration"><div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div><span>Авторский текст</span><span class="count">0</span></div>
+</div>
+
+<!-- ============ Тулбар ============ -->
+<div class="toolbar">
+  <button data-mark="verbs">Выделить глаголы</button>
+  <button data-mark="pronouns">Выделить местоимения</button>
+  <button data-mark="terms">Выделить термины и объекты</button>
+  <button data-mark="clear" class="clear-btn">Убрать выделения</button>
+  <div class="search-box">
+    <input type="search" id="searchInput" placeholder="Поиск по тексту…">
+    <button id="searchBtn" type="button">Найти</button>
+  </div>
+</div>
+
+<!-- ============ Макет ============ -->
+<div class="layout">
+  <main class="main-text" id="mainText">
+
+    <!-- ===== Начало ===== -->
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration"><b class="first-appearance">Марта-Лу Смитсон<span class="new-badge" data-tip="Первое появление">new</span></b>, она же бабби (именно так, не бабушка, бабуля или ба) для девяти внуков, окончательно выжила из ума.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration"><b class="first-appearance">Лиам<span class="new-badge" data-tip="Первое появление">new</span></b> часто ловил подобные разговоры на семейных праздниках или когда кто-то из родни заглядывал в гости. Он слышал, что соседи бабби постоянно звонили ее многочисленным детям: сначала с советами, затем с просьбами, а потом и с более чем угрожающими рекомендациями решить этот вопрос.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">В доме появились яркие рекламные буклеты, в которых на фоне зелёных парков неестественно прилизанные старички чинно прогуливались в тени деревьев чистый воздух и долгожданный покой, играли в шахматы дружеское общение, лежали в уютных палатах с непременными широкими улыбками в окружении глянцево добродушных медсестричек и круглосуточный профессиональный уход.</div>
+    </div>
+
+    <div class="block" data-character="mama">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-mama"/></svg></div>
+      <div class="text bg-mama">— Как ты думаешь, милый, Солфхелп-Хоум ведь не плохой вариант? Или лучше Клэр? А, может, Адмирал у озера?</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">— мама обращалась к Лиаму, но на самом деле просто проговаривала вслух. Перекатывала названия, как камушки по языку. Листала буклеты. Она знала, и Лиам знал, и даже отец, который, собственно, к этому делу никакого отношения не имел, тоже знал, что ни в какой из домов заботы и ухода за престарелыми бабби переезжать не захочет.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Проблема, как горячая картошка, перекидывалась из рук в руки от тети Саншайн к дяде Марли, от него к тете Рэйнбоу и ее дочерям, сделавшим отличную карьеру в медицинской сфере в Нью-Йорке, ну а оттуда обратно в Чикаго к маме Лиама, пока однажды внезапно, но предсказуемо не приземлилась на голову самого Лиама.</div>
+    </div>
+
+    <div class="block" data-character="mama">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-mama"/></svg></div>
+      <div class="text bg-mama">— Ты должен съездить к бабби и уговорить ее.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">— Это было сказано за завтраком и имело вкус зелёного горошка и твердость бекона, соседствующего с ним на тарелке. В такт словам мама постукивала ногтем по стакану апельсинового сока.</div>
+    </div>
+
+    <div class="block" data-character="liam">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div>
+      <div class="text bg-liam">— Почему я?</div>
+    </div>
+
+    <div class="block" data-character="mama">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-mama"/></svg></div>
+      <div class="text bg-mama">— Ты с ней ладил.</div>
+    </div>
+
+    <div class="block" data-character="liam">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div>
+      <div class="text bg-liam">— В одиннадцать.</div>
+    </div>
+
+    <div class="block" data-character="mama">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-mama"/></svg></div>
+      <div class="text bg-mama">— Она любит тебя больше прочих.</div>
+    </div>
+
+    <div class="block" data-character="liam">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div>
+      <div class="text bg-liam">— Ага, настолько, что трижды забывала меня на парковке супермаркета, когда вы ещё зачем-то сплавляли меня к ней на выходные.</div>
+    </div>
+
+    <div class="block" data-character="mama">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-mama"/></svg></div>
+      <div class="text bg-mama">— Так, — мама отодвинула стакан. — Поедешь завтра. Я дам тебе все нужные брошюры. Покажешь, объяснишь. Все равно заняться тебе в ближайшее время нечем.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Это “нечем”, мама нарочно выделила, и Лиам тут же прочитал за ним укор. Раз уж ты такой неудачник и даже поступить не мог, сгоняй к старой маразматичке, поклоняющейся Джиму Хендриксу, хоть так пригодись. Отец, подняв глаза от утренней газеты, подмигнул Лиаму и ухмыльнулся, и это тоже выглядело злорадной издёвкой.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Бабби жила в Энглвуде в южной части Чикаго. Ее дом — маленький, перекошенный, с облупившейся жёлтой краской и разноцветными психоделическими узорами вокруг окон. На ветхом крыльце висел колокольчик из ржавых ключей и винных бутылок. Двор больше напоминал арт-объект и свалку одновременно: на покосившемся заборе висели выцветшие флаги мира, под ними раскинулись горы старых вещей, коробок, поломанных грабель и пакетов с пустыми банками. Там же обитали чёрные мешки с мусором, картонные коробки, сломанные кресла и пара детских велосипедов без колёс. Посреди этого бардака, среди клумбы из старой ванны, выделялись пёстрые гномики и таблички "Make love, not war".</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Лиам припарковал свой бьюик прямо возле кривой калитки. Он немного посидел в машине, собираясь с духом. Сгреб разноцветные буклеты и вышел в августовский зной. Бабби расположилась в скособоченном шезлонге, закинув худые, пучащиеся варикозными узлами икры на гипсовый бюст Линкольна с отколотым носом. На пластиковом столике рядом возвышался зиккурат коробок из-под пиццы. Седые, спутанные пряди, с вплетенными в них бусинами и нитками, пестрое платье, настолько выцветшее и грязное, что определить рисунок на нем не представлялось возможным, и сигарета, зажатая пальцами с длинными разноцветными ногтями. Злая ведьма Запада в ожидании Элли.</div>
+    </div>
+
+    <div class="block" data-character="liam">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div>
+      <div class="text bg-liam">— Бабби! — Лиам улыбнулся как можно шире. Он старался аккуратно идти, лавируя между гор мусора, но все же пару раз споткнулся и почти получил граблями по лбу.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Старушка бодро подскочила и прищурилась.</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Кто это к мне заглянул? Никак младший сын моей старшей дочери? Или нет, постой, ты вроде старший сын моей младшей дочери? Тот, который пошёл работать в полицию или в пожарники, а нет — вроде стал преуспевающим биржевым брокером.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Глядя на вытягивающееся лицо Лиама, она расхохоталась, по-юному громко и заливисто.</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Да, помню я тебя. Ты — вечно недовольный маленький зануда Лиам. Погоди немного, сейчас я принесу самого вкусного домашнего лимонада. Или ты уже достаточно вырос, чтобы перейти на что покрепче?</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Лиам смотрел на вальяжную муху, плавающую между долькой лимона и веточкой мяты в его стакане. Из открытой двери дома тянуло чем-то кислым и тухлым, даже под страхом смерти он был не готов переступить порог. Вспомнился вечно липкий пол, горы грязной посуды и равномерный слой цветастых тряпок на полу, на которые он насмотрелся в детстве. Бабби всегда отличалась какой-то аномальной неряшливой нечистоплотностью и полным презрением к быту.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Лиам брезгливо отодвинул от себя лимонад и на его место положил стопку бумаг.</div>
+    </div>
+
+    <div class="block" data-character="liam">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div>
+      <div class="text bg-liam">— Мама хотела, чтобы ты посмотрела.</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Что это?</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Бабби с любопытством взяла буклеты в руки. Но почти сразу, поймав взглядом благообразного старичка, улыбающегося глянцево и ненатурально, отшвырнула их.</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Мне это не надо!</div>
+    </div>
+
+    <div class="block" data-character="liam">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div>
+      <div class="text bg-liam">— Надо. — Лиам ожидал, чего угодно — бури, оскорблений, истерики. Того, что бабби швырнет в него стаканом, оскверненным мушиным трупом. Именно так она, помнится, рассадила бровь дяде Марли, когда он едко прошелся по ее обожаемым семидесятым. А тете Рэйнбоу она надела на голову супницу с остатками бульона за одно ее предложение продать дом и перебраться в более благоустроенную квартиру.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Но сейчас бабби не буйствовала, напротив, она сжалась, поблекла и стала похожа на девочку, которая вот-вот заплачет. Очень старенькую девочку.</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Но я не хочу.</div>
+    </div>
+
+    <div class="block" data-character="liam">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div>
+      <div class="text bg-liam">— Соседи звонят, жалуются. Говорят, ты расхаживаешь по двору голая.</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Ничего постыдного в человеческом теле не вижу.</div>
+    </div>
+
+    <div class="block" data-character="liam">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div>
+      <div class="text bg-liam">— А родители маленьких детей видят. Ты кормишь енотов, и они до того обнаглели, что начали считать все мусорные баки по улице столовыми с разными вариантами меню.</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Вот мисс Пачули и мистера Карму попрошу не трогать. Они никому не причиняют вреда.</div>
+    </div>
+
+    <div class="block" data-character="liam">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div>
+      <div class="text bg-liam">— Мистера Карму? Ты назвала енота Кармой?</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Что поделать, он так же неотвратим и внезапен.</div>
+    </div>
+
+    <div class="block" data-character="liam">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div>
+      <div class="text bg-liam">— В любом случае это далеко не весь список. Они говорят, что если не примем меры мы, примут они. И тогда это уже будет принудительная госпитализация.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Бабби молчала, жалобно и жалко. Лиам думал, что, возможно, одна из причин, почему именно на него спихнули эту миссию — толстокожесть. Эмпатия на уровне зубочистки. Противоположная ледяная вершина от болота психики бабби.</div>
+    </div>
+
+    <div class="block" data-character="liam">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div>
+      <div class="text bg-liam">— Давай я покажу тебе самые лучшие варианты. Объясню.</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Нет! Убирайся! Пошёл ты! И мои детки тоже. И соседи — эти обыкновенные землеройки. — Она вскочила, опрокинув столик, и, презрительно махнув краем юбки, исчезла в недрах дома.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Лиам продолжал сидеть. Скорее всего, лучшим решением было бы действительно уйти, и пусть мама или тети с дядями сами едут сюда и разбираются. Но он ненавидел незавершенность. И сейчас ему казалось, что разговор ещё не закончен, а подвис в воздухе, и это ощущалось мучительным зудом где-то между лопаток. Вот и вторая причина: долбаный друг мой ОКР.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Бабби появилась на крыльце спустя полчаса. Через плечо у нее была перекинута огромная холщовая сумка.</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Ты ещё здесь, маленький мистер зануда? Я подумала и решила, что возможно вы и правы. Мне действительно уже трудновато одной. А там люди, общение.</div>
+    </div>
+
+    <div class="block" data-character="liam">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div>
+      <div class="text bg-liam">— Бридж по четвергам и ретро-танцы по воскресеньям. — Лиам с готовностью кивнул. — Исключительно доброжелательная атмосфера.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Лицо бабби дернулось, словно она собралась скривиться, но справилась с собой.</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Звучит вдохновляюще, ага.</div>
+    </div>
+
+    <div class="block" data-character="liam">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div>
+      <div class="text bg-liam">— Так я покажу?</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Не так быстро. Я согласна посмотреть эти веселые картинки, скажем, через неделю. Когда мы вернёмся.</div>
+    </div>
+
+    <div class="block" data-character="liam">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div>
+      <div class="text bg-liam">— Вернемся? — Слово звучало подозрительно неправильно и Лиам напрягся.</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Я часто езжу в одно место. По осколкам юношеских воспоминаний или около того. Но последние годы мне слишком тяжело даётся дорога и нужен сопровождающий. Ты ведь составишь компанию старушке?</div>
+    </div>
+
+    <div class="block" data-character="liam">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div>
+      <div class="text bg-liam">— Я?! У меня вообще-то дела и планы. Своя жизнь.</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Неужели ты откажешь любимой бабби? Всего неделя твоей жизни в обмен на мою покорность. К тому же я абсолютно точно знаю, что занятия в Чикагском университете начинаются в конце сентября, а значит сейчас ты абсолютно свободен.</div>
+    </div>
+
+    <div class="block" data-character="liam">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div>
+      <div class="text bg-liam">— И когда ты планируешь ехать? — поспешил сменить скользкую и неприятную тему Лиам.</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Прямо сейчас!</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Грохотнул опрокинутый мусорный бачок, с визгом из него вывалился чёрно-белый ком, развернувшийся в упитанного енота. Отфыркиваясь, он неторопливо засеменил за угол дома.</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— О! Мистер Карма соизволил попрощаться! Наша дорога будет удачной. — Бабби расплылась в широченной желтозубой улыбке.</div>
+    </div>
+
+    <!-- ===== Дневник: Миссис Магуэр ===== -->
+    <div class="block" data-character="maguer">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-maguer"/></svg></div>
+      <div class="text bg-maguer">
+        <div class="diary-heading">Чикаго, Иллинойс · 1:30pm 08/12/2026 · <strong>Миссис Магуэр<span class="new-badge" data-tip="Первое появление">new</span></strong></div>
+        Мария, Иосиф и все святые, неужели это наконец случилось и чокнутая из жёлтого дома съезжает? Не то, чтобы я подглядывала, упаси Господь, просто у меня кухня аккурат окнами на её двор, а занавески сами себя не поправят. К ней сегодня явился внучок — гладенький, чистенький, рубашечка как из рекламы колледжа, волосы прилизаны. На старую хиппушу эту совсем не похож.<br><br>
+        Господи, как же она меня достала. То музыка за полночь — и не нормальная, а эти ее семидесятые навсегда. То личности к ней таскаются: бороды, бусики, женщины в юбках из штор, один раз был мужчина с козой. То она голая во дворе ловит «энергию луны», хотя, между нами, луне тоже не всякое надо показывать. А еноты? Эти полосатые бандиты уже считают мой мусорный бак своим воскресным буфетом.<br><br>
+        И вот теперь внучок сгребает её сумку и, кажется, они уезжают. Я даже перекрестилась. Главное, чтобы она не передумала до конца улицы. Я уже мысленно пеку банановый хлеб в честь освобождения квартала.
+      </div>
+    </div>
+
+    <!-- ===== Диалог в машине ===== -->
+    <div class="block" data-character="liam">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div>
+      <div class="text bg-liam">— Бабби! Не смей курить в машине, иначе я останавливаюсь и по своим воспоминаниям ты шаришься одна. Я не хочу пропахнуть табаком.</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Милый, это не табак.</div>
+    </div>
+
+    <div class="block" data-character="liam">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div>
+      <div class="text bg-liam">— Тем более. Никаких веществ в тачке. Проблем с копами мне только не хватает. Сейчас. Я. Торможу. И ты весь свёрток выкидываешь в окно.</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Окей! Знаешь, маленький зануда мне кажется, что это тебе семьдесят семь, а мне девятнадцать.</div>
+    </div>
+
+    <!-- ===== Дневник: Дейзи ===== -->
+    <div class="block" data-character="daisy">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-daisy"/></svg></div>
+      <div class="text bg-daisy">
+        <div class="diary-heading">Элькхарт, Индиана · 6:00pm 08/12/2026 · <strong>Дейзи<span class="new-badge" data-tip="Первое появление">new</span></strong></div>
+        Токи-Токи сегодня сбила машина. Машина была серая, большая, с ржавым боком. Она даже не остановилась. Только сделала вжух, потом тук, а потом поехала дальше, как будто ничего важного не случилось. Как будто Токи-Токи был пакетом из магазина, а не котом.<br><br>
+        Я ревела, сидя на бордюре, так что даже глаза заболели, а потом думаю, надо зарыть, как бабушку Агату, когда она померла. Чтобы камушек сверху положить и цветочки всякие. Я даже коробку большую нашла и слова придумала. "Токи-токи — ты был верным котом и лучшим другом".<br><br>
+        Я пошла к маме просить лопатку. Мама сказала:<br>
+        — Дейзи, не трогай его. Там микробы.<br><br>
+        Мама сказала, что сейчас у неё звонок по работе, а папа вернётся после восьми и всё решит. Но после восьми — это почти ночью. Нельзя оставлять лучшего друга лежать у дороги до почти ночи.<br><br>
+        Я пошла к мистеру Уолшу, потому что у него в гараже есть настоящая лопата. Он сказал: “Бедняжка”, но дверь полностью не открыл. Миссис Кларк сказала, что ей очень жаль, но мёртвых животных она не выносит. Брендон с соседней улицы сказал: “Фу, я не буду”, и убежал. Эмма уехала к бабушке в Форт-Уэйн, Грейс в лагере с лошадьми, Ной на озере, а Молли вообще в Теннесси, где у неё кузены и настоящая черепаха. Мои знакомые люди закончились.<br><br>
+        Я вернулась к Токи-Токи с коробкой. Положила её рядом, открыла крышку. Я придумала всё правильно, только самого главного сделать не могла — взять его в руки. Очень боялась. Мне казалось, если я дотронусь, он станет совсем мёртвым.<br><br>
+        Тогда возле меня остановилась машина. И из нее вылезла бабушка. Нет, она не была похожа на бабушку Агату, ходящую по воскресеньям в церковь и ругавшую меня за потоптанный газон. Она была как старенькая фея, которая вывалилась из мусорного бака. У неё в волосах были бусинки, нитки и перо.<br><br>
+        — Кто умер, солнышко? — спросила она.<br><br>
+        И сказала это так, будто Токи-Токи был не «какой-то кот», а кто-то большой и взрослый.<br><br>
+        Я сказала:<br>
+        — Токи-Токи.<br><br>
+        И опять начала плакать, хотя уже думала, что все слёзы кончились.<br><br>
+        Из машины вышел дядя, такой, как мой брат Майки, который в прошлом году уехал в Нью-Йорк, взрослый, но не совсем. И, кажется, он был не рад, что они остановились. И что старая фея достала из сумки большой платок и, завернув в него Токи-Токи, прижала его к груди.<br><br>
+        А потом мы вместе похоронили Токи-Токи. Я вспомнила, что правильно говорить похоронили, а не зарыли. Я положила в коробку три цветка клевера, камушек с белой полоской и маленькую пластиковую рыбку из своего браслета. Потому что Токи-Токи любил рыбу, даже пластиковая, наверное, ему понравилась бы.<br><br>
+        Я сказала речь, а дядя, похожий на Майки, написал на дощечке, маркером: "Здесь покоится Токи-Токи – хороший кот и самый верный друг". Старенькая фея заплакала вместе со мной, и мне стало гораздо лучше, как будто кто-то понял и разделил моё горе ровно пополам. Она вынула из своих волос голубую бусину и положила на камень.<br><br>
+        — Чтобы дорога была цветной.<br><br>
+        А потом они уехали. И я подумала, что если бывают феи из мусорного бака, то это, наверное, самые хорошие феи. Потому что обычные только машут палочкой, а эта не побоялась поднять мёртвого кота.
+      </div>
+    </div>
+
+    <!-- ===== В машине, после Дейзи ===== -->
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">В открытое окно бьюика врывались запахи августа — горячего асфальта и пыльной скошенной травы с ноткой навоза с ферм. Лиам долго и тщательно протирал пальцы антибактериальными салфетками, прежде чем взяться за руль. Поглядывал на насвистывающую что-то задорное бабби.</div>
+    </div>
+
+    <div class="block" data-character="liam">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div>
+      <div class="text bg-liam">— Не знал, что тебе нравятся дети.</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Абсолютно точно нет.</div>
+    </div>
+
+    <div class="block" data-character="liam">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div>
+      <div class="text bg-liam">— Тогда зачем?</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Никто не должен уходить в одиночку. И провожать тоже. Неважно, что будет с телом потом, но это самый главный момент. Как помочь открыть дверь в новое.</div>
+    </div>
+
+    <div class="block" data-character="liam">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div>
+      <div class="text bg-liam">— Даже коту?</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Даже коту.</div>
+    </div>
+
+    <!-- ===== Дневник: Марго ===== -->
+    <div class="block" data-character="margo">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-margo"/></svg></div>
+      <div class="text bg-margo">
+        <div class="diary-heading">Мотель Лейксайд, Кливленд, Огайо · 12:30am 08/13/2026 · <strong>Марго<span class="new-badge" data-tip="Первое появление">new</span></strong></div>
+        Он всё-таки нашёл меня.<br><br>
+        Я-то, дура, думала, что если проехать три штата и заплатить за мотель наличкой, то Коди меня в жизни не сыщет. Ага, размечталась. Он всегда меня находил. Мамка сразу сказала: "Марго, этот парень как репей, прицепится — не отдерёшь". А я, глупая гусыня, думала, что это любовь такая, крепкая и горячая.<br><br>
+        Разбудил меня грохот в дверь. Я так и подскочила. Как знала — это он. По стуку определила. Он всегда так барабанит, будто дверь вынести к чертям собирается.<br><br>
+        — Открывай, детка, я всё знаю, я не злюсь, — говорит. А голос — сладкий-сладкий, приторный до тошноты.<br><br>
+        Ну я и открыла. Дура, тыщу раз дура. Только щёлку, чтобы поговорить, а он плечом как двинет. Дальше смутно все. Помню, что летела спиной на комод, помню, как ваза в осколки. Помню его кулак и своё лицо, которое вспыхнуло так, будто мне на щёку кипятку плеснули.<br><br>
+        Я не знаю, как вырвалась. Босиком, в одной футболке, вылетела на улицу. Побежала по галерейке вдоль номеров и давай колотить во все двери подряд.<br><br>
+        — Помогите! Пожалуйста! Кто-нибудь!<br><br>
+        Ноль. Тишина. В одном окошке свет мигнул и погас. В другом занавеска дёрнулась — и всё. Люди, они такие. Не хотят влезать. Своя рубашка ближе, а чужие со своей бедой — пусть сами разбираются.<br><br>
+        Я уж думала — всё, тут мне и конец: у грязной двери в мотеле "Лейксайд", где даже буква "с" на вывеске не горит.<br><br>
+        А потом одна дверь возьми да откройся. И на пороге — старуха. Ей-богу, я такой в жизни не видала. Вся в тряпках цветастых, волосы седые торчком, в них бусины какие-то, а глаза — острые-острые, будто она тебя шилом сверлит. За её спиной парень маячит, молодой, испуганный не меньше моего.<br><br>
+        Коди меня уже почти нагнал. Схватил за руку, дёрнул.<br><br>
+        — Иди сюда, сучка, разговор не закончен!<br><br>
+        И тут старуха выходит вперёд. Маленькая, а встала так, словно она — гора. Посмотрела на Коди снизу вверх, спокойно так, и говорит. Тихо, но у меня аж мурашки:<br><br>
+        — Я вижу, что у тебя внутри, мальчик. Гниль. Чёрная, склизкая. Такие, как ты, долго не живут — их земля сама к себе прибирает раньше срока. Я хоронила троих таких. А сначала проводила правильным словом. — Она чуть наклонила голову. — А ну как я и на тебя погляжу подольше?<br><br>
+        И — не знаю, что это было — может, глаза её. Может, голос. Но Коди — здоровый бык, который меня в комод впечатал, — вдруг побелел. Отпустил мою руку. Попятился.<br><br>
+        — Психичка старая, — буркнул. Но голос дрожал. — Да ну вас всех к чёрту.<br><br>
+        И свалил. Сел в свой пикап и рванул так, что гравий из-под колёс.<br><br>
+        Меня затрясло. Ноги подкосились, и я прямо там, на бетон, и села. А парень — тот, молоденький — приземлился рядом. Достал из кармана пачку салфеток и протянул.<br><br>
+        — Держи, — говорит. И голос такой... мягкий, но без липкой сладости. Не как у Коди.<br><br>
+        — Кровь. У тебя губа разбита.<br><br>
+        Я взяла. Пальцы у него холодные и слегка дрожали. Я посмотрела на него — а он на меня. И как-то сразу отвёл глаза, покраснел, как будто это его застукали за чем-то стыдным.<br><br>
+        — Спасибо, — прохрипела я. Голос сел совсем. — Я думала, никто…<br><br>
+        — Ей спасибо говори, — кивнул он в сторону старухи. — Это она безбашенная и бесстрашная, не я.
+      </div>
+    </div>
+
+    <!-- ===== Мотель, ночь ===== -->
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Полоса лунного света, пробившись в щель между ситцевыми занавесками, лежала на щеке Лиама. Он смотрел в потолок, влажная ночная духота липла к коже.</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Понравилась?</div>
+    </div>
+
+    <div class="block" data-character="liam">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div>
+      <div class="text bg-liam">— Кто?</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Голову мне не дури. У тебя прям глаза заблестели. Хоть бы номер телефона, взял, остолоп.</div>
+    </div>
+
+    <div class="block" data-character="liam">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div>
+      <div class="text bg-liam">— Бабби, а ты что, правда ведьма?</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Какая к бесу ведьма? Навидалась просто таких бойцов домашних. Шкаф огромный, а смелости в нём с чайную ложку. А во мне ее всегда много было, они перед таким пасуют. И ты, это, с темы-то не спрыгивай. Почему вообще мы сейчас с тобой в одном номере, а не ты в ее.</div>
+    </div>
+
+    <div class="block" data-character="liam">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div>
+      <div class="text bg-liam">— Бабби! Давай спать!</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Глупый, маленький мистер зануда. Мир держится на любви, и когда ей предаваться, как не в девятнадцать лет?</div>
+    </div>
+
+    <!-- ===== Дневник: Джастин ===== -->
+    <div class="block" data-character="justin">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-justin"/></svg></div>
+      <div class="text bg-justin">
+        <div class="diary-heading">Придорожное кафе под Эри, Пенсильвания · 10:30am 08/13/2026 · <strong>Джастин<span class="new-badge" data-tip="Первое появление">new</span></strong></div>
+        Значит, так. Кто скажет, что Джастина "Гризли" Маккоя может облапошить старуха — тому я лично пасть порву. Восемнадцать лет за рулём, харлей подо мной ревёт как тыща чертей, на пузе тату с орлом, который жрёт змею, борода до груди — детишки в супермаркетах при виде меня за мамкину юбку прячутся. Я, брат, всякого навидался.<br><br>
+        А эта бабка меня развела. Как пацана. Богом клянусь.<br><br>
+        Сижу я, значит, в этой забегаловке под Эри, где кофе на вкус как использованное моторное масло, и уминаю яичницу с беконом. Тихо-мирно. И тут — звяк колокольчик над дверью. Заходит она. Мелкая, в тряпье цветном, волосья седые дыбом, в них — мамой клянусь — не то бусины, не то куриные кости навтыканы. За ней парнишка, тощий, лицо кислое, будто лимон сожрал.<br><br>
+        Ну, зашли и зашли, мне-то что. Я в тарелку смотрю.<br><br>
+        А она — шасть! — прямо ко мне за столик. Плюхается напротив, будто мы с ней в детстве в песочнице вместе куличи лепили. Парнишку за рукав дёрнула, тот тоже сел со своей миной кислючей.<br><br>
+        — Хорошая у тебя машина, — говорит. — "Фэт Бой", девяносто девятого?<br><br>
+        Я аж жевать перестал. Баба. Древняя. Мотоцикл мой с одного взгляда угадала. Год выпуска. Я, значит, мычу:<br><br>
+        — Ну... допустим.<br><br>
+        — Мой второй муж на таком разбился, — говорит она этак задумчиво, а сама тянет мою тарелку с беконом и — цап! — кусок себе в рот. — Хороший был человек. Дурак, но хороший.<br><br>
+        Парнишка шипит:<br><br>
+        — Бабби! Это чужое!<br><br>
+        — Теперь уже общее, — жуёт. И официантке, что мимо шла, ручкой машет: — Милочка, а нам с внучком то же самое, что вот этому красавцу-мотоциклисту. Он угощает. Правда, солнышко?<br><br>
+        И на меня смотрит. А глаза, брат... как фары дальнего света в лоб.<br><br>
+        И — вот скажи мне — чего я? Мог бы встать, рявкнуть, дескать, никого я не угощаю, катитесь. Я мужиков вдвое тебя здоровее с байка ссаживал за косой взгляд. А тут... молчу. Киваю даже. Как дурак деревенский.<br><br>
+        — Ты не туда едешь, — говорит она вдруг, пока официантка тарелки тащит. Утверждает, а не спрашивает.<br><br>
+        — Я в Буффало еду, — говорю. — По делам. А куда надо?<br><br>
+        — По делам, — фыркнула, будто я анекдот дурной рассказал, и в свежую порцию яичницы вилку тычет. — А душа твоя старая, потрёпанная, совсем не туда просится. Я по глазам вижу. У тебя внутри пацан сидит, который в семьдесят каком-то пластинкой "Кридэнс" заслушивался и подпевал им перед зеркалом в расчёску. Может тебе в другую сторону ехать — туда где басы с деревянной сцены доносятся и качают разноцветные спины палаток?<br><br>
+        ...А я ведь реально перед зеркалом пел, с расчёской розовой сеструхиной..<br><br>
+        Я никому этого не рассказывал. Ни жене. Ни первой, ни второй. Ни братанам по клубу.<br><br>
+        Сижу — а по спине мурашки, здоровые, как тараканы. Смотрю на неё уже иначе. А вдруг и правда ведьма и видит чего?<br><br>
+        У парнишки, аж уши от смущения покраснели, тянет старуху за рукав и бурчит себе что-то под нос, неразборчиво. В тарелку, перед ним поставленную, даже не сунулся.<br><br>
+        Бабка на него — ноль внимания. Уминает МОЙ завтрак, который я ЕЙ заказал, и жмурится от удовольствия, как кошара на солнце.<br><br>
+        — Вкусно у них тут, — говорит. — Спасибо, милок. Хорошее у тебя сердце. Большое. Под всем этим железом и бородой.<br><br>
+        И тут до меня доперло. Медленно так. Как трактор с горки. Никакая она не ведьма. Просто старая проныра в бусах, которая мужика раскрутила на две порции жратвы, ввернув пару угадаек. "Кридэнс" все слушали. Мотоцикл — вон он в окне стоит, номер и модель любой прочитает, кто в теме.<br><br>
+        Развела. Меня. Гризли.<br><br>
+        Я сижу и — не поверишь — ржать хочу. Уважаю. Честно уважаю. Это ж талант.<br><br>
+        Доели они. Встала. Салфеткой губы промокнула, будто королева какая.<br><br>
+        — Ну, поехали, зануда, — парнишке. А мне — подмигнула, зараза: — А коня своего железного всё ж таки продай, милок. Второй муж не послушал.<br><br>
+        И ушла. Колокольчик — звяк.<br><br>
+        Официантка счёт кладёт. За три завтрака. Сижу я, облапошенный, а сам лыблюсь как идиот. И "Кридэнс" чот врубить захотелось.
+      </div>
+    </div>
+
+    <!-- ===== В машине, после Джастина ===== -->
+    <div class="block" data-character="liam">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div>
+      <div class="text bg-liam">— Бабби, неужели мы не можем позволить себе заплатить за завтрак?</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Ты, может, и можешь, а я женщина бедная, пожилая. Откуда у меня лишние деньги? К тому же за чужой счёт всегда вкуснее. И погоди немного, машину не заводи. Дай я ещё сигарету у кого-нибудь стрельну, в тачке-то своей ты мне курить запретил.</div>
+    </div>
+
+    <!-- ===== Дневник: Маркус ===== -->
+    <div class="block" data-character="marcus">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-marcus"/></svg></div>
+      <div class="text bg-marcus">
+        <div class="diary-heading">Торговый центр «Уолден Гэлериа», Буффало, Нью-Йорк · 4:00pm 08/13/2026 · <strong>Маркус<span class="new-badge" data-tip="Первое появление">new</span></strong></div>
+        Двадцать два года я стою на охране этого богоугодного храма потребления. Видал я всякое. Воришек, что колготки в трусы пихают. Мамаш, которые орут громче пожарной сигнализации. Пьяного Санту в июле. Но такого, братцы мои, — такого я не видал.<br><br>
+        Звонок с фуд-корта: старушка буянит. Ну, думаю, очередная бабуля кофе пролила. Иду. А там — вот это картина. Стоит мелкая, похожая на городскую сумашедшую, и — вы не поверите — раздаёт еду из чужих подносов. Берёт у одного картошку, несёт бездомному парню у входа. Люди рты пораскрывали.<br><br>
+        — Мэм, — говорю вежливо, по протоколу. — Мэм, это чужая собственность. Так нельзя.<br><br>
+        А она давай фыркать и плеваться.<br><br>
+        — Собственность, — говорит. — У мальчика живот к спине прилип, а ты мне про собственность. Тебя мама чему учила, здоровяк?<br><br>
+        Я, значит, держусь. Двадцать два года стажа.<br><br>
+        — Мэм, я вызову полицию.<br><br>
+        — А ты позвони, позвони. Спроси у них, положено ли голодным жрать. — И спокойненько так тянет с еще одного подноса наггетс. Хозяйка подноса визжит. Бездомный учуяв, что запахло проблемами к выходу тихонько семенит.<br><br>
+        Тут парнишка подскакивает, тощий, мелкий. Внук, видать.<br><br>
+        — Бабби, ну хватит, тебя ж посадят!<br><br>
+        А она ему:<br><br>
+        — Пусть сажают. Я в шестьдесят восьмом за это сидела и не жаловалась.<br><br>
+        И вот тут, братцы, она мне и выдала. Смотрит — и вдруг лицо у ней меняется. Мягчает. И говорит тихо, ласково:<br><br>
+        — Дэнни… Дэнни, ну чего ты в форме? Ты ж не любил форму.<br><br>
+        Я аж попятился. Какой Дэнни. Меня Маркус зовут. А она ко мне тянется, за рукав, и глаза — мокрые, счастливые:<br><br>
+        — Я знала, что ты придёшь. Я тебя тут ждала. Ты сказал — никуда не уходи.<br><br>
+        Я в осадке, стою как истукан. А парнишка — я на него глянул — он белый весь. Он это в первый раз видит, понял я. Он про эту её… дырку в голове не знал.<br><br>
+        — Бабби, это не Дэнни, — шепчет он. — Это охранник. Посмотри на меня.<br><br>
+        Она моргнула. Раз, другой. И — будто вынырнула. Отпустила рукав. Засмеялась, звонко:<br><br>
+        — Ох, батюшки. Обозналась. Ты, милок, просто на одного хорошего человека похож. Извиняй.<br><br>
+        Но парень уже завёлся. От страха, я так думаю. Встал между нами:<br><br>
+        — Не трогайте её! Она пожилая! Что вы к ней прицепились из-за пачки картошки?!<br><br>
+        — Сынок, я к ней не цеплялся, она…<br><br>
+        — Вызывайте своих копов! Валяйте! Мы никого не боимся!<br><br>
+        Ну. Вызвал. А чего мне ещё делать. Тетка эта развопилась, будто не не наггетсов, а девичества лишили. Двадцать два года стажа, а сердце — не камень. Стою и думаю: и старуху жалко, и пацана, у которого руки трясутся, а он бабку грудью закрывает.<br><br>
+        Приехали ребята. Повезли обоих в участок. Не в тюрьму, конечно, — разобраться. Старушка в машину садилась, обернулась на меня и — подмигнула. Хитро так.
+      </div>
+    </div>
+
+    <!-- ===== В камере ===== -->
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">В камере дурно пахло и было ужасно жарко, но бабби, казалось, это вовсе не раздражало. Она сидела на лавке, болтала ногами, как школьница, и разглядывала облупившийся потолок с искренним интересом.</div>
+    </div>
+
+    <div class="block" data-character="liam">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div>
+      <div class="text bg-liam">— Это кто такой — Дэнни?</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Первый мой муж. Твоей дед, а может не твой. Не помню. Хороший. Умер, когда мне двадцать три было. Последнее время он часто ко мне… заходит. Только все с чужими лицами.</div>
+    </div>
+
+    <div class="block" data-character="liam">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div>
+      <div class="text bg-liam">— Сколько у тебя вообще мужей было?</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Много, но точно меньше чем детей. Мне всегда хотелось дать миру больше прекрасного. А вот что потом делать с этим прекрасным, я не знала. Однажды, например, двоих я на заправке забыла. В Огайо. С ребятами в фургоне ехали на концерт, я курнула, пока эти в туалет пошли, и мы рванули. Вспомнила про них через два штата. Они на той заправке шесть часов просидели. Одни. Семь лет старшему и пять младшей. Я плохая была мать. Всё гналась куда-то, а дети сзади бежали и звали. Я на них оглядывалась — и снова вперёд.</div>
+    </div>
+
+    <!-- ===== Дневник: Шериф Уолтер ===== -->
+    <div class="block" data-character="walter">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-walter"/></svg></div>
+      <div class="text bg-walter">
+        <div class="diary-heading">Полицейский участок, Буффало, Нью-Йорк · 8:00am 08/14/2026 · <strong>Шериф Уолтер<span class="new-badge" data-tip="Первое появление">new</span></strong></div>
+        Мне через четыре месяца на пенсию. Сорок один год при значке. Думал, до последнего дня досижу тихо, без сюрпризов. Ага. Как же. Прихожу утром, кофе не допил, дежурный докладывает: старушка со внуком, задержаны в "Гэлерии", кормила бомжа чужой картошкой. Иду в камеру — глянуть на экспонаты.<br><br>
+        И встал в дверях как вкопанный.<br><br>
+        Рыжик. Седая уже вся, ссохлась, как яблоко в духовке. Но глаза. Эти глаза я б из тыщи узнал. Лето семьдесят шестого, площадь у ратуши, она босиком на капоте моей патрульной машины поёт "Крокодилов рок", а я, молодой дурак-стажёр, не знаю, арестовать её или жениться.<br><br>
+        — Лу, — говорю. И голос у меня сел. — Марта-Лу Смитсон.<br><br>
+        А она смотрит. Вежливо, но без интереса. Не узнаёт.<br><br>
+        — Мы знакомы, милок?<br><br>
+        Полоснуло по сердцу. Сорок лет я эту улыбку помнил, а она — меня нет.<br><br>
+        — Уолт, — говорю. — Уолти. Ты меня "копиком" звала. Я тебе штраф выписать не мог, руки тряслись.<br><br>
+        Ничего. Тишина. Внук на меня смотрит виновато — мол, извините.<br><br>
+        Я уж рукой махнул, хотя обидно стало жутко. Бумаги начал оформлять. И тут — от двери уже — слышу тихо:<br><br>
+        — Уолти?<br><br>
+        Обернулся.<br><br>
+        Она смотрит — и узнала. На одну секунду. Все сорок лет разом в глаза вернулись.<br><br>
+        — Ты так и не решился меня арестовать, — говорит и улыбается. Та самая улыбка.<br><br>
+        — Не решился, — говорю. А сам думаю, как бы при дежурном-то не раскиснуть и слезу не пустить.<br><br>
+        — Отпусти нас, копик. Мне ещё далеко ехать.<br><br>
+        — Куда, Рыжик?<br><br>
+        Но она уже отвернулась. И глаза опять — пустые. Как не было.<br><br>
+        Отпустил я их, конечно. И весь день потом у окна простоял.
+      </div>
+    </div>
+
+    <!-- ===== После участка ===== -->
+    <div class="block" data-character="liam">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div>
+      <div class="text bg-liam">— Бабби, я не поступил в Чикагский. Мама всем говорит, что я взял "год на подумать", а я просто не прошел.</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— И?</div>
+    </div>
+
+    <div class="block" data-character="liam">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div>
+      <div class="text bg-liam">— Что "и"?</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Ну, не поступил. Небо от этого на голову не упало. Земля не перестала вращаться.</div>
+    </div>
+
+    <div class="block" data-character="liam">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div>
+      <div class="text bg-liam">— Что б ты понимала! Это для меня было важнее всего, я шёл к этому со средней школы.</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Шёл он. Милый, диплом это всего лишь бумажка. Он не сделал бы тебя ярче или счастливее. Куда важней место своё найти. Я вот, может, до сих пор ищу.</div>
+    </div>
+
+    <!-- ===== Дневник: Пэтти ===== -->
+    <div class="block" data-character="patti">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-patti"/></svg></div>
+      <div class="text bg-patti">
+        <div class="diary-heading">Придорожное кафе «У Донны», Харрис, Нью-Йорк · 6:40pm 08/14/2026 · <strong>Пэтти<span class="new-badge" data-tip="Первое появление">new</span></strong></div>
+        Гроза налетела внезапно, как оно тут между холмов и водится. Небо почернело, ливануло стеной, и посетителей у нас — раз-два и обчёлся. Я протирала стойку и поглядывала в окно, как молнии царапаются золотыми когтями.<br><br>
+        Их двое было. Старушка — неухоженная, как те, кто ночует под путепроводом у трассы, тележки из супермаркета с горой пакетов только не хватало, и парнишка, тощий, приличный, но какой-то весь замороженный. Пили чай.<br><br>
+        Из музыкального автомата вдруг заиграло, глючит его в грозу, сам по себе врубается. Что-то из моей молодости — то ли "Ван Моррисон", то ли ещё кто. И старушка эта уставилась в окно, на ливень. Встала. Медленно, держась за стол.<br><br>
+        — Пойдём, — говорит парню.<br><br>
+        — Куда пойдём? Бабби, там льёт как из ведра.<br><br>
+        — Вот именно. — Глаза у неё загорелись, как у девчонки. — Танцевать.<br><br>
+        Он аж поперхнулся.<br><br>
+        — Под дождём?! Ты с ума сошла?<br><br>
+        — Давно, милый, давно. Но нет ничего прекраснее танца в грозу, попробуй — тебе должно понравиться.<br><br>
+        Она толкнула дверь и вышла под ливень.<br><br>
+        Я к окну прилипла. Парнишка выскочил следом, кричит:<br><br>
+        — Бабби! Вернись! Простудишься!<br><br>
+        А она уже посреди пустой стоянки, под стеной воды, раскинула руки и кружится. Лицо к небу задрала, глаза закрыла. Вода по ней течёт ручьями, волосы сосульками обвисли, платье потемнело — а она смеётся. Молнии полыхают, гром грохочет, а старушка эта танцует так, будто ей не восемьдесят, а восемнадцать.<br><br>
+        — Иди сюда! — кричит она парню. — Потанцуй со старухой! Второго такого дождя не будет! Он никогда не повторится!<br><br>
+        И мальчишка тоже шагнул под ливень. Весь сжался сперва, плечи поднял. А потом распрямился, подошёл и обнял её. Она голову ему на грудь приткнула и они закачались. Прямо там, на залитой водой стоянке, под громом и молниями. Я от окна отлипнуть не могла, до того странно и красиво.<br><br>
+        А потом она вдруг обмякла. Просто — раз, и осела у него на руках, как тряпичная кукла.<br><br>
+        Он ещё даже позвать на помощь не успел, как я к телефону кинулась, набирать девять-один-один.
+      </div>
+    </div>
+
+    <!-- ===== Скорая ===== -->
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Скорая мчалась вниз с холмов, кренясь на поворотах. Фельдшер что-то делал с капельницей. Бабби лежала выцветшая с кислородной маской на лице, и глаза полуприкрыты. Лиам держал её за руку.</div>
+    </div>
+
+    <div class="block" data-character="liam">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div>
+      <div class="text bg-liam">— Помнишь, ты нам с Хлоей и Сэмом сказки рассказывала. Про страну, где всегда зреет земляника, про жёлтый автобус, на котором ездят в небо только бородатые гитаристы. Про дерево, которое поёт любимые песни, если приложить к нему ухо. Я потом два года искал его во дворах и парках. Я тогда не понимал, почему у тебя в историях мир такой… добрый. А настоящий — грязный, злой и вечно мне подлянки строил. И это несоответствие меня мучило, я ведь сам, когда подрос, попросил не возить меня к тебе. Думал, ты врёшь. Просто врёшь маленьким детям. Мама удивилась. Она ведь любит тебя очень, и все дяди и тети тоже. Только любить проще издалека. Так и обиды прощаются, и на заправке у супермаркета никого не забудут.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Бабби стянула маску с лица. Улыбнулась.</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Мы почти приехали. Слышишь? Почти-почти.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Лиам не понял, про больницу она или нет.</div>
+    </div>
+
+    <!-- ===== Дневник: Доктор Аллертон ===== -->
+    <div class="block" data-character="allerton">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-allerton"/></svg></div>
+      <div class="text bg-allerton">
+        <div class="diary-heading">Медицинский центр «Гарнет-Хелс», Харрис, Нью-Йорк · 12:15am 08/15/2026 · <strong>Доктор Аллертон<span class="new-badge" data-tip="Первое появление">new</span></strong></div>
+        Пациентка Смитсон, семьдесят семь лет. Поступила с синкопе на фоне того, что мы деликатно называем "декомпенсацией". А если не деликатно — организм у неё изношен так, будто она прожила три жизни подряд. Сердце едва тянет. И это ещё не главное.<br><br>
+        Главное было на снимках грудной клетки и в анализах. Я такое видел много раз. Процесс распространённый, запущенный, без каких-либо попыток в лечение. А она ведь наверняка знала. Такое не пропустишь — боли, слабость, периодическая спутанность сознания.<br><br>
+        Внук ждал в коридоре. Совсем мальчишка. Сидел, обхватив колени.<br><br>
+        — Она в стабильном состоянии, — сказал я. — Пока. Но я буду с вами честен, ваша бабушка умирает. Ей точно нельзя никуда ехать. Ни завтра, ни послезавтра. Ей нужна госпитализация, а дальше — разговор с онкологом и, скорее всего, паллиативная служба.<br><br>
+        Он поднял на меня глаза.<br><br>
+        — Паллиативная — это…<br><br>
+        — Это когда мы уже не лечим болезнь, а купируем боли и помогаем уйти комфортно.<br><br>
+        Он долго молчал.<br><br>
+        — Сколько осталось?<br><br>
+        — Точно не скажет никто. Недели. Может, месяц-два, если беречь силы. Любая нагрузка сейчас — это риск. Вы понимаете? Ей нужен полный покой.<br><br>
+        Парень кивнул.<br><br>
+        — Можно к ней?<br><br>
+        — Да. Она в сознании. Но будьте аккуратны, хорошенько подумайте, что станете говорить.
+      </div>
+    </div>
+
+    <!-- ===== Больница ===== -->
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Ты не бросишь меня здесь!</div>
+    </div>
+
+    <div class="block" data-character="liam">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div>
+      <div class="text bg-liam">— Тебе нельзя, никуда, совсем. Я позвоню маме и прочим — они приедут.</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Мы отсюда уходим. Сегодня ночью.</div>
+    </div>
+
+    <div class="block" data-character="liam">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div>
+      <div class="text bg-liam">— Нет.</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Лиам, я сюда ехала не для того, чтобы помереть на казённой простыне под пиканье приборов. Понимаешь?</div>
+    </div>
+
+    <div class="block" data-character="liam">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div>
+      <div class="text bg-liam">— Я не могу. Меня вся семья возненавидит.</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Пусть. Зато проводишь по-человечески. Помнишь, я говорила — самое важное — не оставить в одиночестве на пороге. Неси мою одежду, она в том шкафчике. Ты же уже понял, куда мы?</div>
+    </div>
+
+    <div class="block" data-character="liam">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div>
+      <div class="text bg-liam">— В Бетел?</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Да, милый. Именно туда.</div>
+    </div>
+
+    <!-- ===== Бетел ===== -->
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Холм они одолевали медленно. Лиам поддерживал бабби под локоть, и всё равно через каждые десять шагов она останавливалась, упиралась ладонями в колени, и пережидала, пока грудь перестанет ходить ходуном. Трава была мокрой от росы, кроссовки Лиама пропитались влагой насквозь. Бабби смотрела вверх, на гребень, за которым небо уже наливалось молочно-розовым.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Остановившись почти на самой вершине, она вдруг заговорила. Перемежая слова одышкой и хриплым кашлем.</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Я однажды тоже провожала. Не здесь, конечно — совсем в другом месте, но так же на рассвете. Я была папина дочка, нежный цветочек и любимица, и, когда пришло его время, он не лёг помирать. Встал, оделся и говорит: "Марта, пойдём, покажу тебе кое-что. Только тебе". И мы пошли. Через поля и сквозь травы, еле-еле потихонечку до леса. Когда солнце встало — он показал мне переход. Свою речку из тридцатых: отмель, ивы, клёв с самого утра, войны ещё нет, все живы. Там ему было хорошо. А для всех остальных он просто пропал. Понимаешь? Ни тела, ни могилы, ни записки. Полиция, собаки, объявления в газете — искали месяцами. Мать до смерти думала, что он бросил нас. Я одна знала правду и всю жизнь её при себе держала — кому такое расскажешь. А на прощание он снял вот это и надел мне. Святой Христофор, покровитель путешественников. И сказал: "Твой билет обратно. Проводишь до воды — и назад. За мной не ходи, тебе ещё рано". Я и не пошла. Медальон меня удержал. — Она сняла шнурок через голову, путаясь в седых прядях с бусинами.</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Теперь твоя очередь, маленький мистер зануда. — Бабби надела медальон Лиаму на шею, придавила ладонью к его груди, будто ставя печать.</div>
+    </div>
+
+    <div class="block" data-character="liam">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div>
+      <div class="text bg-liam">— Бабби, я не…</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Тише. Смотри.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">И тут из-за края земли выкатилось солнце. Свет хлынул по склону вниз, в широкую зелёную чашу, и Лиам увидел. Всё поле внизу было забито. Разноцветные фургончики-фольксвагены, расписанные цветами, длинные кадиллаки отливающие хромом, автобусы. Дощатые сцены, леса, растяжки. Тысячи, десятки тысяч людей — на одеялах, на плечах друг у друга. Дым костров стоял столбами в утреннем воздухе. И снизу, тонко и ясно, доносилась музыка — гитара, тянущая одну долгую чистую ноту, от которой у Лиама перехватило дыхание.</div>
+    </div>
+
+    <div class="block" data-character="liam">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div>
+      <div class="text bg-liam">— Бабби, — прошептал он. — Это же… Вудсток. Настоящий.</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Настоящий? — Она тихо засмеялась, глядя вниз. — Нет, милый. Такого Вудстока не было. Никогда.</div>
+    </div>
+
+    <div class="block" data-character="liam">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-liam"/></svg></div>
+      <div class="text bg-liam">— Как — не было? Вот же он…</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Настоящий-то был совсем другой. — Она качнула головой, и в голосе её не было ни капли сожаления, только нежность. — Грязь по колено. Три дня ливень. Жратвы не хватало, воды не хватало, сортиров — тем паче. Половину я проспала в мокром спальнике, а вторую проревела из-за одного дурака с гитарой, который меня бросил ради девицы из Огайо. Звук с половины поля не слышно было. Кто-то ширялся, кого-то на "скорой" увозили. Вот такой был настоящий.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Она обвела рукой сияющую внизу картину — чистую, тёплую, звенящую.</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— А этот — не тот, что был. Это тот, каким я его домечтала за шестьдесят лет. Вылизала до последней травинки. Убрала грязь, убрала дождь, убрала того дурака. Оставила только музыку, солнце и то, как мне было двадцать и казалось, что весь мир принадлежит только мне. — Она посмотрела на Лиама. — Идеального места в "сейчас" не бывает, милый. Никогда. Оно живёт только в двух местах — в мечте и в памяти. Там его и можно вычистить до блеска. Вот отец ушёл на свою речку, которой давно нет и, может, и не было такой красивой. А я вот — сюда. В свой Вудсток. В тот, что лучше настоящего. И он меня ждёт — правильный, каким я его придумала.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Воздух на гребне дрожал и плыл, как марево над раскалённым асфальтом. Вот он, переход. Где реальность становится тонкой, как папиросная бумага.</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Пора, — сказала бабби.</div>
+    </div>
+
+    <div class="block" data-character="babbi">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-babbi"/></svg></div>
+      <div class="text bg-babbi">— Всё хорошо, солнышко. Ты меня довёл. Дальше я одна. А ты стой тут. Стой и держи Христофора. Он тебя вернёт.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Бабби пошла вниз. Лиам рванулся было следом — и медальон на груди вдруг стал тяжёлым, тёплым, словно чья-то ладонь легла ему на грудь и придержала. Тебе ещё рано. Он остался стоять.</div>
+    </div>
+
+    <div class="block" data-character="narration">
+      <div class="avatar"><svg viewBox="0 0 60 60"><use href="#p-narration"/></svg></div>
+      <div class="text bg-narration">Бабби спускалась по склону, всё быстрее, всё легче, и с каждым шагом что-то с неё осыпалось. Седина стекала с волос, и они вспыхивали медью в утреннем солнце. Спина распрямлялась. И вот уже вниз по склону, к музыке, к разноцветной толпе, бежала не старуха, а рыжая девчонка лет двадцати — тонкая, звонкая, в тяжёлой джинсовой куртке, которая была ей велика на три размера, с рукавами, закатанными до локтя. Она обернулась на бегу, махнула ему рукой — и нырнула в гущу своего идеального, никогда не существовавшего Вудстока.</div>
+    </div>
+
+  </main>
+
+  <aside class="info-panel" id="infoPanel"></aside>
+</div>
+
+<script>
+(function () {
+  const escapeRegex = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+  // =================== Разметка ===================
+  const terms = [
+    'Солфхелп-Хоум', 'Адмирал у озера', 'Клэр',
+    'Марта-Лу Смитсон', 'Марта-Лу', 'Смитсон',
+    'Энглвуд', 'Чикаго', 'Иллинойс', 'Илинойс',
+    'бьюик',
+    'Make love, not war',
+    'Джим Хендрикс',
+    'Линкольн',
+    'Элькхарт', 'Индиана',
+    'Мотель Лейксайд', 'Лейксайд',
+    'Кливленд', 'Огайо',
+    'харлей', 'Харлей',
+    'Фэт Бой',
+    'Кридэнс',
+    'Уолден Гэлериа', 'Гэлериа',
+    'Буффало', 'Нью-Йорк',
+    'Бетел', 'Вудсток',
+    'Святой Христофор', 'Христофор',
+    'Гарнет-Хелс', 'Харрис',
+    'ОКР',
+    'паллиативная', 'онколог',
+    'синкопе', 'декомпенсация',
+    'фольксваген', 'кадиллак',
+    'Токи-Токи', 'Токи',
+    'Коди', 'Дэнни', 'Уолти', 'Рыжик', 'копик',
+    'бабби',
+    'Лиам',
+    'Хлоя', 'Сэм', 'Майки',
+    'Дейзи', 'Марго', 'Джастин',
+    'Гризли', 'Маккой',
+    'Маркус', 'Уолтер',
+    'Пэтти', 'Аллертон', 'Магуэр',
+    'Пачули', 'Карма', 'Карму',
+    'Саншайн', 'Марли', 'Рэйнбоу',
+    'Агата', 'Уолш', 'Кларк',
+    'Брендон', 'Эмма', 'Грейс',
+    'Ной', 'Молли',
+    'Форт-Уэйн', 'Теннесси'
+  ].sort((a, b) => b.length - a.length);
+  const termRegex = new RegExp(
+    `(?<![а-яёА-ЯЁ\\w])(${terms.map(escapeRegex).join('|')})(?![а-яёА-ЯЁ\\w])`, 'giu'
+  );
+
+  const pronouns = [
+    'я','ты','он','она','оно','мы','вы','они',
+    'меня','тебя','его','её','нее','нас','вас','них',
+    'мне','тебе','ему','ей','ней','нам','вам','им','ним',
+    'мной','мною','тобой','тобою','нами','вами','ими','ними',
+    'себя','себе','собой','собою',
+    'мой','моя','моё','мои','моего','моей','моему','моим','моём',
+    'твой','твоя','твоё','твои','твоего','твоей','твоему','твоим',
+    'наш','наша','наше','наши','нашего','нашей','нашему','нашим',
+    'ваш','ваша','ваше','ваши','вашего','вашей','вашему','вашим',
+    'свой','своя','своё','свои','своего','своей','своему','своим',
+    'этот','эта','это','эти','этого','этой','этому','этим','этом',
+    'тот','та','те','того','той','тому','тем','том',
+    'такой','такая','такое','такие','такого','такой','таком',
+    'весь','вся','всё','все','всего','всей','всему','всем',
+    'сам','сама','само','сами','самого','самой',
+    'любой','любая','любое','любые','любого','любой',
+    'другой','другая','другое','другие','другого','другой',
+    'иной','иная','иное','иные',
+    'кто','что','какой','какая','какое','какие',
+    'никто','ничто','никакой','ничей'
+  ].sort((a, b) => b.length - a.length);
+  const pronounRegex = new RegExp(
+    `(?<![а-яёА-ЯЁ\\w])(${pronouns.map(escapeRegex).join('|')})(?![а-яёА-ЯЁ\\w])`, 'giu'
+  );
+
+  const verbRegex = /(?<![а-яёА-ЯЁ])([а-яё]+(?:ться|тся|ть|ешь|ишь|ем|им|ете|ите|ет|ёт|ит|ут|ют|ат|ят|ал|ала|ало|али|ил|ила|ило|или|ыл|ыла|ыло|ыли|ёл|ел|ела|ело|ели|лся|лась|лось|лись))(?![а-яёА-ЯЁ])/giu;
+
+  const verbStoplist = new Set([
+    'мать','дочь','ночь','печь','речь','вещь','помощь','площадь','часть','власть',
+    'скорость','гордость','зависть','радость','плоть','масть','пасть','сеть','плеть',
+    'пять','шесть','семь','восемь','девять','десять','семнадцать','двадцать','тридцать',
+    'суть','путь','ртуть','муть','сень','ступень','тень','день','корень','олень','зять',
+    'гость','кость','кисть','месть','лесть','честь','прелесть','шест','куст','лист',
+    'аист','мост','пост','хвост','рост','тост','тест','жест','шелест','холст',
+    'стол','стул','бал','зал','вал','канал','финал','сигнал','журнал','идеал','портал',
+    'металл','кристалл','капитал','квартал','вокзал','причал','обвал','провал','отвал',
+    'привал','перевал','подвал','кинжал','материал','минерал','овал','фиал','адмирал',
+    'генерал','маршал','фестиваль','госпиталь','портфель','кабель','мебель','корабль',
+    'ансамбль','автомобиль','кабинет','букет','пакет','совет','буфет','аппетит','кредит',
+    'лимит','бандит','маршрут','салют','парашют','уют','привет','ответ','запрет','завет',
+    'рассвет','цвет','навет','раунд','тополь','тополю','угол','котел','котёл','орел','орёл',
+    'узел','козел','козёл','сокол','футбол','баскетбол','волейбол','гол','ноль',
+    'дело','дела','делу','делом','деле','дел','тел','тело','тела','телу','телом','теле',
+    'село','сёла','сёл','мел','лось'
+  ]);
+
+  function markText(el, regex, className, stoplist) {
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
+      acceptNode(node) {
+        const p = node.parentNode;
+        if (p && p.classList && (
+          p.classList.contains('term') ||
+          p.classList.contains('pronoun') ||
+          p.classList.contains('verb') ||
+          p.classList.contains('new-badge') ||
+          p.classList.contains('diary-heading')
+        )) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    const nodes = [];
+    let n;
+    while ((n = walker.nextNode())) nodes.push(n);
+
+    nodes.forEach(node => {
+      const text = node.textContent;
+      const re = new RegExp(regex.source, regex.flags);
+      const hits = [];
+      let m;
+      while ((m = re.exec(text)) !== null) {
+        if (stoplist && stoplist.has(m[0].toLowerCase())) continue;
+        hits.push({ s: m.index, e: m.index + m[0].length, t: m[0] });
+        if (m.index === re.lastIndex) re.lastIndex++;
+      }
+      if (!hits.length) return;
+
+      const frag = document.createDocumentFragment();
+      let pos = 0;
+      hits.forEach(h => {
+        if (h.s > pos) frag.appendChild(document.createTextNode(text.slice(pos, h.s)));
+        const span = document.createElement('span');
+        span.className = className;
+        span.textContent = h.t;
+        frag.appendChild(span);
+        pos = h.e;
+      });
+      if (pos < text.length) frag.appendChild(document.createTextNode(text.slice(pos)));
+      node.parentNode.replaceChild(frag, node);
+    });
+  }
+
+  document.querySelectorAll('.block .text').forEach(el => {
+    markText(el, termRegex,    'term');
+    markText(el, pronounRegex, 'pronoun');
+    markText(el, verbRegex,    'verb', verbStoplist);
+  });
+
+  // =================== Кнопки-тогглы ===================
+  const toggleBtns = document.querySelectorAll('.toolbar button[data-mark="verbs"], .toolbar button[data-mark="pronouns"], .toolbar button[data-mark="terms"]');
+  toggleBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const mark = btn.dataset.mark;
+      document.body.classList.toggle('show-' + mark);
+      btn.classList.toggle('active');
+    });
+  });
+
+  // =================== «Убрать выделения» ===================
+  document.querySelector('.clear-btn').addEventListener('click', () => {
+    document.body.classList.remove('show-verbs', 'show-pronouns', 'show-terms');
+    toggleBtns.forEach(b => b.classList.remove('active'));
+  });
+
+  // =================== Счётчики в легенде ===================
+  function updateCounts() {
+    const counts = {};
+    document.querySelectorAll('.block').forEach(b => {
+      counts[b.dataset.character] = (counts[b.dataset.character] || 0) + 1;
+    });
+    document.querySelectorAll('.legend-strip .item[data-char]').forEach(item => {
+      const c = item.querySelector('.count');
+      if (c) c.textContent = counts[item.dataset.char] || 0;
+    });
+  }
+  updateCounts();
+
+  // =================== Инфо-панель ===================
+  const characterInfo = {
+    babbi: {
+      title: 'Бабби (Марта-Лу Смитсон)',
+      sections: [
+        { label: 'Внешность', text: 'Старуха с седыми спутанными волосами, в которые вплетены бусины и нитки. Цветастое выцветшее платье, длинные разноцветные ногти, сигарета в пальцах. Живёт в жёлтом доме с психоделическими узорами.' },
+        { label: 'Манера говорить', text: 'Прямолинейно, с юмором, часто с вызовом. Обожает шокировать и поддевать. В серьёзные моменты — тихо, проникновенно, с нежностью.' },
+        { label: 'Словечки', text: '«Маленький мистер зануда», «копик», «Рыжик», «милок», «солнышко».' },
+        { label: 'Роль', text: 'Бабушка девяти внуков, хиппи, вдова. Хочет умереть по-своему — на рассвете в Бетеле, у своего идеального Вудстока.' }
+      ]
+    },
+    liam: {
+      title: 'Лиам',
+      sections: [
+        { label: 'Внешность', text: 'Молодой человек, аккуратный, чистенький, с прилизанными волосами. Носит рубашку «как из рекламы колледжа».' },
+        { label: 'Манера говорить', text: 'Сначала раздражённая, затем — теплее. С бабби — смесь недоверия и восхищения. В конце — нежность и понимание.' },
+        { label: 'Словечки', text: '«Бабби, давай спать», «Ты с ума сошла?», «В Бетел?»' },
+        { label: 'Роль', text: 'Внук, которому поручили «уговорить» бабби. Не поступил в Чикагский университет. В итоге сопровождает бабби в её последнее путешествие.' }
+      ]
+    },
+    mama: {
+      title: 'Мама Лиама',
+      sections: [
+        { label: 'Внешность', text: 'Практичная, деловая. Волосы собраны в пучок. За завтраком стучит ногтем по стакану сока.' },
+        { label: 'Манера говорить', text: 'Организованно, с лёгким укором. Умеет сказать так, чтобы стало стыдно.' },
+        { label: 'Словечки', text: '«Так, поедешь завтра», «Все равно заняться тебе нечем».' },
+        { label: 'Роль', text: 'Дочь бабби, мать Лиама. Инициирует «решение вопроса» с домом престарелых.' }
+      ]
+    },
+    maguer: {
+      title: 'Миссис Магуэр',
+      sections: [
+        { label: 'Внешность', text: 'Соседка бабби. Аккуратная, с седым пучком и очками. Кухня окнами на двор бабби.' },
+        { label: 'Манера говорить', text: 'Ворчливая, с иронией. Религиозные восклицания. Склонна к драматизму.' },
+        { label: 'Словечки', text: '«Мария, Иосиф и все святые», «чокнутая из жёлтого дома», «полосатые бандиты».' },
+        { label: 'Роль', text: 'Соседка, которая мечтает, чтобы бабби съехала.' }
+      ]
+    },
+    daisy: {
+      title: 'Дейзи',
+      sections: [
+        { label: 'Внешность', text: 'Маленькая девочка с косичками. В браслете — пластиковая рыбка.' },
+        { label: 'Манера говорить', text: 'Детская, непосредственная, трогательная. Называет бабби «старенькой феей».' },
+        { label: 'Словечки', text: '«Токи-Токи», «самый верный друг», «чтобы дорога была цветной».' },
+        { label: 'Роль', text: 'Девочка, чьего кота сбила машина. Бабби помогает ей похоронить кота.' }
+      ]
+    },
+    margo: {
+      title: 'Марго',
+      sections: [
+        { label: 'Внешность', text: 'Молодая женщина с разбитой губой, в футболке, босиком. Сбежала от абьюзера.' },
+        { label: 'Манера говорить', text: 'Взволнованная, сбивчивая, с самобичеванием. Потом — тихая, благодарная.' },
+        { label: 'Словечки', text: '«Дура, тыщу раз дура», «как репей», «безбашенная и бесстрашная».' },
+        { label: 'Роль', text: 'Жертва домашнего насилия, которой бабби помогла в мотеле.' }
+      ]
+    },
+    justin: {
+      title: 'Джастин «Гризли» Маккой',
+      sections: [
+        { label: 'Внешность', text: 'Здоровый байкер с бородой до груди, тату с орлом на пузе. Ездит на харлее «Фэт Бой».' },
+        { label: 'Манера говорить', text: 'Грубоватая, но с самоиронией. Восхищается бабби, хотя сам не понимает, как она его «развела».' },
+        { label: 'Словечки', text: '«Брат», «пасть порву», «облапошенный», «ржать хочу».' },
+        { label: 'Роль', text: 'Байкер, которого бабби развела на завтрак и заставила вспомнить юность.' }
+      ]
+    },
+    marcus: {
+      title: 'Маркус',
+      sections: [
+        { label: 'Внешность', text: 'Охранник торгового центра. Двадцать два года стажа. В форме.' },
+        { label: 'Манера говорить', text: 'По протоколу, вежливо. Внутренне — устало и с сочувствием.' },
+        { label: 'Словечки', text: '«Мэм, это чужая собственность», «сердце — не камень».' },
+        { label: 'Роль', text: 'Охранник, которого бабби приняла за Дэнни — своего первого мужа.' }
+      ]
+    },
+    walter: {
+      title: 'Шериф Уолтер',
+      sections: [
+        { label: 'Внешность', text: 'Пожилой шериф, сорок один год при значке. Носит форму.' },
+        { label: 'Манера говорить', text: 'Спокойная, с горечью. Вспоминает молодость — «Рыжика» из семьдесят шестого.' },
+        { label: 'Словечки', text: '«Рыжик», «копик», «Уолти».' },
+        { label: 'Роль', text: 'Шериф, который знал бабби в молодости и до сих пор помнит её улыбку.' }
+      ]
+    },
+    patti: {
+      title: 'Пэтти',
+      sections: [
+        { label: 'Внешность', text: 'Официантка придорожного кафе. Носит фартук и сеточку для волос.' },
+        { label: 'Манера говорить', text: 'Наблюдательная, сочувствующая. Рассказывает с удивлением и теплотой.' },
+        { label: 'Словечки', text: '«Я к окну прилипла», «будто ей не восемьдесят, а восемнадцать».' },
+        { label: 'Роль', text: 'Свидетельница танца бабби под грозой.' }
+      ]
+    },
+    allerton: {
+      title: 'Доктор Аллертон',
+      sections: [
+        { label: 'Внешность', text: 'Врач в белом халате. Профессиональный, усталый.' },
+        { label: 'Манера говорить', text: 'Честно, прямо, но с сочувствием. Не скрывает диагноз.' },
+        { label: 'Словечки', text: '«Организм изношен, будто она прожила три жизни», «паллиативная служба».' },
+        { label: 'Роль', text: 'Врач, сообщивший Лиаму, что бабби умирает.' }
+      ]
+    },
+    narration: {
+      title: 'Авторский текст',
+      sections: [
+        { label: 'Голос', text: 'Третье лицо, наблюдающее за Лиамом и бабби. Внимание к деталям, пейзажам, жестам.' },
+        { label: 'Манера', text: 'Тёплая, ироничная, иногда грустная. Соединяет бытовое и мистическое (переход в «идеальный Вудсток»).' },
+        { label: 'Особенность', text: 'Повествование ведётся от третьего лица, но в дневниковых вставках — от первого.' }
+      ]
+    }
+  };
+
+  let activeChar = null;
+  const infoPanel = document.getElementById('infoPanel');
+
+  function applyFilter() {
+    document.querySelectorAll('.block').forEach(b => {
+      b.style.display = (!activeChar || b.dataset.character === activeChar) ? '' : 'none';
+    });
+    document.querySelectorAll('.legend-strip .item[data-char]').forEach(i => {
+      i.classList.toggle('active', i.dataset.char === activeChar);
+    });
+    document.querySelectorAll('.block .avatar').forEach(a => {
+      const b = a.closest('.block');
+      a.classList.toggle('active', !!activeChar && b && b.dataset.character === activeChar);
+    });
+  }
+
+  function updateInfoPanel() {
+    if (!activeChar || !characterInfo[activeChar]) {
+      infoPanel.classList.remove('visible');
+      infoPanel.innerHTML = '';
+      return;
+    }
+    const info = characterInfo[activeChar];
+    let html = `<h3>${info.title}</h3><p class="panel-sub">Сгенерированный портрет</p>`;
+    info.sections.forEach(s => {
+      html += `<div class="info-section"><div class="info-label">${s.label}</div><div class="info-text">${s.text}</div></div>`;
+    });
+    infoPanel.innerHTML = html;
+    infoPanel.classList.add('visible');
+  }
+
+  function selectCharacter(key) {
+    activeChar = (activeChar === key) ? null : key;
+    applyFilter();
+    updateInfoPanel();
+  }
+
+  document.querySelectorAll('.legend-strip .item[data-char]').forEach(item => {
+    item.addEventListener('click', () => selectCharacter(item.dataset.char));
+  });
+
+  document.querySelectorAll('.block').forEach(block => {
+    const av = block.querySelector('.avatar');
+    if (av) av.addEventListener('click', () => selectCharacter(block.dataset.character));
+  });
+
+  // =================== Поиск ===================
+  const searchInput = document.getElementById('searchInput');
+  const searchBtn   = document.getElementById('searchBtn');
+
+  function doSearch() {
+    const q = searchInput.value.trim().toLowerCase();
+    if (!q) return;
+    const blocks = document.querySelectorAll('.block');
+    for (const block of blocks) {
+      if (block.textContent.toLowerCase().includes(q)) {
+        if (block.style.display === 'none') {
+          activeChar = null;
+          applyFilter();
+          updateInfoPanel();
+        }
+        block.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        block.classList.remove('search-hit');
+        void block.offsetWidth;
+        block.classList.add('search-hit');
+        setTimeout(() => block.classList.remove('search-hit'), 3000);
+        return;
+      }
+    }
+    alert('Не найдено: «' + searchInput.value + '»');
+  }
+
+  searchBtn.addEventListener('click', doSearch);
+  searchInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') doSearch();
+    if (e.key === 'Escape') { searchInput.value = ''; searchInput.blur(); }
+  });
+})();
+</script>
+</body>
+</html>
