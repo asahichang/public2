@@ -33,7 +33,6 @@
 <!-- ================= /SVG-ИКОНКИ ================= -->
 
 <style>
-/* Layout: one long scroll. Each section opens with a giant word filled with a stellar-spectrum gradient (M-class ember to O-class blue); content sits on a quiet hairline grid under it. */
 :root{
   --bg:#070a12; --bg2:#0d1220; --fg:#eef1f7; --muted:#9ba5ba; --line:rgba(255,255,255,.12);
   --s1:#ff5b3a; --s2:#ffb23f; --s3:#fff0b8; --s4:#8ff0e6; --s5:#3cb8ff;
@@ -44,7 +43,6 @@
   --f-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
   color-scheme:dark;
 }
-/* secret palette: red shift (must stay last among the token blocks) */
 :root[data-spectrum="red"]{--s1:var(--r1);--s2:var(--r2);--s3:var(--r3);--s4:var(--r4);--s5:var(--r5)}
 
 *{box-sizing:border-box}
@@ -55,7 +53,7 @@ body{
   padding-left:max(16px,env(safe-area-inset-left,0px));
   padding-right:max(16px,env(safe-area-inset-right,0px));
   overflow-x:clip;-webkit-font-smoothing:antialiased;
-  padding-top: calc(40px + env(safe-area-inset-top,0px)); /* space for promo */
+  padding-top: calc(40px + env(safe-area-inset-top,0px));
 }
 ::selection{background:var(--s2);color:#07090f}
 :focus-visible{outline:2px solid var(--s4);outline-offset:3px;border-radius:4px}
@@ -67,7 +65,6 @@ main,footer{position:relative;z-index:1}
 .ic{width:20px;height:20px;display:block;flex:none}
 .ic-xs{width:14px;height:14px}
 
-/* ambient layers: all static or opacity-only, nothing repaints per frame */
 .aura,.sky,.tws{position:fixed;inset:0;z-index:0;pointer-events:none}
 .aura{background:
   radial-gradient(60vmax 40vmax at 88% -8%,color-mix(in srgb,var(--s1) 20%,transparent),transparent 70%),
@@ -77,7 +74,6 @@ main,footer{position:relative;z-index:1}
   animation:tw var(--d,5s) ease-in-out var(--dl,0s) infinite alternate}
 @keyframes tw{to{opacity:calc(.95*var(--star-k))}}
 
-/* gradient text */
 .g{background:var(--g,linear-gradient(95deg,var(--s1),var(--s2) 28%,var(--s3) 52%,var(--s4) 76%,var(--s5)));
   -webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
 .gb{--g:linear-gradient(95deg,var(--s1),var(--s2) 55%,var(--s3))}
@@ -87,7 +83,7 @@ main,footer{position:relative;z-index:1}
 .ga{--g:linear-gradient(95deg,var(--s1),var(--s2) 30%,var(--s3) 55%,var(--s4) 78%,var(--s5))}
 
 /* TOP PROMO BAR */
-.promo{position:fixed;z-index:40;top:0;left:0;right:0;height:40px;background:#ff2a1f;color:#fff;
+.promo{position:fixed;z-index:40;top:0;left:0;right:0;height:40px;background:#d96c4a;color:#fff;
   display:flex;align-items:center;justify-content:space-between;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
   font:500 .85rem/1 var(--f-body);box-shadow:0 2px 10px rgba(0,0,0,.3)}
@@ -101,11 +97,17 @@ main,footer{position:relative;z-index:1}
 .p-link.p2{background:linear-gradient(90deg,#fff,#8ff0e6);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .p-link::after{content:"";position:absolute;left:0;right:0;bottom:-3px;height:1px;background:currentColor;opacity:.5;transform:scaleX(0);transition:transform .2s}
 .p-link:hover::after{transform:scaleX(1)}
+.promo-spacer{width:100px}
+.p-mob{display:none}
+
 @media (max-width:760px){
   .promo{padding-inline:12px;font-size:.75rem}
   .promo-txt{text-align:center;justify-content:center;flex:1}
   .promo-soc{gap:.5rem}
   .promo-soc .ic{width:16px;height:16px}
+  .promo-spacer{display:none}
+  .p-full{display:none}
+  .p-mob{display:inline-block}
 }
 
 /* HEADER & NAV */
@@ -156,28 +158,40 @@ main,footer{position:relative;z-index:1}
 .menu-toggle .ic{width:20px;height:20px}
 
 /* dropdown generic */
-.drop-menu{position:absolute;top:calc(100% + .7rem);z-index:40;min-width:14rem;padding:.45rem;
+.drop-menu{display:none;position:absolute;top:calc(100% + .7rem);z-index:40;min-width:14rem;padding:.45rem;
   border:1px solid var(--line);border-radius:1rem;
   background:color-mix(in srgb,var(--bg) 92%,transparent);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
-  box-shadow:0 24px 60px -24px rgba(0,0,0,.9);display:flex;flex-direction:column;gap:.1rem}
+  box-shadow:0 24px 60px -24px rgba(0,0,0,.9);flex-direction:column;gap:.1rem}
+.drop-menu.open{display:flex}
 .drop-menu a{display:flex;align-items:center;gap:.7rem;padding:.7rem .9rem;border-radius:.7rem;text-decoration:none;
   font:600 .9rem/1.3 var(--f-body);color:var(--fg);white-space:nowrap}
 .drop-menu a:hover{background:color-mix(in srgb,var(--fg) 10%,transparent)}
 .drop-menu .ic{width:20px;height:20px;color:var(--s2)}
 .navdrop-menu{left:50%;transform:translateX(-50%)}
 .top-drop-menu{right:0}
+.readmenu{display:none;position:absolute;left:0;bottom:calc(100% + .7rem);z-index:8;min-width:15.5rem;padding:.45rem;
+  border:1px solid var(--line);border-radius:1rem;
+  background:color-mix(in srgb,var(--bg) 92%,transparent);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
+  box-shadow:0 24px 60px -24px rgba(0,0,0,.9);flex-direction:column;gap:.1rem}
+.readmenu.open{display:flex}
+.readmenu a{display:flex;align-items:center;gap:.7rem;padding:.7rem .85rem;border-radius:.7rem;text-decoration:none;
+  font:600 .92rem/1.2 var(--f-body);color:var(--fg);white-space:nowrap}
+.readmenu a:hover{background:color-mix(in srgb,var(--fg) 9%,transparent)}
+.readmenu .ic{width:20px;height:20px;color:var(--s2)}
+.read-btn .ic{transition:transform .2s}
+.read-btn[aria-expanded="true"] .ic{transform:rotate(180deg)}
 
 @media (max-width:860px){
   .menu-toggle{display:flex}
   .left-menu{gap:0;justify-content:flex-start}
   .brand span{display:none}
   .nav{position:absolute;top:calc(100% + 10px);left:12px;right:12px;flex-direction:column;align-items:stretch;
-    padding:1rem;border-radius:1.2rem;display:none;box-shadow:0 20px 40px -10px rgba(0,0,0,.7)}
+    padding:1rem;border-radius:1.2rem;display:none;box-shadow:0 20px 40px -10px rgba(0,0,0,.7);z-index:100;background:var(--bg)}
   .nav.open{display:flex}
   .nav a,.nav button{padding:1rem;text-align:left;font-size:1rem;border-radius:.8rem}
   .navdrop-btn{justify-content:space-between;width:100%}
   .navdrop-menu{position:static;transform:none;box-shadow:none;border:0;background:transparent;padding:.5rem 0 0 1rem;display:none}
-  .navdrop-menu.open{display:flex}
+  .navdrop-menu.open{display:flex;flex-direction:column}
   .top-drop-menu{position:fixed;top:100px;right:12px;left:12px;width:auto}
 }
 
@@ -221,18 +235,6 @@ details[open]>.more::before{content:"\2013"}
 .hero .lead{max-width:36ch;font-size:clamp(1.1rem,2.1vw,1.35rem);line-height:1.45;margin:1.4rem 0 0}
 .cta{display:flex;flex-wrap:wrap;align-items:center;gap:.8rem;margin-top:1.6rem}
 
-/* «Где читать» + play */
-.readwrap{position:relative;display:inline-flex}
-.readmenu{position:absolute;left:0;bottom:calc(100% + .7rem);z-index:8;min-width:15.5rem;padding:.45rem;
-  border:1px solid var(--line);border-radius:1rem;
-  background:color-mix(in srgb,var(--bg) 92%,transparent);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
-  box-shadow:0 24px 60px -24px rgba(0,0,0,.9);display:flex;flex-direction:column;gap:.1rem}
-.readmenu a{display:flex;align-items:center;gap:.7rem;padding:.7rem .85rem;border-radius:.7rem;text-decoration:none;
-  font:600 .92rem/1.2 var(--f-body);color:var(--fg);white-space:nowrap}
-.readmenu a:hover{background:color-mix(in srgb,var(--fg) 9%,transparent)}
-.readmenu .ic{width:20px;height:20px;color:var(--s2)}
-.read-btn .ic{transition:transform .2s}
-.read-btn[aria-expanded="true"] .ic{transform:rotate(180deg)}
 .playbtn{width:52px;height:52px;border-radius:50%;border:0;cursor:pointer;display:grid;place-items:center;color:#fff;
   background:radial-gradient(circle at 35% 30%,#ff6a45,#ff2a1f 70%);
   box-shadow:0 12px 30px -10px rgba(255,50,30,.75),inset 0 1px 0 rgba(255,255,255,.25);
@@ -286,7 +288,10 @@ details[open]>.more::before{content:"\2013"}
 .cv-a{font:500 .68rem/1.3 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;opacity:.88}
 .c5{background:radial-gradient(70% 40% at 50% 50%,rgba(143,240,230,.2),transparent 70%),#05080f}
 .c5 svg{position:absolute;left:0;right:0;top:42%;width:100%;height:18%;z-index:0}
-.meta{padding-top:1.1rem;display:none} /* Hide text metadata */
+.meta{padding-top:1.1rem}
+.meta .k{font:500 .72rem/1.3 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0}
+.meta h3{font:700 1.15rem/1.2 var(--f-display);margin:.45rem 0 .6rem}
+.meta p.b{margin:0 0 .9rem;color:color-mix(in srgb,var(--fg) 88%,transparent);font-size:.98rem}
 .excerpt{margin:.9rem 0 0;padding-left:1rem;border-left:2px solid var(--s2);font-size:.95rem;font-style:italic}
 
 /* games */
@@ -398,10 +403,10 @@ tr:last-child td{border-bottom:0}
 .vmeta{font:500 .72rem/1.3 var(--f-mono);letter-spacing:.06em;color:var(--muted);text-transform:uppercase;margin:0}
 
 /* subscribe */
-.news{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:2rem;align-items:center;max-width:100%}
+.news{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:2rem;align-items:center;max-width:100%;overflow:hidden;width:100%}
 @media (max-width:860px){.news{grid-template-columns:1fr}}
-.news-h{font:800 clamp(2rem,5.4vw,3.6rem)/.95 var(--f-display);text-transform:uppercase;margin:0;letter-spacing:-.02em}
-.news-f{display:grid;gap:.9rem;min-width:0}
+.news-h{font:800 clamp(2rem,5.4vw,3.6rem)/.95 var(--f-display);text-transform:uppercase;margin:0;letter-spacing:-.02em;word-break:break-word}
+.news-f{display:grid;gap:.9rem;min-width:0;width:100%}
 .news-f input[type=email]{width:100%;padding:1rem 1.2rem;border-radius:999px;border:1px solid var(--line);
   background:color-mix(in srgb,var(--bg) 70%,transparent);color:var(--fg);font:500 1rem var(--f-body);outline:none;transition:border-color .2s,box-shadow .2s}
 .news-f input[type=email]:focus{border-color:var(--s4);box-shadow:0 0 0 3px color-mix(in srgb,var(--s4) 22%,transparent)}
@@ -410,6 +415,10 @@ tr:last-child td{border-bottom:0}
 .seg-btn.on{background:var(--fg);color:var(--bg)}
 .news-f .btn{justify-content:center}
 .news-note{font-size:.75rem;color:var(--muted);margin:0}
+@media (max-width:860px){
+  .seg{width:100%;display:flex}
+  .seg-btn{flex:1;text-align:center}
+}
 
 /* footer columns */
 .footnav{border-top:1px solid var(--line);padding-block:clamp(2.5rem,6vw,4rem);margin-top:2rem}
@@ -493,12 +502,10 @@ tr:last-child td{border-bottom:0}
     <a href="https://www.youtube.com/" target="_blank" rel="noopener" aria-label="YouTube"><svg class="ic" aria-hidden="true"><use href="#i-yt"/></svg></a>
   </div>
   <div class="promo-txt">
-    <span>Подпишись на новости:</span>
-    <button class="p-link p1" data-tab="r">читателям</button>
-    <span>и</span>
-    <button class="p-link p2" data-tab="w">писателям</button>
+    <span class="p-full">Подпишись на новости: <button class="p-link p1" data-tab="r">читателям</button> и <button class="p-link p2" data-tab="w">писателям</button></span>
+    <button class="p-link p-mob" data-tab="r">Подпишись</button>
   </div>
-  <div style="width:100px"></div> <!-- spacer to center text -->
+  <div class="promo-spacer"></div>
 </div>
 
 <!-- HEADER -->
@@ -516,7 +523,7 @@ tr:last-child td{border-bottom:0}
       <a href="#games" data-s="games">Игры</a>
       <div style="position:relative">
         <button class="navdrop-btn" id="wdBtn" type="button" aria-expanded="false">Писателям <svg class="ic ic-xs" aria-hidden="true"><use href="#i-arrow"/></svg></button>
-        <div class="drop-menu navdrop-menu" id="wdMenu" hidden>
+        <div class="drop-menu navdrop-menu" id="wdMenu">
           <a href="#writers">Писательский марафон</a>
           <a href="#blog">Статьи</a>
           <a href="#apps">Приложения</a>
@@ -531,7 +538,7 @@ tr:last-child td{border-bottom:0}
         <button class="icon-btn" id="topReadBtn" aria-label="Где читать" aria-expanded="false">
           <svg class="ic" aria-hidden="true"><use href="#i-book"/></svg>
         </button>
-        <div class="drop-menu top-drop-menu" id="topReadMenu" hidden>
+        <div class="drop-menu top-drop-menu" id="topReadMenu">
           <a href="https://author.today" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-at"/></svg> Author Today</a>
           <a href="https://www.litres.ru" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-litres"/></svg> Литрес</a>
           <a href="https://litnet.com" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-litnet"/></svg> Литнет</a>
@@ -556,10 +563,10 @@ tr:last-child td{border-bottom:0}
       <div class="cta">
         <a class="btn p" href="#books">Читать книги</a>
         <div class="readwrap" id="readwrap">
-          <button class="btn o read-btn" id="readBtn" type="button" aria-expanded="false" aria-controls="readmenu">
+          <button class="btn o read-btn" id="readBtn" type="button" aria-expanded="false">
             Где читать <svg class="ic ic-xs" aria-hidden="true"><use href="#i-arrow"/></svg>
           </button>
-          <div class="readmenu" id="readmenu" hidden>
+          <div class="readmenu" id="readmenu">
             <a href="https://author.today" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-at"/></svg> Author Today</a>
             <a href="https://www.litres.ru" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-litres"/></svg> Литрес</a>
             <a href="https://litnet.com" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-litnet"/></svg> Литнет</a>
@@ -589,21 +596,46 @@ tr:last-child td{border-bottom:0}
         <div class="books" id="booksTrack">
           <article class="book">
             <div class="cover"><img src="https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?q=80&w=400&auto=format&fit=crop" alt="Обложка: Тихий апогей"></div>
+            <div class="meta">
+              <p class="k">Роман · 412 стр.</p>
+              <p class="b">Экипаж буксира на окраине системы получает сигнал от собственного корабля. Корабль прибыл в точку встречи на сорок лет раньше и ждёт.</p>
+              <details><summary class="more">Первые строки</summary><p class="excerpt">Бортовой журнал начинался с фразы, которую Ирма не писала: «Если вы это читаете, мы уже давно вас ждём».</p></details>
+            </div>
           </article>
           <article class="book">
             <div class="cover"><img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=400&auto=format&fit=crop" alt="Обложка: Свет после нас"></div>
+            <div class="meta">
+              <p class="k">Роман · 536 стр.</p>
+              <p class="b">Ковчег идёт к звезде, которая, судя по свежим данным, уже погасла. Шестое поколение решает, говорить ли об этом остальным.</p>
+              <details><summary class="more">Первые строки</summary><p class="excerpt">Когда долетим, нас будут помнить по расписанию вахт, сказал Дэв. Для начала это немало.</p></details>
+            </div>
           </article>
           <article class="book">
             <div class="cover"><img src="https://images.unsplash.com/photo-1506703719100-a0f3a48c0f41?q=80&w=400&auto=format&fit=crop" alt="Обложка: Нулевой дрейф"></div>
+            <div class="meta">
+              <p class="k">Сборник · девять рассказов</p>
+              <p class="b">Ремонт, усталость, радиосвязь и маленькие решения, от которых зависит воздух. Девять историй о работе в невесомости.</p>
+              <details><summary class="more">Первые строки</summary><p class="excerpt">Лёгкие предметы в невесомости не падают. Тяжёлые решения тоже: они висят рядом и ждут, пока на них посмотрят.</p></details>
+            </div>
           </article>
           <article class="book">
             <div class="cover"><img src="https://images.unsplash.com/photo-1543722530-d2c3201371e7?q=80&w=400&auto=format&fit=crop" alt="Обложка: Протокол Лета"></div>
+            <div class="meta">
+              <p class="k">Роман · 368 стр.</p>
+              <p class="b">Первым контактом занимаются не герои, а переводчики-юристы. Каждое слово в договоре с чужими имеет цену, и платить придётся людям.</p>
+              <details><summary class="more">Первые строки</summary><p class="excerpt">Статья четвёртая. Стороны признают, что слово «мир» занимает в их языках разные места на шкале риска.</p></details>
+            </div>
           </article>
           <article class="book" id="secret" hidden>
             <div class="cover c5">
               <span class="cv-a">Рукопись · найдена</span>
               <svg viewBox="0 0 100 20" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,10 18,10.4 30,9.6 42,10.2 47,3 50,17 53,5 58,10.3 72,9.7 84,10.2 100,10" fill="none" stroke="#8ff0e6" stroke-width="1.2" vector-effect="non-scaling-stroke"/></svg>
               <h3 class="cv-t">Водородная линия</h3><span class="cv-a">А. Чанг</span>
+            </div>
+            <div class="meta">
+              <p class="k">Рукопись · не издана</p>
+              <p class="b">Принято на 1420,40. Повтор каждые 71 секунду. Автор пока не уверен, что хочет знать, кто это отправил.</p>
+              <details><summary class="more">Первые строки</summary><p class="excerpt">Сигнал был слишком правильным, чтобы быть шумом, и слишком усталым, чтобы быть приказом.</p></details>
             </div>
           </article>
         </div>
@@ -1147,41 +1179,46 @@ if (canHover){
   if (btn && menu) {
     btn.addEventListener('click', e => {
       e.stopPropagation();
-      const isHidden = menu.hidden;
-      menu.hidden = !isHidden;
-      btn.setAttribute('aria-expanded', String(isHidden));
+      menu.classList.toggle('open');
+      btn.setAttribute('aria-expanded', menu.classList.contains('open'));
     });
-    document.addEventListener('click', e => { if (!menu.hidden && !btn.contains(e.target)) menu.hidden = true; });
+    document.addEventListener('click', e => {
+      if (!menu.classList.contains('open')) return;
+      if (!menu.contains(e.target) && !btn.contains(e.target)) {
+        menu.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+      }
+    });
   }
   // hero read
   const hWrap = $('#readwrap'), hBtn = $('#readBtn'), hMenu = $('#readmenu');
   if (hWrap && hBtn && hMenu) {
     hBtn.addEventListener('click', e => {
       e.stopPropagation();
-      const isHidden = hMenu.hidden;
-      hMenu.hidden = !isHidden;
-      hBtn.setAttribute('aria-expanded', String(isHidden));
+      hMenu.classList.toggle('open');
+      hBtn.setAttribute('aria-expanded', hMenu.classList.contains('open'));
     });
-    document.addEventListener('click', e => { if (!hMenu.hidden && !hWrap.contains(e.target)) hMenu.hidden = true; });
+    document.addEventListener('click', e => {
+      if (!hMenu.classList.contains('open')) return;
+      if (!hMenu.contains(e.target) && !hBtn.contains(e.target)) {
+        hMenu.classList.remove('open');
+        hBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
   }
   // writers nav
   const wBtn = $('#wdBtn'), wMenu = $('#wdMenu');
   if (wBtn && wMenu) {
     wBtn.addEventListener('click', e => {
       e.stopPropagation();
-      const isHidden = wMenu.hidden;
-      wMenu.hidden = !isHidden;
-      wBtn.setAttribute('aria-expanded', String(isHidden));
-      if (window.innerWidth <= 860 && !isHidden) {
-        wMenu.classList.add('open');
-      } else {
-        wMenu.classList.remove('open');
-      }
+      wMenu.classList.toggle('open');
+      wBtn.setAttribute('aria-expanded', wMenu.classList.contains('open'));
     });
     document.addEventListener('click', e => {
-      if (!wMenu.hidden && !wMenu.contains(e.target) && !wBtn.contains(e.target)) {
-        wMenu.hidden = true;
+      if (!wMenu.classList.contains('open')) return;
+      if (!wMenu.contains(e.target) && !wBtn.contains(e.target)) {
         wMenu.classList.remove('open');
+        wBtn.setAttribute('aria-expanded', 'false');
       }
     });
   }
@@ -1253,7 +1290,7 @@ if (canHover){
   // promo bar links
   $$('.p-link').forEach(btn => {
     btn.addEventListener('click', () => {
-      setTab(btn.dataset.tab);
+      if (btn.dataset.tab) setTab(btn.dataset.tab);
       const el = $('#subscribe');
       if (el) el.scrollIntoView({ behavior: reduce() ? 'auto' : 'smooth', block: 'center' });
     });
