@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500..900&family=Onest:wght@400..700&family=JetBrains+Mono:wght@400..700&display=swap">
 
-<!-- ================= SVG-ИКОНКИ (меняйте здесь) ================= -->
+<!-- ================= SVG-ИКОНКИ ================= -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
   <defs>
     <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></symbol>
@@ -32,7 +32,6 @@
     <symbol id="i-snow" viewBox="0 0 24 24"><path d="M12 2.5v19M3.8 7.2l16.4 9.6M20.2 7.2 3.8 16.8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M12 6.5 9.8 4.6M12 6.5l2.2-1.9M12 17.5l-2.2 1.9M12 17.5l2.2 1.9" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></symbol>
   </defs>
 </svg>
-<!-- ================= /SVG-ИКОНКИ ================= -->
 
 <style>
 :root{
@@ -231,7 +230,7 @@ details[open]>.more::before{content:"\2013"}
 .hero{position:relative;padding-block:clamp(3rem,8vw,6rem) clamp(2rem,5vw,4rem);overflow-x:clip}
 .hero::before{content:"";position:absolute;inset:0;pointer-events:none;
   background:radial-gradient(520px circle at var(--mx,72%) var(--my,28%),color-mix(in srgb,var(--s2) 16%,transparent),transparent 65%)}
-.hero-in{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:center}
+.hero-in{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start}
 .hero-text-col{min-width:0}
 .hero h1{font:800 clamp(2.2rem,8vw,5.5rem)/.9 var(--f-display);letter-spacing:-.025em;text-transform:uppercase;margin:0;padding-bottom:.08em;max-width:800px;
   --g:linear-gradient(100deg,var(--s1),var(--s2) 22%,var(--s3) 42%,var(--s4) 66%,var(--s5) 80%,var(--s1) 100%);
@@ -261,93 +260,94 @@ details[open]>.more::before{content:"\2013"}
   box-shadow:0 0 10px var(--s3);animation:blink 4.4s steps(1) infinite}
 @keyframes blink{0%,12%,24%,36%,60%,100%{opacity:1}6%,18%,30%,48%{opacity:.12}}
 .ticker{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:1px;background:var(--line);
-  border:1px solid var(--line);border-radius:1rem;overflow:hidden;margin:clamp(2rem,5vw,3.5rem) 0 0}
+  border:1px solid var(--line);border-radius:1rem;overflow:hidden;margin:clamp(2rem,5vw,3.5rem) 0 0; grid-column: 1 / -1;}
 .ticker>div{background:color-mix(in srgb,var(--bg) 86%,transparent);padding:1rem 1.2rem;min-width:0}
 .ticker dt{font:500 .7rem/1.35 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .ticker dd{margin:.4rem 0 0;font:700 clamp(1.05rem,2.2vw,1.4rem)/1.25 var(--f-display)}
 
-/* --- НОВЫЙ БЛОК: 3D КНИГА И КАРУСЕЛЬ --- */
-.hero-visual-col { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; min-width: 0;}
-.carousel-wrapper {position: relative; width: 100%; max-width: 320px; height: 360px; display: flex; align-items: center; justify-content: center;}
-.carousel-viewport {width: 100%; height: 100%; overflow: hidden; position: relative; display: flex; align-items: center; justify-content: center;}
-.carousel-track {display: flex; height: 100%; transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.3, 1); width: 100%;}
-.carousel-slide {min-width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; padding: 0;}
+/* --- НОВЫЙ БЛОК: 3D КНИГА И КАРУСЕЛЬ (ИЗОЛИРОВАННЫЕ КЛАССЫ) --- */
+.hc-visual-col { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; width: 100%; min-width: 0; margin-top: -10px;}
+.hc-carousel-wrapper {position: relative; width: 100%; max-width: 300px; height: 280px; display: flex; align-items: center; justify-content: center;}
+.hc-carousel-viewport {width: 100%; height: 100%; overflow: hidden; position: relative; display: flex; align-items: center; justify-content: center;}
+.hc-carousel-track {display: flex; height: 100%; transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.3, 1); width: 100%;}
+.hc-carousel-slide {min-width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; padding: 0;}
 
-/* Стрелки в стиле сайта */
-.carousel-arrow {position: absolute; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border-radius: 50%; 
+/* Стрелки */
+.hc-carousel-arrow {position: absolute; top: 50%; transform: translateY(-50%); width: 36px; height: 36px; border-radius: 50%; 
   background: color-mix(in srgb, var(--bg) 70%, transparent); border: 1px solid var(--line); color: var(--fg); 
   display: flex; align-items: center; justify-content: center; z-index: 10; backdrop-filter: blur(5px); 
-  transition: all 0.3s ease; font-size: 1.2rem; cursor: pointer;}
-.carousel-arrow:hover {color: var(--s3); border-color: var(--s3); box-shadow: 0 0 20px color-mix(in srgb, var(--s2) 40%, transparent);}
-.carousel-arrow.left { left: -5px; }
-.carousel-arrow.right { right: -5px; }
+  transition: all 0.3s ease; font-size: 1rem; cursor: pointer;}
+.hc-carousel-arrow:hover {color: var(--s3); border-color: var(--s3); box-shadow: 0 0 20px color-mix(in srgb, var(--s2) 40%, transparent);}
+.hc-carousel-arrow.left { left: -5px; }
+.hc-carousel-arrow.right { right: -5px; }
 
 /* Иконки под каруселью */
-.thumbnails {display: flex; gap: 8px; margin-top: 25px; justify-content: center; flex-wrap: nowrap; z-index: 10; width: 100%;}
-.thumb {width: 38px; height: 38px; border-radius: 10px; background: rgba(255,255,255,0.03); border: 1px solid var(--line); 
+.hc-thumbnails {display: flex; gap: 6px; margin-top: 10px; justify-content: center; flex-wrap: nowrap; z-index: 10; width: 100%;}
+.hc-thumb {width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.03); border: 1px solid var(--line); 
   display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; color: var(--muted); cursor: pointer;}
-.thumb.active {border-color: var(--s3); background: color-mix(in srgb, var(--s2) 15%, transparent); color: var(--s3); box-shadow: 0 0 15px color-mix(in srgb, var(--s2) 30%, transparent);}
-.thumb svg { width: 18px; height: 18px; fill: currentColor; }
+.hc-thumb.active {border-color: var(--s3); background: color-mix(in srgb, var(--s2) 15%, transparent); color: var(--s3); box-shadow: 0 0 15px color-mix(in srgb, var(--s2) 30%, transparent);}
+.hc-thumb svg { width: 14px; height: 14px; fill: currentColor; }
 
 /* 3D Объекты */
-.book-scene {width: 180px; height: 270px; position: relative; transform-style: preserve-3d; animation: bookFloat 8s ease-in-out infinite; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.6));}
-.book {width: 100%; height: 100%; position: absolute; transform-style: preserve-3d; animation: spinBook 16s linear infinite; transform: rotateX(15deg) rotateY(0deg);}
-@keyframes spinBook {0% { transform: rotateX(15deg) rotateY(0deg); } 100% { transform: rotateX(15deg) rotateY(360deg); }}
-@keyframes bookFloat {0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); }}
-.book-face {position: absolute; left: 50%; top: 50%; backface-visibility: hidden;}
+.hc-book-scene {width: 160px; height: 240px; position: relative; transform-style: preserve-3d; animation: hcBookFloat 8s ease-in-out infinite; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.6));}
+.hc-book {width: 100%; height: 100%; position: absolute; transform-style: preserve-3d; animation: hcSpinBook 16s linear infinite; transform: rotateX(15deg) rotateY(0deg);}
+@keyframes hcSpinBook {0% { transform: rotateX(15deg) rotateY(0deg); } 100% { transform: rotateX(15deg) rotateY(360deg); }}
+@keyframes hcBookFloat {0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); }}
+.hc-book-face {position: absolute; left: 50%; top: 50%; backface-visibility: hidden;}
 
 /* Обложки */
-.book-front {width: 180px; height: 270px; transform: translate(-50%, -50%) translateZ(15px); background: var(--bg2); border: 1px solid var(--line); border-radius: 2px; overflow: hidden; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);}
-.book-front img {width: 100%; height: 100%; object-fit: cover;}
+.hc-book-front {width: 160px; height: 240px; transform: translate(-50%, -50%) translateZ(15px); background: var(--bg2); border: 1px solid var(--line); border-radius: 2px; overflow: hidden; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);}
+.hc-book-front img {width: 100%; height: 100%; object-fit: cover;}
 
 /* Задняя обложка с текстом */
-.book-back {width: 180px; height: 270px; transform: translate(-50%, -50%) translateZ(-15px) rotateY(180deg); background: var(--bg2); border: 1px solid var(--line); border-radius: 2px; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);}
-.book-back-text {font: 700 1.1rem/1.3 var(--f-display); color: var(--fg); margin-bottom: 10px;}
-.book-back-year {font: 500 0.85rem/1 var(--f-mono); color: var(--muted);}
+.hc-book-back {width: 160px; height: 240px; transform: translate(-50%, -50%) translateZ(-15px) rotateY(180deg); background: var(--bg2); border: 1px solid var(--line); border-radius: 2px; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 15px; text-align: center; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);}
+.hc-book-back-text {font: 700 1rem/1.3 var(--f-display); color: var(--fg); margin-bottom: 10px;}
+.hc-book-back-year {font: 500 0.8rem/1 var(--f-mono); color: var(--muted);}
 
 /* Корешок и торцы */
-.book-spine {width: 30px; height: 270px; transform: translate(-50%, -50%) translateX(-90px) rotateY(-90deg); background: linear-gradient(to right, #060814, var(--bg2) 50%, #060814); border-left: 1px solid var(--line); border-right: 1px solid var(--line);}
-.book-pages-right {width: 30px; height: 270px; transform: translate(-50%, -50%) translateX(90px) rotateY(90deg); background: repeating-linear-gradient(90deg, #e0e0e0, #e0e0e0 1px, #b0b0b0 1px, #b0b0b0 2px); box-shadow: inset 10px 0 15px rgba(0,0,0,0.5);}
-.book-pages-top {width: 180px; height: 30px; transform: translate(-50%, -50%) translateY(-135px) rotateX(90deg); background: repeating-linear-gradient(0deg, #e0e0e0, #e0e0e0 1px, #b0b0b0 1px, #b0b0b0 2px); box-shadow: inset 0 -10px 15px rgba(0,0,0,0.5);}
-.book-pages-bottom {width: 180px; height: 30px; transform: translate(-50%, -50%) translateY(135px) rotateX(-90deg); background: repeating-linear-gradient(0deg, #e0e0e0, #e0e0e0 1px, #b0b0b0 1px, #b0b0b0 2px); box-shadow: inset 0 10px 15px rgba(0,0,0,0.5);}
+.hc-book-spine {width: 30px; height: 240px; transform: translate(-50%, -50%) translateX(-80px) rotateY(-90deg); background: linear-gradient(to right, #060814, var(--bg2) 50%, #060814); border-left: 1px solid var(--line); border-right: 1px solid var(--line);}
+.hc-book-pages-right {width: 30px; height: 240px; transform: translate(-50%, -50%) translateX(80px) rotateY(90deg); background: repeating-linear-gradient(90deg, #e0e0e0, #e0e0e0 1px, #b0b0b0 1px, #b0b0b0 2px); box-shadow: inset 10px 0 15px rgba(0,0,0,0.5);}
+.hc-book-pages-top {width: 160px; height: 30px; transform: translate(-50%, -50%) translateY(-120px) rotateX(90deg); background: repeating-linear-gradient(0deg, #e0e0e0, #e0e0e0 1px, #b0b0b0 1px, #b0b0b0 2px); box-shadow: inset 0 -10px 15px rgba(0,0,0,0.5);}
+.hc-book-pages-bottom {width: 160px; height: 30px; transform: translate(-50%, -50%) translateY(120px) rotateX(-90deg); background: repeating-linear-gradient(0deg, #e0e0e0, #e0e0e0 1px, #b0b0b0 1px, #b0b0b0 2px); box-shadow: inset 0 10px 15px rgba(0,0,0,0.5);}
 
-/* Мокапы игр (упрощенные под новый стиль) */
-.mock-game-app {width: 220px; height: 300px; background: var(--bg2); border: 1px solid var(--line); border-radius: 20px; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; overflow: hidden; box-shadow: 0 0 30px rgba(0,0,0,0.5);}
-.mock-game-app::before {content: ""; position: absolute; inset: 0; background: radial-gradient(circle at center, color-mix(in srgb, var(--s1) 20%, transparent), transparent 70%);}
-.badge {position: absolute; top: 16px; left: 16px; background: linear-gradient(90deg, var(--s1), var(--s2)); color: #000; padding: 4px 12px; border-radius: 20px; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; z-index: 2;}
-.game-icon {width: 70px; height: 70px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; color: var(--fg); font-size: 2rem; margin-bottom: 20px; box-shadow: 0 0 20px color-mix(in srgb, var(--s2) 30%, transparent); z-index: 1;}
-.game-title-mock {font-family: "Unbounded", sans-serif; font-size: 1.1rem; color: var(--fg); z-index: 1;}
-.game-sub {color: var(--s4); font-size: 0.75rem; margin-top: 8px; z-index: 1; font-family: var(--f-mono);}
+/* Мокапы игр */
+.hc-mock-game-app {width: 200px; height: 260px; background: var(--bg2); border: 1px solid var(--line); border-radius: 20px; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; overflow: hidden; box-shadow: 0 0 30px rgba(0,0,0,0.5);}
+.hc-mock-game-app::before {content: ""; position: absolute; inset: 0; background: radial-gradient(circle at center, color-mix(in srgb, var(--s1) 20%, transparent), transparent 70%);}
+.hc-badge {position: absolute; top: 16px; left: 16px; background: linear-gradient(90deg, var(--s1), var(--s2)); color: #000; padding: 4px 12px; border-radius: 20px; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; z-index: 2;}
+.hc-game-icon {width: 60px; height: 60px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; color: var(--fg); font-size: 1.5rem; margin-bottom: 15px; box-shadow: 0 0 20px color-mix(in srgb, var(--s2) 30%, transparent); z-index: 1;}
+.hc-game-title-mock {font-family: "Unbounded", sans-serif; font-size: 1rem; color: var(--fg); z-index: 1;}
+.hc-game-sub {color: var(--s4); font-size: 0.7rem; margin-top: 6px; z-index: 1; font-family: var(--f-mono);}
 
-.mock-cards {position: relative; width: 180px; height: 270px; display: flex; justify-content: center; align-items: center;}
-.mock-card {position: absolute; width: 100px; height: 160px; border-radius: 10px; background: var(--bg2); border: 1px solid var(--line); box-shadow: 0 10px 20px rgba(0,0,0,0.5); display: flex; flex-direction: column; justify-content: center; align-items: center;}
-.mock-card::after {content: "★"; font-size: 2rem; color: var(--s3);}
-.mock-card:first-child {transform: rotate(-15deg) translateX(-30px);}
-.mock-card:last-child {transform: rotate(15deg) translateX(30px); border-color: var(--s1);}
-.mock-card:last-child::after {color: var(--s1);}
-.badge-cards {position: absolute; top: -20px; left: 50%; transform: translateX(-50%); background: linear-gradient(90deg, var(--s4), var(--s5)); color: #000; padding: 4px 12px; border-radius: 20px; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; white-space: nowrap; z-index: 2;}
+.hc-mock-cards {position: relative; width: 160px; height: 240px; display: flex; justify-content: center; align-items: center;}
+.hc-mock-card {position: absolute; width: 90px; height: 140px; border-radius: 10px; background: var(--bg2); border: 1px solid var(--line); box-shadow: 0 10px 20px rgba(0,0,0,0.5); display: flex; flex-direction: column; justify-content: center; align-items: center;}
+.hc-mock-card::after {content: "★"; font-size: 1.5rem; color: var(--s3);}
+.hc-mock-card:first-child {transform: rotate(-15deg) translateX(-25px);}
+.hc-mock-card:last-child {transform: rotate(15deg) translateX(25px); border-color: var(--s1);}
+.hc-mock-card:last-child::after {color: var(--s1);}
+.hc-badge-cards {position: absolute; top: -20px; left: 50%; transform: translateX(-50%); background: linear-gradient(90deg, var(--s4), var(--s5)); color: #000; padding: 4px 12px; border-radius: 20px; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; white-space: nowrap; z-index: 2;}
 
-.mock-desktop-app {width: 280px; height: 180px; background: var(--bg2); border: 1px solid var(--line); border-radius: 12px; backdrop-filter: blur(10px); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.8); display: flex; flex-direction: column; overflow: hidden;}
-.mac-header {height: 30px; background: rgba(0,0,0,0.4); display: flex; align-items: center; padding: 0 12px; gap: 8px; border-bottom: 1px solid rgba(255,255,255,0.05);}
-.mac-dot {width: 8px; height: 8px; border-radius: 50%;}
-.mac-dot.red {background: #ff5f56;} .mac-dot.yellow {background: #ffbd2e;} .mac-dot.green {background: #27c93f;}
-.mac-content {flex: 1; padding: 16px; display: flex; flex-direction: column; gap: 10px;}
-.mac-line {height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; width: 100%;}
-.mac-line.short {width: 60%;} .mac-line.color {background: linear-gradient(90deg, var(--s1), var(--s2)); width: 40%;}
+.hc-mock-desktop-app {width: 240px; height: 160px; background: var(--bg2); border: 1px solid var(--line); border-radius: 12px; backdrop-filter: blur(10px); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.8); display: flex; flex-direction: column; overflow: hidden;}
+.hc-mac-header {height: 24px; background: rgba(0,0,0,0.4); display: flex; align-items: center; padding: 0 10px; gap: 6px; border-bottom: 1px solid rgba(255,255,255,0.05);}
+.hc-mac-dot {width: 8px; height: 8px; border-radius: 50%;}
+.hc-mac-dot.red {background: #ff5f56;} .hc-mac-dot.yellow {background: #ffbd2e;} .hc-mac-dot.green {background: #27c93f;}
+.hc-mac-content {flex: 1; padding: 12px; display: flex; flex-direction: column; gap: 8px;}
+.hc-mac-line {height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; width: 100%;}
+.hc-mac-line.short {width: 60%;} .hc-mac-line.color {background: linear-gradient(90deg, var(--s1), var(--s2)); width: 40%;}
 
-.mock-phone {width: 140px; height: 280px; background: #000; border: 6px solid #222; border-radius: 24px; position: relative; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.8), inset 0 0 10px rgba(255,255,255,0.1); display: flex; flex-direction: column; overflow: hidden;}
-.phone-notch {position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 60px; height: 16px; background: #222; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; z-index: 2;}
-.phone-screen {flex: 1; margin-top: 16px; display: flex; flex-direction: column; padding: 12px; gap: 10px;}
-.phone-game-header {height: 40px; background: rgba(255,255,255,0.05); border-radius: 8px; display: flex; align-items: center; padding: 0 10px; font-size: 0.7rem; color: var(--s3);}
-.phone-game-btn {height: 80px; background: linear-gradient(135deg, color-mix(in srgb, var(--s1) 20%, transparent), color-mix(in srgb, var(--s5) 20%, transparent)); border: 1px solid var(--s3); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--fg); font-size: 0.8rem; font-weight: bold;}
+.hc-mock-phone {width: 120px; height: 240px; background: #000; border: 4px solid #222; border-radius: 20px; position: relative; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.8), inset 0 0 10px rgba(255,255,255,0.1); display: flex; flex-direction: column; overflow: hidden;}
+.hc-phone-notch {position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 50px; height: 12px; background: #222; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; z-index: 2;}
+.hc-phone-screen {flex: 1; margin-top: 12px; display: flex; flex-direction: column; padding: 10px; gap: 8px;}
+.hc-phone-game-header {height: 30px; background: rgba(255,255,255,0.05); border-radius: 6px; display: flex; align-items: center; padding: 0 8px; font-size: 0.6rem; color: var(--s3);}
+.hc-phone-game-btn {height: 60px; background: linear-gradient(135deg, color-mix(in srgb, var(--s1) 20%, transparent), color-mix(in srgb, var(--s5) 20%, transparent)); border: 1px solid var(--s3); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--fg); font-size: 0.7rem; font-weight: bold;}
 
 @media (max-width: 860px) {
-  .hero-in { grid-template-columns: 1fr; gap: 3rem; }
-  .hero-visual-col { order: 2; margin-top: 1rem; }
+  .hero-in { grid-template-columns: 1fr; gap: 2rem; }
+  .hc-visual-col { order: 2; margin-top: 0; }
   .hero-text-col { order: 1; }
-  .carousel-wrapper { max-width: 100%; }
-  .carousel-arrow.left { left: 0; }
-  .carousel-arrow.right { right: 0; }
+  .ticker { order: 3; margin-top: 1rem; }
+  .hc-carousel-wrapper { max-width: 100%; height: 320px; }
+  .hc-carousel-arrow.left { left: 0; }
+  .hc-carousel-arrow.right { right: 0; }
 }
 
 /* shelf (books, videos) */
@@ -612,6 +612,7 @@ tr:last-child td{border-bottom:0}
   .mega,.tws i,.hero h1,.nav::after{animation:none!important}
   .cover{transition:none}
   .books,.videos{scroll-behavior:auto}
+  .hc-book { animation: none; transform: rotateX(15deg) rotateY(0deg); }
 }
 </style>
 
@@ -748,33 +749,28 @@ tr:last-child td{border-bottom:0}
             <svg class="ic" aria-hidden="true"><use href="#i-play"/></svg>
           </button>
         </div>
-        <dl class="ticker">
-          <div><dt>Voyager 1 пересечёт отметку «1 световой день»</dt><dd id="vg">18 ноября 2026</dd></div>
-          <div><dt>Свет идёт до Марса</dt><dd>3–22 мин</dd></div>
-          <div><dt>Слов в моих книгах</dt><dd>1,24 млн</dd></div>
-        </dl>
       </div>
 
       <!-- ВНЕДРЕННЫЙ БЛОК: 3D КАРУСЕЛЬ -->
-      <div class="hero-visual-col">
-        <div class="carousel-wrapper">
-          <button class="carousel-arrow left" id="prevBtn" aria-label="Предыдущий слайд">←</button>
-          <div class="carousel-viewport">
-            <div class="carousel-track" id="carouselTrack">
+      <div class="hc-visual-col">
+        <div class="hc-carousel-wrapper">
+          <button class="hc-carousel-arrow left" id="hc-prevBtn" aria-label="Предыдущий слайд">←</button>
+          <div class="hc-carousel-viewport">
+            <div class="hc-carousel-track" id="hc-carouselTrack">
               
               <!-- Слайд 1: Синяя книга -->
-              <div class="carousel-slide">
-                <div class="book-scene">
-                  <div class="book">
-                    <div class="book-face book-back">
-                      <div class="book-back-text">Скоро новинка от Асахи Чанга!</div>
-                      <div class="book-back-year">2026</div>
+              <div class="hc-carousel-slide">
+                <div class="hc-book-scene">
+                  <div class="hc-book">
+                    <div class="hc-book-face hc-book-back">
+                      <div class="hc-book-back-text">Скоро новинка от Асахи Чанга!</div>
+                      <div class="hc-book-back-year">2026</div>
                     </div>
-                    <div class="book-face book-spine"></div>
-                    <div class="book-face book-pages-right"></div>
-                    <div class="book-face book-pages-top"></div>
-                    <div class="book-face book-pages-bottom"></div>
-                    <div class="book-face book-front">
+                    <div class="hc-book-face hc-book-spine"></div>
+                    <div class="hc-book-face hc-book-pages-right"></div>
+                    <div class="hc-book-face hc-book-pages-top"></div>
+                    <div class="hc-book-face hc-book-pages-bottom"></div>
+                    <div class="hc-book-face hc-book-front">
                       <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=400&auto=format&fit=crop" alt="Обложка">
                     </div>
                   </div>
@@ -782,18 +778,18 @@ tr:last-child td{border-bottom:0}
               </div>
 
               <!-- Слайд 2: Красная книга -->
-              <div class="carousel-slide">
-                <div class="book-scene">
-                  <div class="book">
-                    <div class="book-face book-back">
-                      <div class="book-back-text">Скоро новинка от Асахи Чанга!</div>
-                      <div class="book-back-year">2026</div>
+              <div class="hc-carousel-slide">
+                <div class="hc-book-scene">
+                  <div class="hc-book">
+                    <div class="hc-book-face hc-book-back">
+                      <div class="hc-book-back-text">Скоро новинка от Асахи Чанга!</div>
+                      <div class="hc-book-back-year">2026</div>
                     </div>
-                    <div class="book-face book-spine"></div>
-                    <div class="book-face book-pages-right"></div>
-                    <div class="book-face book-pages-top"></div>
-                    <div class="book-face book-pages-bottom"></div>
-                    <div class="book-face book-front">
+                    <div class="hc-book-face hc-book-spine"></div>
+                    <div class="hc-book-face hc-book-pages-right"></div>
+                    <div class="hc-book-face hc-book-pages-top"></div>
+                    <div class="hc-book-face hc-book-pages-bottom"></div>
+                    <div class="hc-book-face hc-book-front">
                       <img src="https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?q=80&w=400&auto=format&fit=crop" alt="Обложка">
                     </div>
                   </div>
@@ -801,80 +797,86 @@ tr:last-child td{border-bottom:0}
               </div>
 
               <!-- Слайд 3: Игра-онлайн -->
-              <div class="carousel-slide">
-                <div class="mock-game-app">
-                  <div class="badge">Игра-онлайн</div>
-                  <div class="game-icon">▶</div>
-                  <div class="game-title-mock">Орбита</div>
-                  <div class="game-sub">Нарративная стратегия</div>
+              <div class="hc-carousel-slide">
+                <div class="hc-mock-game-app">
+                  <div class="hc-badge">Игра-онлайн</div>
+                  <div class="hc-game-icon">▶</div>
+                  <div class="hc-game-title-mock">Орбита</div>
+                  <div class="hc-game-sub">Нарративная стратегия</div>
                 </div>
               </div>
 
               <!-- Слайд 4: Карточная игра -->
-              <div class="carousel-slide">
-                <div class="mock-cards">
-                  <div class="badge-cards">Карточная игра</div>
-                  <div class="mock-card"></div>
-                  <div class="mock-card"></div>
+              <div class="hc-carousel-slide">
+                <div class="hc-mock-cards">
+                  <div class="hc-badge-cards">Карточная игра</div>
+                  <div class="hc-mock-card"></div>
+                  <div class="hc-mock-card"></div>
                 </div>
               </div>
 
               <!-- Слайд 5: Десктоп приложение -->
-              <div class="carousel-slide">
-                <div class="mock-desktop-app">
-                  <div class="mac-header">
-                    <div class="mac-dot red"></div>
-                    <div class="mac-dot yellow"></div>
-                    <div class="mac-dot green"></div>
+              <div class="hc-carousel-slide">
+                <div class="hc-mock-desktop-app">
+                  <div class="hc-mac-header">
+                    <div class="hc-mac-dot red"></div>
+                    <div class="hc-mac-dot yellow"></div>
+                    <div class="hc-mac-dot green"></div>
                   </div>
-                  <div class="mac-content">
-                    <div class="mac-line color"></div>
-                    <div class="mac-line"></div>
-                    <div class="mac-line short"></div>
-                    <div class="mac-line"></div>
+                  <div class="hc-mac-content">
+                    <div class="hc-mac-line color"></div>
+                    <div class="hc-mac-line"></div>
+                    <div class="hc-mac-line short"></div>
+                    <div class="hc-mac-line"></div>
                   </div>
                 </div>
               </div>
 
               <!-- Слайд 6: Мобильный телефон -->
-              <div class="carousel-slide">
-                <div class="mock-phone">
-                  <div class="phone-notch"></div>
-                  <div class="phone-screen">
-                    <div class="phone-game-header">Игровое приложение</div>
-                    <div class="phone-game-btn">Играть</div>
+              <div class="hc-carousel-slide">
+                <div class="hc-mock-phone">
+                  <div class="hc-phone-notch"></div>
+                  <div class="hc-phone-screen">
+                    <div class="hc-phone-game-header">Игровое приложение</div>
+                    <div class="hc-phone-game-btn">Играть</div>
                   </div>
                 </div>
               </div>
 
             </div>
           </div>
-          <button class="carousel-arrow right" id="nextBtn" aria-label="Следующий слайд">→</button>
+          <button class="hc-carousel-arrow right" id="hc-nextBtn" aria-label="Следующий слайд">→</button>
         </div>
 
-        <div class="thumbnails" id="thumbnails">
-          <button class="thumb active" data-index="0">
+        <div class="hc-thumbnails" id="hc-thumbnails">
+          <button class="hc-thumb active" data-index="0">
             <svg viewBox="0 0 24 24"><path d="M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.1C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.1.25.1.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1zm0 13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5v11.5z"/></svg>
           </button>
-          <button class="thumb" data-index="1">
+          <button class="hc-thumb" data-index="1">
             <svg viewBox="0 0 24 24"><path d="M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.1C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.1.25.1.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1zm0 13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5v11.5z"/></svg>
           </button>
-          <button class="thumb" data-index="2">
+          <button class="hc-thumb" data-index="2">
             <svg viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 10H3V8h18v8zM6 15h2v-2H6v2zm4 0h2v-2h-2v2zm4 0h2v-2h-2v2z"/></svg>
           </button>
-          <button class="thumb" data-index="3">
+          <button class="hc-thumb" data-index="3">
             <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM7 10h2v7H7zm4-3h2v10h-2zm4-3h2v13h-2z"/></svg>
           </button>
-          <button class="thumb" data-index="4">
+          <button class="hc-thumb" data-index="4">
             <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12zM6 10h2v2H6zm0 4h8v2H6zm10 0h2v2h-2zm-6-4h8v2h-8z"/></svg>
           </button>
-          <button class="thumb" data-index="5">
+          <button class="hc-thumb" data-index="5">
             <svg viewBox="0 0 24 24"><path d="M17 1H7c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2zm0 18H7V5h10v14zm-5-1c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z"/></svg>
           </button>
         </div>
       </div>
       <!-- /ВНЕДРЕННЫЙ БЛОК -->
 
+      <!-- Вынесенный блок плашек (теперь общая строка сетки) -->
+      <dl class="ticker">
+        <div><dt>Voyager 1 пересечёт отметку «1 световой день»</dt><dd id="vg">18 ноября 2026</dd></div>
+        <div><dt>Свет идёт до Марса</dt><dd>3–22 мин</dd></div>
+        <div><dt>Слов в моих книгах</dt><dd>1,24 млн</dd></div>
+      </dl>
     </div>
   </section>
 
@@ -1735,12 +1737,12 @@ if (canHover){
   new IntersectionObserver(es => { visible = es[0].isIntersecting; if (visible && !running && !reduce()){ running = true; requestAnimationFrame(loop); } }).observe($('#rx'));
 })();
 
-/* КАРУСЕЛЬ (НОВЫЙ БЛОК) */
+/* КАРУСЕЛЬ (НОВЫЙ ИЗОЛИРОВАННЫЙ БЛОК) */
 (() => {
-  const track = document.getElementById('carouselTrack');
-  const prevBtn = document.getElementById('prevBtn');
-  const nextBtn = document.getElementById('nextBtn');
-  const thumbs = document.querySelectorAll('.thumb');
+  const track = document.getElementById('hc-carouselTrack');
+  const prevBtn = document.getElementById('hc-prevBtn');
+  const nextBtn = document.getElementById('hc-nextBtn');
+  const thumbs = document.querySelectorAll('.hc-thumb');
   let currentIndex = 0;
   const totalSlides = 6;
 
