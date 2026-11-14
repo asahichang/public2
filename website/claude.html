@@ -1,0 +1,773 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Марк Ардеев</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500..900&family=Onest:wght@400..700&family=JetBrains+Mono:wght@400..700&display=swap">
+<style>
+/* Layout: one long scroll. Each section opens with a giant word filled with a stellar-spectrum gradient (M-class ember to O-class blue); content sits on a quiet hairline grid under it. */
+:root{
+  --bg:#070a12; --bg2:#0d1220; --fg:#eef1f7; --muted:#9ba5ba; --line:rgba(255,255,255,.12);
+  --s1:#ff5b3a; --s2:#ffb23f; --s3:#fff0b8; --s4:#8ff0e6; --s5:#3cb8ff;
+  --r1:#ff2a1f; --r2:#ff5a2a; --r3:#ff8a3d; --r4:#ffb36b; --r5:#ffd9a8;
+  --star:255,244,225; --star-k:1; --planet:#0a0f1b;
+  --f-display:"Unbounded","Oswald","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Onest","Golos Text",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#e8edf3; --bg2:#f6f8fb; --fg:#0b1220; --muted:#475266; --line:rgba(11,18,32,.16);
+    --s1:#d1330f; --s2:#c76f00; --s3:#a98100; --s4:#0a8f86; --s5:#0a62d6;
+    --r1:#c40f08; --r2:#d1330f; --r3:#d1600a; --r4:#b8800a; --r5:#8f6a1a;
+    --star:11,18,32; --star-k:.4; --planet:#dbe4ee; color-scheme:light;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#e8edf3; --bg2:#f6f8fb; --fg:#0b1220; --muted:#475266; --line:rgba(11,18,32,.16);
+  --s1:#d1330f; --s2:#c76f00; --s3:#a98100; --s4:#0a8f86; --s5:#0a62d6;
+  --r1:#c40f08; --r2:#d1330f; --r3:#d1600a; --r4:#b8800a; --r5:#8f6a1a;
+  --star:11,18,32; --star-k:.4; --planet:#dbe4ee; color-scheme:light;
+}
+/* secret palette: red shift (must stay last among the token blocks) */
+:root[data-spectrum="red"]{--s1:var(--r1);--s2:var(--r2);--s3:var(--r3);--s4:var(--r4);--s5:var(--r5)}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--fg);font:400 1.0625rem/1.6 var(--f-body);
+  padding-block:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  overflow-x:clip;-webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--s2);color:#07090f}
+:focus-visible{outline:2px solid var(--s4);outline-offset:3px;border-radius:4px}
+a{color:inherit}
+.wrap{max-width:1240px;margin-inline:auto}
+main,footer{position:relative;z-index:1}
+.mono{font-family:var(--f-mono)}
+
+/* ambient layers: all static or opacity-only, nothing repaints per frame */
+.aura,.sky,.tws{position:fixed;inset:0;z-index:0;pointer-events:none}
+.aura{background:
+  radial-gradient(60vmax 40vmax at 88% -8%,color-mix(in srgb,var(--s1) 20%,transparent),transparent 70%),
+  radial-gradient(50vmax 40vmax at -10% 62%,color-mix(in srgb,var(--s5) 15%,transparent),transparent 70%)}
+.sky{width:100%;height:100%}
+.tws i{position:absolute;width:2px;height:2px;border-radius:50%;background:rgb(var(--star));opacity:.08;
+  animation:tw var(--d,5s) ease-in-out var(--dl,0s) infinite alternate}
+@keyframes tw{to{opacity:calc(.95*var(--star-k))}}
+
+/* gradient text */
+.g{background:var(--g,linear-gradient(95deg,var(--s1),var(--s2) 28%,var(--s3) 52%,var(--s4) 76%,var(--s5)));
+  -webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+.gb{--g:linear-gradient(95deg,var(--s1),var(--s2) 55%,var(--s3))}
+.gg{--g:linear-gradient(95deg,var(--s2),var(--s3) 45%,var(--s4))}
+.gw{--g:linear-gradient(95deg,var(--s3),var(--s4) 50%,var(--s5))}
+.gl{--g:linear-gradient(95deg,var(--s5),var(--s4) 38%,var(--s2) 78%,var(--s1))}
+.ga{--g:linear-gradient(95deg,var(--s1),var(--s2) 30%,var(--s3) 55%,var(--s4) 78%,var(--s5))}
+
+/* nav */
+.nav{position:fixed;z-index:20;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top,0px) + 10px);
+  display:flex;align-items:center;gap:.15rem;padding:.3rem;max-width:calc(100% - 24px);overflow-x:auto;scrollbar-width:none;
+  border:1px solid var(--line);border-radius:999px;
+  background:color-mix(in srgb,var(--bg) 74%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+.nav::-webkit-scrollbar{display:none}
+.nav a,.nav button{font:600 .8rem/1 var(--f-body);color:var(--muted);text-decoration:none;white-space:nowrap;
+  padding:.65rem .75rem;border-radius:999px;border:0;background:none;cursor:pointer}
+.nav a:hover,.nav button:hover{color:var(--fg)}
+.nav a.on{color:var(--fg);background:color-mix(in srgb,var(--fg) 11%,transparent)}
+.nav .th{width:34px;height:34px;padding:0;display:grid;place-items:center;flex:none}
+.nav .th i{width:15px;height:15px;border-radius:50%;border:2px solid currentColor;
+  background:linear-gradient(90deg,currentColor 50%,transparent 50%)}
+.nav::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;
+  background:linear-gradient(90deg,var(--s1),var(--s3),var(--s5));transform-origin:left;transform:scaleX(0)}
+@supports (animation-timeline:scroll()){
+  .nav::after{animation:prog linear both;animation-timeline:scroll(root)}
+  @keyframes prog{to{transform:scaleX(1)}}
+}
+@media (max-width:520px){.nav a{padding:.65rem .55rem;font-size:.74rem}}
+
+/* generic */
+.eyebrow{font:500 .76rem/1.4 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 1.2rem}
+.lede{font-size:clamp(1.1rem,2.1vw,1.4rem);line-height:1.5;max-width:46ch;margin:1.6rem 0 0}
+.btn{display:inline-flex;align-items:center;gap:.5rem;font:600 .95rem/1 var(--f-body);padding:.95rem 1.35rem;border-radius:999px;
+  border:1px solid transparent;cursor:pointer;text-decoration:none;transition:transform .2s}
+.btn:hover{transform:translateY(-2px)}
+.btn.p{background:var(--fg);color:var(--bg)}
+.btn.o{color:var(--fg);background:linear-gradient(var(--bg),var(--bg)) padding-box,linear-gradient(100deg,var(--s1),var(--s3),var(--s5)) border-box}
+.btn.s{padding:.7rem 1rem;font-size:.85rem}
+.sec{position:relative;padding-block:clamp(4rem,10vw,8rem);overflow-x:clip;scroll-margin-top:3rem}
+.mega{font:800 clamp(3.2rem,16vw,12rem)/.9 var(--f-display);letter-spacing:-.02em;text-transform:uppercase;margin:0;padding-bottom:.08em}
+.mega.l2{font-size:clamp(1.9rem,9vw,8.2rem)}
+@supports (animation-timeline:view()){
+  .mega{animation:drift linear both;animation-timeline:view();animation-range:entry 0% exit 100%}
+  @keyframes drift{from{transform:translateX(3%)}to{transform:translateX(-3%)}}
+}
+.panel{padding:clamp(1.2rem,3vw,2rem);border:1px solid var(--line);border-radius:1.4rem;background:color-mix(in srgb,var(--bg2) 82%,transparent)}
+.chip{display:inline-block;padding:.32rem .75rem;border:1px solid var(--line);border-radius:999px;font:500 .74rem/1.2 var(--f-mono);letter-spacing:.04em;color:var(--muted)}
+.chip.live{color:var(--fg);border-color:transparent;
+  background:linear-gradient(var(--bg),var(--bg)) padding-box,linear-gradient(100deg,var(--s1),var(--s3),var(--s5)) border-box}
+.chips{display:flex;flex-wrap:wrap;gap:.5rem}
+details>summary{list-style:none;cursor:pointer}
+details>summary::-webkit-details-marker{display:none}
+.more{font:600 .84rem/1.2 var(--f-mono);display:inline-flex;gap:.55rem;align-items:center}
+.more::before{content:"+";display:grid;place-items:center;width:1.4rem;height:1.4rem;border-radius:50%;border:1px solid var(--line)}
+details[open]>.more::before{content:"\2013"}
+
+/* hero */
+.hero{position:relative;padding-block:clamp(6.5rem,14vw,10rem) clamp(2rem,5vw,4rem);overflow-x:clip}
+.hero::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(520px circle at var(--mx,72%) var(--my,28%),color-mix(in srgb,var(--s2) 16%,transparent),transparent 65%)}
+.hero-in{position:relative;z-index:1}
+.mark{display:inline-flex;align-items:center;gap:.7rem;text-decoration:none;font:600 .8rem/1 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;margin-bottom:1.6rem}
+.mark i{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--s1),var(--s3) 50%,var(--s5))}
+.hero h1{font:800 clamp(3rem,14vw,11rem)/.88 var(--f-display);letter-spacing:-.025em;text-transform:uppercase;margin:0;padding-bottom:.08em;
+  --g:linear-gradient(100deg,var(--s1),var(--s2) 22%,var(--s3) 42%,var(--s4) 66%,var(--s5) 80%,var(--s1) 100%);
+  background-size:220% 100%;background-position:var(--gx,60%) 50%;animation:sheen 2.4s cubic-bezier(.2,.7,.2,1) backwards}
+@keyframes sheen{from{background-position:0% 50%}}
+.hero h1 span{display:block}
+.hero .lead{max-width:36ch;font-size:clamp(1.15rem,2.3vw,1.5rem);line-height:1.45;margin:1.8rem 0 0}
+.cta{display:flex;flex-wrap:wrap;gap:.8rem;margin-top:2rem}
+.planet{position:absolute;z-index:0;right:max(-8vw,-6rem);top:clamp(5rem,10vw,7.5rem);width:clamp(170px,36vw,440px);aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(circle at 28% 25%,color-mix(in srgb,var(--s2) 30%,var(--planet)) 0,var(--planet) 62%);
+  box-shadow:inset 1.6rem 1.8rem 3.4rem -.6rem color-mix(in srgb,var(--s1) 70%,transparent),0 0 7rem color-mix(in srgb,var(--s1) 26%,transparent);
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.planet::after{content:"";position:absolute;left:-28%;right:-28%;top:38%;height:28%;border-radius:50%;
+  border:2px solid color-mix(in srgb,var(--s3) 50%,transparent);transform:rotate(-16deg)}
+.anomaly{position:absolute;z-index:3;left:52%;top:4.6rem;width:30px;height:30px;border:0;background:none;padding:0;cursor:pointer}
+.anomaly::before{content:"";position:absolute;left:12px;top:12px;width:6px;height:6px;border-radius:50%;background:var(--s3);
+  box-shadow:0 0 10px var(--s3);animation:blink 4.4s steps(1) infinite}
+@keyframes blink{0%,12%,24%,36%,60%,100%{opacity:1}6%,18%,30%,48%{opacity:.12}}
+.ticker{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:1rem;overflow:hidden;margin:clamp(2rem,5vw,3.5rem) 0 0}
+.ticker>div{background:color-mix(in srgb,var(--bg) 86%,transparent);padding:1rem 1.2rem;min-width:0}
+.ticker dt{font:500 .7rem/1.35 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.ticker dd{margin:.4rem 0 0;font:700 clamp(1.05rem,2.2vw,1.4rem)/1.25 var(--f-display)}
+
+/* books */
+.books{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,240px),1fr));gap:2.4rem 1.6rem;margin-top:2.6rem}
+.book{min-width:0}
+.cover{container-type:inline-size;position:relative;aspect-ratio:2/3;max-width:100%;border-radius:.35rem .9rem .9rem .35rem;overflow:hidden;color:#fff;
+  padding:8cqi;display:flex;flex-direction:column;justify-content:space-between;background:#070a12;
+  box-shadow:0 22px 44px -20px rgba(0,0,0,.65);
+  transform:perspective(800px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .25s ease-out}
+.cover::after{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:linear-gradient(90deg,rgba(255,255,255,.24),transparent)}
+.cover>*{position:relative;z-index:1}
+.cv-t{font:800 clamp(.95rem,8.4cqi,2rem)/1 var(--f-display);text-transform:uppercase;letter-spacing:-.01em;margin:0}
+.cv-a{font:500 .68rem/1.3 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;opacity:.88}
+.c1{background:radial-gradient(130% 75% at 50% 112%,#ff5b3a 0,#b92c19 24%,transparent 60%),radial-gradient(60% 40% at 78% 22%,rgba(255,240,184,.22),transparent 70%),#070a12}
+.c1::before{content:"";position:absolute;width:150%;aspect-ratio:1;left:-25%;top:16%;border-radius:50%;border:1px solid rgba(255,240,184,.4)}
+.c2{background:conic-gradient(from -15deg at 50% 106%,transparent 0deg,rgba(255,240,184,.9) 15deg,transparent 30deg),radial-gradient(80% 50% at 50% 112%,rgba(255,178,63,.65),transparent 70%),#070a12}
+.c3{background:radial-gradient(70% 50% at 18% 18%,rgba(143,240,230,.38),transparent 70%),#070a12}
+.c3::before{content:"";position:absolute;inset:0;background:radial-gradient(circle,rgba(143,240,230,.95) 1.2px,transparent 1.9px) 0 0/16px 16px;
+  -webkit-mask-image:linear-gradient(160deg,#000 0,transparent 70%);mask-image:linear-gradient(160deg,#000 0,transparent 70%)}
+.c4{background:radial-gradient(90% 60% at 50% 100%,rgba(255,178,63,.5),transparent 70%),#070a12}
+.c4::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,178,63,.8) 0 1.5px,transparent 1.5px 12px);
+  -webkit-mask-image:linear-gradient(0deg,#000 0,transparent 75%);mask-image:linear-gradient(0deg,#000 0,transparent 75%)}
+.c5{background:radial-gradient(70% 40% at 50% 50%,rgba(143,240,230,.2),transparent 70%),#05080f}
+.c5 svg{position:absolute;left:0;right:0;top:42%;width:100%;height:18%;z-index:0}
+.meta{padding-top:1.1rem}
+.meta .k{font:500 .72rem/1.3 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0}
+.meta h3{font:700 1.15rem/1.2 var(--f-display);margin:.45rem 0 .6rem}
+.meta p.b{margin:0 0 .9rem;color:color-mix(in srgb,var(--fg) 88%,transparent);font-size:.98rem}
+.excerpt{margin:.9rem 0 0;padding-left:1rem;border-left:2px solid var(--s2);font-size:.95rem;font-style:italic}
+
+/* games */
+.rows{margin-top:2.6rem;border-top:1px solid var(--line)}
+.row{position:relative;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:1.2rem 3rem;padding:2.2rem 0;border-bottom:1px solid var(--line)}
+.row::before{content:"";position:absolute;inset:0 -1rem;border-radius:1rem;pointer-events:none;opacity:0;transition:opacity .3s;
+  background:radial-gradient(420px circle at var(--mx,50%) var(--my,50%),color-mix(in srgb,var(--s2) 14%,transparent),transparent 70%)}
+.row:hover::before{opacity:1}
+.row>*{position:relative;min-width:0}
+.row h3{font:800 clamp(1.7rem,5vw,3.4rem)/1 var(--f-display);text-transform:uppercase;letter-spacing:-.02em;margin:0;padding-bottom:.08em;overflow-wrap:anywhere}
+.row p{margin:0 0 1rem;max-width:48ch}
+.rx{margin-top:3.2rem;display:grid;gap:1.3rem}
+.rx-h{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.5rem 1.5rem;align-items:baseline}
+.rx-h h3{font:800 clamp(1.4rem,3.4vw,2.2rem)/1.05 var(--f-display);text-transform:uppercase;margin:0}
+.spec{display:flex;align-items:flex-end;gap:3px;height:130px;padding:.6rem;border-radius:.9rem;border:1px solid var(--line);background:color-mix(in srgb,var(--bg) 70%,transparent)}
+.spec i{flex:1;height:100%;transform-origin:bottom;transform:scaleY(.1);border-radius:2px 2px 0 0;background:linear-gradient(to top,var(--s1),var(--s2) 45%,var(--s4))}
+.fout{font:700 clamp(2.3rem,9vw,4.6rem)/1 var(--f-mono);letter-spacing:-.03em}
+.fout small{font-size:.32em;letter-spacing:0;color:var(--muted);margin-left:.5rem}
+.tune{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:.8rem;align-items:center}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:36px;background:transparent;cursor:pointer;margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:6px;background:linear-gradient(90deg,var(--s1),var(--s2),var(--s3),var(--s4),var(--s5))}
+input[type=range]::-moz-range-track{height:6px;border-radius:6px;background:linear-gradient(90deg,var(--s1),var(--s2),var(--s3),var(--s4),var(--s5))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;margin-top:-10px;border-radius:50%;background:var(--fg);border:3px solid var(--bg);box-shadow:0 0 0 2px var(--fg)}
+input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--fg);border:3px solid var(--bg);box-shadow:0 0 0 2px var(--fg)}
+.step{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:none;color:var(--fg);font:600 1.1rem var(--f-mono);cursor:pointer}
+.meter{height:8px;border-radius:8px;background:var(--line);overflow:hidden}
+.meter span{display:block;height:100%;transform-origin:left;transform:scaleX(var(--m,0));background:linear-gradient(90deg,var(--s1),var(--s2),var(--s3),var(--s4));transition:transform .15s}
+.rxs{margin:0;font:500 .9rem/1.5 var(--f-mono);color:var(--muted);min-height:3em}
+.rxs.ok{color:var(--fg)}
+
+/* writers */
+.tools{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:1.6rem;margin-top:3rem;align-items:start}
+.tools h3{font:800 clamp(1.3rem,3vw,1.9rem)/1.1 var(--f-display);text-transform:uppercase;margin:0 0 1.2rem}
+.seed{margin:0;display:grid;gap:.9rem}
+.seed dt{font:500 .7rem/1.3 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.seed dd{margin:.2rem 0 0;font-size:1.05rem}
+.seed .pn{font:800 clamp(2rem,6vw,3.4rem)/1 var(--f-display);text-transform:uppercase;padding-bottom:.08em}
+.btns{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.4rem}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:1.2rem}
+table{border-collapse:collapse;width:100%;min-width:480px;font-size:.95rem}
+th,td{text-align:left;padding:.8rem 1rem;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:500 .7rem/1.3 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+td:nth-child(2){font:600 .88rem/1.4 var(--f-mono);white-space:nowrap}
+tr:last-child td{border-bottom:0}
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:2rem;margin-top:3rem}
+.rules div{padding-top:1.1rem;border-top:3px solid;border-image:linear-gradient(90deg,var(--s1),var(--s3),var(--s5)) 1}
+.rules h3{font:700 1.15rem/1.25 var(--f-display);margin:0 0 .6rem}
+.rules p{margin:0;color:color-mix(in srgb,var(--fg) 88%,transparent)}
+
+/* blog */
+.posts{margin-top:2.6rem;border-top:1px solid var(--line)}
+.post{border-bottom:1px solid var(--line)}
+.post summary{display:grid;grid-template-columns:7.5rem minmax(0,1fr) auto;gap:.5rem 1.6rem;align-items:baseline;padding:1.7rem 0}
+.post h3{font:700 clamp(1.3rem,3.6vw,2.4rem)/1.12 var(--f-display);letter-spacing:-.015em;margin:0;padding-bottom:.25em;
+  background:linear-gradient(90deg,var(--s1),var(--s3),var(--s5)) left bottom/0% 3px no-repeat;transition:background-size .45s ease}
+.post summary:hover h3,.post[open] h3{background-size:100% 3px}
+.post time,.post .tag{font:500 .76rem/1.3 var(--f-mono);letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
+.post .body{padding:0 0 1.9rem calc(7.5rem + 1.6rem);max-width:calc(62ch + 9.1rem)}
+.post .body p{margin:0}
+@media (max-width:760px){
+  .row,.tools{grid-template-columns:1fr}
+  .post summary{grid-template-columns:1fr}
+  .post summary time{order:-1}
+  .post .body{padding-left:0}
+}
+
+/* about */
+.about{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:3rem;margin-top:2.6rem;align-items:start}
+@media (max-width:860px){.about{grid-template-columns:1fr}}
+.statement{font:600 clamp(1.7rem,4.6vw,3.3rem)/1.16 var(--f-body);letter-spacing:-.02em;margin:0 0 2rem}
+.hl{background:linear-gradient(95deg,var(--s1),var(--s2),var(--s3));-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+.hl2{background:linear-gradient(95deg,var(--s4),var(--s5));-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+.bio{max-width:54ch;margin:0 0 2rem}
+.mail{display:flex;flex-wrap:wrap;align-items:center;gap:.8rem 1rem}
+.mail code{font:600 1rem var(--f-mono);-webkit-user-select:all;user-select:all;overflow-wrap:anywhere}
+.tl{list-style:none;margin:0;padding:0;border-left:1px solid var(--line)}
+.tl li{position:relative;display:grid;grid-template-columns:5.6rem minmax(0,1fr);gap:1rem;padding:.9rem 0 .9rem 1.4rem}
+.tl li::before{content:"";position:absolute;left:-5px;top:1.55rem;width:9px;height:9px;border-radius:50%;background:var(--bg);border:2px solid var(--s2)}
+.tl b{font:700 1.2rem/1.2 var(--f-display)}
+
+/* footer */
+.foot{padding-block:3rem;border-top:1px solid var(--line);color:var(--muted);font:400 .85rem/1.7 var(--f-mono)}
+.foot p{margin:0}
+#coda{max-width:60ch;margin-top:1.6rem;font:500 1.05rem/1.6 var(--f-body);color:var(--fg)}
+.toast{position:fixed;z-index:30;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);transform:translate(-50%,16px);
+  max-width:min(92vw,520px);padding:.85rem 1.2rem;border-radius:1rem;background:var(--fg);color:var(--bg);
+  font:500 .92rem/1.45 var(--f-body);opacity:0;pointer-events:none;transition:opacity .3s,transform .3s}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .mega,.tws i,.hero h1,.nav::after{animation:none!important}
+  .cover{transition:none}
+}
+</style>
+
+<div class="aura" aria-hidden="true"></div>
+<canvas class="sky" id="sky" aria-hidden="true"></canvas>
+<div class="tws" id="tws" aria-hidden="true"></div>
+
+<nav class="nav" aria-label="Разделы сайта">
+  <a href="#books" data-s="books">Книги</a>
+  <a href="#games" data-s="games">Игры</a>
+  <a href="#writers" data-s="writers">Писателям</a>
+  <a href="#blog" data-s="blog">Блог</a>
+  <a href="#about" data-s="about">Обо мне</a>
+  <button class="th" id="theme" type="button" aria-label="Сменить тему: ночь или карта неба"><i></i></button>
+</nav>
+
+<main>
+  <section class="hero spot" id="top">
+    <div class="planet" id="planet" aria-hidden="true"></div>
+    <button class="anomaly" id="anomaly" type="button" aria-label="Необычный источник сигнала"></button>
+    <div class="wrap hero-in">
+      <a class="mark" id="mark" href="#top" aria-label="Марк Ардеев, в начало страницы"><i></i>М. Ардеев</a>
+      <p class="eyebrow">Научная фантастика · 4 книги · 3 игры</p>
+      <h1 class="g"><span>Марк</span><span>Ардеев</span></h1>
+      <p class="lead">Пишу о людях, которые улетели далеко от дома, и о счёте, который им за это выставляют.</p>
+      <div class="cta">
+        <a class="btn p" href="#books">Читать книги</a>
+        <a class="btn o" href="#games">Поймать сигнал</a>
+      </div>
+      <dl class="ticker">
+        <div><dt>Voyager 1 пересечёт отметку «1 световой день»</dt><dd id="vg">18 ноября 2026</dd></div>
+        <div><dt>Свет идёт до Марса</dt><dd>3–22 мин</dd></div>
+        <div><dt>Слов в моих книгах</dt><dd>1,24 млн</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="sec" id="books">
+    <div class="wrap">
+      <p class="eyebrow">Библиотека · 2018–2024</p>
+      <h2 class="mega g gb">Книги</h2>
+      <p class="lede">Четыре книги о дальних рейсах. Физика в них сходится, люди нет.</p>
+
+      <div class="books">
+        <article class="book">
+          <div class="cover c1"><span class="cv-a">Роман · 2024</span><h3 class="cv-t">Тихий апогей</h3><span class="cv-a">М. Ардеев</span></div>
+          <div class="meta">
+            <p class="k">Роман · 412 стр.</p>
+            <p class="b">Экипаж буксира на окраине системы получает сигнал от собственного корабля. Корабль прибыл в точку встречи на сорок лет раньше и ждёт.</p>
+            <details><summary class="more">Первые строки</summary><p class="excerpt">Бортовой журнал начинался с фразы, которую Ирма не писала: «Если вы это читаете, мы уже давно вас ждём».</p></details>
+          </div>
+        </article>
+        <article class="book">
+          <div class="cover c2"><span class="cv-a">Роман · 2022</span><h3 class="cv-t">Свет после нас</h3><span class="cv-a">М. Ардеев</span></div>
+          <div class="meta">
+            <p class="k">Роман · 536 стр.</p>
+            <p class="b">Ковчег идёт к звезде, которая, судя по свежим данным, уже погасла. Шестое поколение решает, говорить ли об этом остальным.</p>
+            <details><summary class="more">Первые строки</summary><p class="excerpt">Когда долетим, нас будут помнить по расписанию вахт, сказал Дэв. Для начала это немало.</p></details>
+          </div>
+        </article>
+        <article class="book">
+          <div class="cover c3"><span class="cv-a">Сборник · 2020</span><h3 class="cv-t">Нулевой дрейф</h3><span class="cv-a">М. Ардеев</span></div>
+          <div class="meta">
+            <p class="k">Сборник · девять рассказов</p>
+            <p class="b">Ремонт, усталость, радиосвязь и маленькие решения, от которых зависит воздух. Девять историй о работе в невесомости.</p>
+            <details><summary class="more">Первые строки</summary><p class="excerpt">Лёгкие предметы в невесомости не падают. Тяжёлые решения тоже: они висят рядом и ждут, пока на них посмотрят.</p></details>
+          </div>
+        </article>
+        <article class="book">
+          <div class="cover c4"><span class="cv-a">Роман · 2018</span><h3 class="cv-t">Протокол Лета</h3><span class="cv-a">М. Ардеев</span></div>
+          <div class="meta">
+            <p class="k">Роман · 368 стр.</p>
+            <p class="b">Первым контактом занимаются не герои, а переводчики-юристы. Каждое слово в договоре с чужими имеет цену, и платить придётся людям.</p>
+            <details><summary class="more">Первые строки</summary><p class="excerpt">Статья четвёртая. Стороны признают, что слово «мир» занимает в их языках разные места на шкале риска.</p></details>
+          </div>
+        </article>
+        <article class="book" id="secret" hidden>
+          <div class="cover c5">
+            <span class="cv-a">Рукопись · найдена</span>
+            <svg viewBox="0 0 100 20" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,10 18,10.4 30,9.6 42,10.2 47,3 50,17 53,5 58,10.3 72,9.7 84,10.2 100,10" fill="none" stroke="#8ff0e6" stroke-width="1.2" vector-effect="non-scaling-stroke"/></svg>
+            <h3 class="cv-t">Водородная линия</h3><span class="cv-a">М. Ардеев</span>
+          </div>
+          <div class="meta">
+            <p class="k">Рукопись · не издана</p>
+            <p class="b">Принято на 1420,40. Повтор каждые 71 секунду. Автор пока не уверен, что хочет знать, кто это отправил.</p>
+            <details><summary class="more">Первые строки</summary><p class="excerpt">Сигнал был слишком правильным, чтобы быть шумом, и слишком усталым, чтобы быть приказом.</p></details>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="games">
+    <div class="wrap">
+      <p class="eyebrow">Три проекта · 2023–2026</p>
+      <h2 class="mega g gg">Игры</h2>
+      <p class="lede">Игры тоже про расчёт: ресурсы, задержки и выбор, после которого не вернуться. Ниже стоит приёмник, на нём можно поймать сигнал.</p>
+
+      <div class="rows">
+        <article class="row spot">
+          <h3 class="g gb">Дальний рейс</h3>
+          <div>
+            <p>Вы диспетчер буксира. Каждый приказ долетает с задержкой, и к моменту исполнения ситуация уже другая.</p>
+            <div class="chips"><span class="chip live">Вышла · 2023</span><span class="chip">Интерактивная новелла</span><span class="chip">Браузер</span><span class="chip">40 минут</span></div>
+          </div>
+        </article>
+        <article class="row spot">
+          <h3 class="g gg">Дельта-V</h3>
+          <div>
+            <p>Hard-SF без калькулятора. Топливо и время считаются на кубиках, а у каждого корабля есть секрет, который вскроется на третьей сессии.</p>
+            <div class="chips"><span class="chip live">Вышла · 2025</span><span class="chip">Настольная ролевая система</span><span class="chip">64 стр.</span><span class="chip">2–5 игроков</span></div>
+          </div>
+        </article>
+        <article class="row spot">
+          <h3 class="g gw">Остывающая станция</h3>
+          <div>
+            <p>Одиночная игра о станции, которая теряет тепло. Закрывайте модули, чтобы сохранить жилые, и решайте, кто остаётся в холоде.</p>
+            <div class="chips"><span class="chip">Прототип · 2026</span><span class="chip">ПК</span><span class="chip">Одиночная</span></div>
+          </div>
+        </article>
+      </div>
+
+      <div class="panel rx spot" id="rx">
+        <div class="rx-h">
+          <h3 class="g gg">Приёмник</h3>
+          <span class="chip">Диапазон 1415–1426 МГц</span>
+        </div>
+        <div class="spec" id="spec" aria-hidden="true"></div>
+        <div class="fout"><span id="fout">1417,30</span><small>МГц</small></div>
+        <div class="tune">
+          <button class="step" type="button" data-step="-0.01" aria-label="Частота на 0,01 МГц ниже">−</button>
+          <input type="range" id="freq" min="1415" max="1426" step="0.01" value="1417.3" aria-label="Частота приёмника, МГц">
+          <button class="step" type="button" data-step="0.01" aria-label="Частота на 0,01 МГц выше">+</button>
+        </div>
+        <div>
+          <div class="meter" aria-hidden="true"><span id="mfill"></span></div>
+          <p class="mono" style="margin:.5rem 0 0;font-size:.8rem;color:var(--muted)" id="mtxt">Уровень сигнала: 0%</p>
+        </div>
+        <p class="rxs" id="rxstat" aria-live="polite">Двигайте частоту и следите за уровнем. Подсказка спрятана на первой странице.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="writers">
+    <div class="wrap">
+      <p class="eyebrow">Мастерская · 2 инструмента и 3 правила</p>
+      <h2 class="mega l2 g gw">Для<br>писателей</h2>
+      <p class="lede">Инструменты, которыми я пользуюсь сам: генератор вводных для миров и шпаргалка по расстояниям, чтобы задержка связи в вашей книге была честной.</p>
+
+      <div class="tools">
+        <div class="panel spot">
+          <h3 class="g gw">Генератор вводной</h3>
+          <dl class="seed" id="seed" aria-live="polite"></dl>
+          <div class="btns">
+            <button class="btn p s" type="button" id="gen">Новая вводная</button>
+            <button class="btn o s" type="button" id="copyseed">Копировать</button>
+          </div>
+        </div>
+        <div>
+          <div class="tw">
+            <table>
+              <caption class="eyebrow" style="text-align:left;padding:1rem 1rem 0">Сколько идёт свет от Земли</caption>
+              <thead><tr><th>Куда</th><th>Время</th><th>Что это даёт сюжету</th></tr></thead>
+              <tbody>
+                <tr><td>Луна</td><td>1,3 с</td><td>Разговор почти без паузы, но она уже слышна</td></tr>
+                <tr><td>Солнце</td><td>8 мин 20 с</td><td>Вспышку на нём видят с опозданием</td></tr>
+                <tr><td>Марс</td><td>3–22 мин</td><td>Диалог превращается в обмен письмами</td></tr>
+                <tr><td>Юпитер</td><td>33–54 мин</td><td>Вопрос и ответ занимают целую вахту</td></tr>
+                <tr><td>Нептун</td><td>около 4 ч</td><td>Приказ за обедом, ответ к ужину</td></tr>
+                <tr><td>Voyager 1</td><td>≈ 1 сутки</td><td>Двое суток от вопроса до ответа</td></tr>
+                <tr><td>Проксима Центавра</td><td>4,24 года</td><td>Любое сообщение становится письмом потомкам</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="rules">
+        <div><h3>Сначала бюджет, потом сцена</h3><p>Посчитайте delta-v и запас воздуха до того, как напишете погоню. Ограничения дают драме форму.</p></div>
+        <div><h3>У чуда есть счёт</h3><p>Если технология делает невозможное, она что-то забирает: время, память, людей. Покажите, что именно.</p></div>
+        <div><h3>Задержка связи это сюжет</h3><p>Пока вопрос летит к Земле, герои успевают сделать три ошибки. Не отнимайте у них эти минуты.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="blog">
+    <div class="wrap">
+      <p class="eyebrow">Заметки · 5 свежих</p>
+      <h2 class="mega g gl">Блог</h2>
+      <p class="lede">Про ремесло, физику и то, как я проверяю собственные сюжеты на прочность.</p>
+
+      <div class="posts">
+        <details class="post spot" name="post" open>
+          <summary><time datetime="2026-10-28">28 окт 2026</time><h3>Тишина как персонаж</h3><span class="tag">ремесло · 6 мин</span></summary>
+          <div class="body"><p>В вакууме нет звука, но в хорошей сцене он есть. Разбираю, чем заменить грохот: вибрацией корпуса, дыханием и паузами в эфире.</p></div>
+        </details>
+        <details class="post spot" name="post">
+          <summary><time datetime="2026-10-02">2 окт 2026</time><h3>Сколько стоит гиперпрыжок</h3><span class="tag">миры · 8 мин</span></summary>
+          <div class="body"><p>Считаю бюджет сюжета. Если перелёт стоит экипажу год жизни, каждая сцена на борту становится дорогой, и это можно использовать.</p></div>
+        </details>
+        <details class="post spot" name="post">
+          <summary><time datetime="2026-09-14">14 сен 2026</time><h3>Как я слежу за Voyager вместо новостей</h3><span class="tag">наука · 5 мин</span></summary>
+          <div class="body"><p>Сигнал идёт почти сутки, и это отличный тренажёр для писателя: вы всегда читаете прошлое и учитесь не путать его с настоящим.</p></div>
+        </details>
+        <details class="post spot" name="post">
+          <summary><time datetime="2026-08-21">21 авг 2026</time><h3>Три ошибки в сценах невесомости</h3><span class="tag">ремесло · 7 мин</span></summary>
+          <div class="body"><p>Волосы, жидкости и пламя. Что чаще всего ломает достоверность и как это исправить, не превращая сцену в лекцию.</p></div>
+        </details>
+        <details class="post spot" name="post">
+          <summary><time datetime="2026-07-30">30 июл 2026</time><h3>Орбита буксира за один вечер</h3><span class="tag">лаборатория · 9 мин</span></summary>
+          <div class="body"><p>Короткий разбор: как с помощью электронной таблицы проверить, успеет ли экипаж к стыковке, и что делать, если не успевает.</p></div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="about">
+    <div class="wrap">
+      <p class="eyebrow">Автор · инженер по образованию</p>
+      <h2 class="mega l2 g ga">Обо мне</h2>
+      <div class="about">
+        <div>
+          <p class="statement">Десять лет я <span class="hl">считал орбиты</span> для спутников связи. Теперь считаю, <span class="hl2">сколько стоит одиночество</span> на борту.</p>
+          <p class="bio">Первые рассказы я написал в ночные смены, пока ждал результатов расчётов. Сейчас пишу научную фантастику, делаю игры и веду мастерскую для тех, кто хочет, чтобы космос в тексте работал по правилам.</p>
+          <div class="mail">
+            <span class="eyebrow" style="margin:0">Для переводов, интервью и игр</span>
+            <code id="mail">author@example.com</code>
+            <button class="btn o s" type="button" id="copymail">Копировать адрес</button>
+          </div>
+        </div>
+        <ol class="tl">
+          <li><b class="g">2012</b><span>Первые рассказы в ночные смены</span></li>
+          <li><b class="g">2018</b><span>Роман «Протокол Лета»</span></li>
+          <li><b class="g">2020</b><span>Сборник «Нулевой дрейф»</span></li>
+          <li><b class="g">2022</b><span>Роман «Свет после нас»</span></li>
+          <li><b class="g">2023</b><span>Первая игра, «Дальний рейс»</span></li>
+          <li><b class="g">2024</b><span>Роман «Тихий апогей»</span></li>
+          <li><b class="g">2026</b><span>Работаю над новым романом</span></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <p>© 2026 Марк Ардеев. Сайт отправлен с Земли, ответ с Марса придёт через 6–44 минуты.</p>
+    <p id="coda" hidden>Вы дочитали до конца, а значит, вы из тех, кто слушает. В архиве станции осталась строчка, которую никто не удалял: «Если связь пропала, это не тишина. Это ответ, который ещё в пути».</p>
+    <div id="end" style="height:2px"></div>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+'use strict';
+const $ = (s, c = document) => c.querySelector(s);
+const $$ = (s, c = document) => Array.from(c.querySelectorAll(s));
+const root = document.documentElement;
+const mqReduce = matchMedia('(prefers-reduced-motion: reduce)');
+const reduce = () => mqReduce.matches;
+const canHover = matchMedia('(hover: hover)').matches;
+const store = {
+  get(k){ try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v){ try { localStorage.setItem(k, v); } catch (e) {} }
+};
+const plural = (n, f) => { const m = n % 10, h = n % 100; return (m === 1 && h !== 11) ? f[0] : (m >= 2 && m <= 4 && (h < 10 || h >= 20)) ? f[1] : f[2]; };
+
+/* toast */
+const toastEl = $('#toast'); let toastT;
+const toast = msg => { toastEl.textContent = msg; toastEl.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => toastEl.classList.remove('show'), 5600); };
+
+/* copy with fallback */
+function copyText(text){
+  const done = () => toast('Скопировано.');
+  const fallback = () => {
+    const ta = document.createElement('textarea'); ta.value = text; ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); done(); } catch (e) { toast('Не удалось скопировать. Выделите текст вручную.'); }
+    document.body.removeChild(ta);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fallback); else fallback();
+}
+
+/* theme: night sky or star chart */
+const currentTheme = () => root.getAttribute('data-theme') || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+$('#theme').addEventListener('click', () => root.setAttribute('data-theme', currentTheme() === 'dark' ? 'light' : 'dark'));
+
+/* starfield: drawn once per resize, no animation loop */
+const cv = $('#sky'), cx = cv.getContext('2d');
+let W = 0, H = 0, dpr = 1, warping = false;
+const stars = Array.from({length: 200}, () => ({x: Math.random(), y: Math.random(), r: Math.random() * 1.15 + .25, a: Math.random() * .65 + .25}));
+const tint = () => { const cs = getComputedStyle(root); return {rgb: (cs.getPropertyValue('--star') || '255,244,225').trim(), k: parseFloat(cs.getPropertyValue('--star-k')) || 1}; };
+const starCount = () => Math.min(stars.length, Math.round(W * H / 7000));
+function draw(){
+  if (warping) return;
+  const t = tint(), n = starCount();
+  cx.setTransform(dpr, 0, 0, dpr, 0, 0); cx.clearRect(0, 0, W, H);
+  for (let i = 0; i < n; i++){ const s = stars[i]; cx.fillStyle = 'rgba(' + t.rgb + ',' + (s.a * t.k).toFixed(2) + ')'; cx.beginPath(); cx.arc(s.x * W, s.y * H, s.r, 0, 6.2832); cx.fill(); }
+}
+function resize(){
+  if (W && Math.abs(innerWidth - W) < 1 && Math.abs(innerHeight - H) < 120) return;
+  W = innerWidth; H = innerHeight; dpr = Math.min(devicePixelRatio || 1, 1.5);
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); draw();
+}
+let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(resize, 150); });
+resize();
+new MutationObserver(draw).observe(root, {attributes: true, attributeFilter: ['data-theme']});
+matchMedia('(prefers-color-scheme: light)').addEventListener('change', draw);
+
+/* twinkling stars: opacity-only CSS animation on 16 dots */
+(() => {
+  const box = $('#tws');
+  for (let i = 0; i < 16; i++){
+    const d = document.createElement('i');
+    d.style.cssText = 'left:' + (Math.random() * 100).toFixed(1) + '%;top:' + (Math.random() * 100).toFixed(1) + '%;--d:' + (3 + Math.random() * 5).toFixed(1) + 's;--dl:-' + (Math.random() * 6).toFixed(1) + 's';
+    box.appendChild(d);
+  }
+})();
+
+/* EGG: warp jump (Konami code on desktop, long press on the planet on touch) */
+function warp(){
+  if (warping) return;
+  if (reduce()){ toast('Гиперпрыжок совершён. Анимация отключена в настройках вашей системы.'); return; }
+  warping = true;
+  const t = tint(), t0 = performance.now(), dur = 2300, mx = W / 2, my = H / 2, n = starCount();
+  cx.lineCap = 'round';
+  (function frame(now){
+    const p = Math.min(1, (now - t0) / dur), v = Math.sin(p * Math.PI);
+    cx.setTransform(dpr, 0, 0, dpr, 0, 0); cx.clearRect(0, 0, W, H);
+    cx.strokeStyle = 'rgba(' + t.rgb + ',' + (.85 * t.k).toFixed(2) + ')'; cx.lineWidth = 1.2;
+    cx.beginPath();
+    for (let i = 0; i < n; i++){
+      const s = stars[i], dx = s.x * W - mx, dy = s.y * H - my, d = Math.hypot(dx, dy) || 1, ux = dx / d, uy = dy / d;
+      const d1 = d * (1 + 4 * v * v), len = v * .45 * d1;
+      cx.moveTo(mx + ux * (d1 - len), my + uy * (d1 - len)); cx.lineTo(mx + ux * d1, my + uy * d1);
+    }
+    cx.stroke();
+    if (p < 1) requestAnimationFrame(frame);
+    else { warping = false; draw(); toast('Гиперпрыжок завершён. По часам Земли вы пропустили три года.'); }
+  })(t0);
+}
+const konami = ['arrowup','arrowup','arrowdown','arrowdown','arrowleft','arrowright','arrowleft','arrowright','b','a']; let ki = 0;
+addEventListener('keydown', e => {
+  const k = (e.key || '').toLowerCase();
+  if (k === konami[ki]){ ki++; if (ki === konami.length){ ki = 0; warp(); } } else ki = (k === konami[0]) ? 1 : 0;
+});
+(() => {
+  const hero = $('#top'), planet = $('#planet'); let lp;
+  hero.addEventListener('pointerdown', e => {
+    const r = planet.getBoundingClientRect(), cxp = r.left + r.width / 2, cyp = r.top + r.height / 2;
+    if (Math.hypot(e.clientX - cxp, e.clientY - cyp) <= r.width / 2) lp = setTimeout(warp, 800);
+  });
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => hero.addEventListener(ev, () => clearTimeout(lp)));
+})();
+
+/* EGG: 5 clicks on the logo swap the palette to red shift */
+(() => {
+  let n = 0, t;
+  $('#mark').addEventListener('click', () => {
+    n++; clearTimeout(t); t = setTimeout(() => n = 0, 1400);
+    if (n >= 5){
+      n = 0;
+      if (root.getAttribute('data-spectrum') === 'red'){ root.removeAttribute('data-spectrum'); toast('Спектр возвращён.'); }
+      else { root.setAttribute('data-spectrum', 'red'); toast('Красное смещение: вы удаляетесь от источника слишком быстро.'); }
+    }
+  });
+})();
+
+/* EGG: the odd blinking star */
+$('#anomaly').addEventListener('click', () => toast('Источник на 1420,40 МГц. Это линия нейтрального водорода: на этой частоте радиоастрономы ищут чужие сигналы. Приёмник в разделе «Игры».'));
+
+/* EGG: 8 seconds at the very bottom */
+(() => {
+  let t;
+  new IntersectionObserver(es => {
+    if (es[0].isIntersecting) t = setTimeout(() => { $('#coda').hidden = false; }, 8000); else clearTimeout(t);
+  }).observe($('#end'));
+})();
+
+/* EGG: console message */
+try { console.log('%c Сигнал принят ', 'background:#ffb23f;color:#07090f;font:700 14px monospace;padding:4px 8px', '\nЕсли вы читаете код, привет, коллега. На сайте спрятано несколько пасхалок. Подсказка: водород.'); } catch (e) {}
+
+/* Voyager 1 countdown */
+(() => {
+  const target = new Date(2026, 10, 18), now = new Date();
+  const days = Math.round((target - new Date(now.getFullYear(), now.getMonth(), now.getDate())) / 864e5);
+  $('#vg').textContent = days > 1 ? '18 ноября · через ' + days + ' ' + plural(days, ['день', 'дня', 'дней'])
+    : days === 1 ? '18 ноября · уже завтра' : days === 0 ? 'сегодня' : 'порог пройден 18 ноября';
+})();
+
+/* hero gradient and spotlights follow the pointer; one rAF write per frame */
+if (canHover){
+  const hero = $('#top'); let hr = 0, hx = .5;
+  hero.addEventListener('pointermove', e => {
+    const r = hero.getBoundingClientRect(); hx = (e.clientX - r.left) / r.width;
+    if (!hr) hr = requestAnimationFrame(() => { hr = 0; hero.style.setProperty('--gx', (hx * 100).toFixed(1) + '%'); });
+  }, {passive: true});
+  let sp = null, spx = 0, spy = 0, tick = false;
+  document.addEventListener('pointermove', e => {
+    const t = e.target.closest && e.target.closest('.spot'); if (!t) return;
+    const r = t.getBoundingClientRect(); sp = t; spx = e.clientX - r.left; spy = e.clientY - r.top;
+    if (!tick){ tick = true; requestAnimationFrame(() => { tick = false; sp.style.setProperty('--mx', spx + 'px'); sp.style.setProperty('--my', spy + 'px'); }); }
+  }, {passive: true});
+  $$('.cover').forEach(c => {
+    c.addEventListener('pointermove', e => {
+      const r = c.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
+      c.style.setProperty('--ry', (x * 14).toFixed(1) + 'deg'); c.style.setProperty('--rx', (-y * 14).toFixed(1) + 'deg');
+    }, {passive: true});
+    c.addEventListener('pointerleave', () => { c.style.setProperty('--rx', '0deg'); c.style.setProperty('--ry', '0deg'); });
+  });
+}
+
+/* active section in the nav */
+(() => {
+  const links = $$('.nav a[data-s]');
+  const io = new IntersectionObserver(es => es.forEach(en => {
+    if (en.isIntersecting) links.forEach(l => l.classList.toggle('on', l.dataset.s === en.target.id));
+  }), {rootMargin: '-45% 0px -50% 0px'});
+  $$('main section[id]').forEach(s => io.observe(s));
+})();
+
+/* receiver mini-game */
+(() => {
+  const N = 40, TARGET = 1420.40, bars = [], spec = $('#spec');
+  for (let i = 0; i < N; i++){ const b = document.createElement('i'); spec.appendChild(b); bars.push(b); }
+  const f = $('#freq'), out = $('#fout'), fill = $('#mfill'), mtxt = $('#mtxt'), stat = $('#rxstat');
+  let locked = store.get('hline') === '1', hold = 0, visible = false, running = false, last = 0;
+  const fmt = v => v.toFixed(2).replace('.', ',');
+  const sig = () => Math.exp(-Math.pow((parseFloat(f.value) - TARGET) / .9, 2));
+  function unlock(){ $('#secret').hidden = false; }
+  function render(t){
+    const s = sig(), tt = t / 1000;
+    for (let i = 0; i < N; i++){
+      const d = (i - (N - 1) / 2) / 3.2, peak = s * .9 * Math.exp(-d * d);
+      const noise = (.12 + .38 * (reduce() ? .5 : Math.random()) + .08 * Math.sin(tt * 2.2 + i * .9)) * (1 - .82 * s);
+      bars[i].style.transform = 'scaleY(' + Math.min(1, .05 + noise + peak).toFixed(3) + ')';
+    }
+  }
+  function sync(){
+    out.textContent = fmt(parseFloat(f.value));
+    const s = sig(); fill.style.setProperty('--m', s.toFixed(3)); mtxt.textContent = 'Уровень сигнала: ' + Math.round(s * 100) + '%';
+  }
+  function onLock(){
+    locked = true; store.set('hline', '1'); unlock();
+    stat.classList.add('ok');
+    stat.textContent = 'Захват. Три импульса, пауза, три импульса, повтор каждые 71 секунду. Расшифровка: «Мы тоже слушали».';
+    toast('Найдена неопубликованная рукопись. Загляните в раздел «Книги».');
+  }
+  function check(t){
+    if (locked) return;
+    if (Math.abs(parseFloat(f.value) - TARGET) <= .05){
+      if (reduce() || (hold && t - hold > 700)) onLock(); else if (!hold) hold = t;
+    } else hold = 0;
+  }
+  function loop(t){
+    if (!visible){ running = false; return; }
+    requestAnimationFrame(loop);
+    if (t - last < 66) return; last = t; render(t); check(t);
+  }
+  const update = () => { sync(); render(performance.now()); check(performance.now()); };
+  f.addEventListener('input', update);
+  $$('.step').forEach(b => b.addEventListener('click', () => { f.value = (parseFloat(f.value) + parseFloat(b.dataset.step)).toFixed(2); update(); }));
+  if (locked){ unlock(); f.value = TARGET.toFixed(2); stat.classList.add('ok'); stat.textContent = 'Сигнал уже пойман. Расшифровка: «Мы тоже слушали». Рукопись ждёт в разделе «Книги».'; }
+  sync(); render(0);
+  new IntersectionObserver(es => { visible = es[0].isIntersecting; if (visible && !running && !reduce()){ running = true; requestAnimationFrame(loop); } }).observe($('#rx'));
+})();
+
+/* story seed generator */
+(() => {
+  const pick = a => a[Math.floor(Math.random() * a.length)];
+  const A = ['Ка', 'Ве', 'Ор', 'Ми', 'Зен', 'Ар', 'Не', 'Си', 'Дра', 'Кор', 'Эл', 'Тар', 'Ила', 'Ной'];
+  const B = ['лис', 'нор', 'ва', 'ти', 'ра', 'мен', 'сон', 'гея', 'лон', 'бек'];
+  const C = ['', ' II', ' b', '-7', ' Дальняя'];
+  const ATM = ['разреженный, выходить можно только в скафандре', 'плотный и тёплый, как суп', 'пригодный для дыхания, но с ядовитыми приливами', 'почти нет, люди живут под куполами', 'прозрачный: звёзды видны в разгар дня', 'шумный: ветер никогда не стихает'];
+  const NEED = ['вода', 'запчасти', 'чужое разрешение', 'время', 'тишина', 'доверие'];
+  const TROUBLE = ['смена экипажа задерживается уже второй год', 'два посёлка делят единственный источник тепла', 'терраформирование идёт быстрее, чем люди готовы меняться', 'кто-то пользуется задержкой связи и отдаёт приказы от чужого имени', 'найден артефакт, который нельзя ни прочитать, ни выбросить', 'грузовой корабль вернулся раньше, чем улетел', 'главный инженер скрывает, что запас воздуха считали неверно'];
+  const RULE = ['каждый разговор с Землёй стоит суток запаса воздуха', 'двигатель работает только пока экипаж спит', 'копия памяти оставляет оригинал без воспоминаний', 'оружие нельзя брать на борт без согласия всего экипажа', 'пассажиры стареют быстрее команды', 'любое чудо оплачивается чьим-то временем'];
+  const box = $('#seed'); let text = '';
+  function gen(){
+    const s = {
+      'Планета': pick(A) + pick(B) + pick(C),
+      'Тяжесть': (.2 + Math.random() * 1.7).toFixed(2).replace('.', ',') + ' g',
+      'Воздух': pick(ATM),
+      'Не хватает': pick(NEED),
+      'Что пошло не так': pick(TROUBLE),
+      'Непреложное правило': pick(RULE),
+      'Связь с метрополией': Math.round(3 + Math.random() * 37) + ' мин в одну сторону'
+    };
+    box.textContent = '';
+    Object.keys(s).forEach(k => {
+      const dt = document.createElement('dt'), dd = document.createElement('dd');
+      dt.textContent = k; dd.textContent = s[k];
+      if (k === 'Планета') dd.className = 'pn g gw';
+      box.appendChild(dt); box.appendChild(dd);
+    });
+    text = Object.keys(s).map(k => k + ': ' + s[k]).join('\n');
+  }
+  $('#gen').addEventListener('click', gen);
+  $('#copyseed').addEventListener('click', () => copyText(text));
+  gen();
+  $('#copymail').addEventListener('click', () => copyText($('#mail').textContent));
+})();
+})();
+</script>
+
+</body></html>
