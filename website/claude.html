@@ -19,6 +19,8 @@
     <symbol id="i-tg" viewBox="0 0 24 24"><path d="M21.9 4.3 18.6 20c-.2 1-.9 1.2-1.7.8l-4.4-3.3-2.1 2c-.2.2-.4.4-.9.4l.3-4.5 8.2-7.4c.4-.3-.1-.5-.6-.2L7.2 13.5 3 12.2c-1-.3-1-1 .2-1.4L20.6 3.5c.8-.3 1.5.2 1.3.8Z" fill="currentColor"/></symbol>
     <symbol id="i-vk" viewBox="0 0 24 24"><text x="12" y="17" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="13" fill="currentColor">VK</text></symbol>
     <symbol id="i-yt" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M10 9l5 3-5 3z" fill="currentColor"/></symbol>
+    <symbol id="i-tiktok" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" fill="currentColor"/></symbol>
+    <symbol id="i-boosty" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm2 14h-4v-4h4v4zm0-6h-4V6h4v4z" fill="currentColor"/></symbol>
     <!-- площадки -->
     <symbol id="i-at" viewBox="0 0 24 24"><path d="M5 4.5h11a3 3 0 0 1 3 3V19H8a3 3 0 0 1-3-3V4.5Z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 9h8M8 13h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
     <symbol id="i-litres" viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" fill="currentColor"/></symbol>
@@ -158,7 +160,7 @@ main,footer{position:relative;z-index:1}
 .menu-toggle .ic{width:20px;height:20px}
 
 /* dropdown generic */
-.drop-menu{display:none;position:absolute;top:calc(100% + .7rem);z-index:40;min-width:14rem;padding:.45rem;
+.drop-menu{display:none;position:absolute;top:calc(100% + .7rem);z-index:100;min-width:14rem;padding:.45rem;
   border:1px solid var(--line);border-radius:1rem;
   background:color-mix(in srgb,var(--bg) 92%,transparent);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
   box-shadow:0 24px 60px -24px rgba(0,0,0,.9);flex-direction:column;gap:.1rem}
@@ -169,7 +171,7 @@ main,footer{position:relative;z-index:1}
 .drop-menu .ic{width:20px;height:20px;color:var(--s2)}
 .navdrop-menu{left:50%;transform:translateX(-50%)}
 .top-drop-menu{right:0}
-.readmenu{display:none;position:absolute;left:0;bottom:calc(100% + .7rem);z-index:8;min-width:15.5rem;padding:.45rem;
+.readmenu{display:none;position:absolute;left:0;top:calc(100% + .7rem);z-index:100;min-width:15.5rem;padding:.45rem;
   border:1px solid var(--line);border-radius:1rem;
   background:color-mix(in srgb,var(--bg) 92%,transparent);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
   box-shadow:0 24px 60px -24px rgba(0,0,0,.9);flex-direction:column;gap:.1rem}
@@ -184,7 +186,6 @@ main,footer{position:relative;z-index:1}
 @media (max-width:860px){
   .menu-toggle{display:flex}
   .left-menu{gap:0;justify-content:flex-start}
-  .brand span{display:none}
   .nav{position:absolute;top:calc(100% + 10px);left:12px;right:12px;flex-direction:column;align-items:stretch;
     padding:1rem;border-radius:1.2rem;display:none;box-shadow:0 20px 40px -10px rgba(0,0,0,.7);z-index:100;background:var(--bg)}
   .nav.open{display:flex}
@@ -235,6 +236,8 @@ details[open]>.more::before{content:"\2013"}
 .hero .lead{max-width:36ch;font-size:clamp(1.1rem,2.1vw,1.35rem);line-height:1.45;margin:1.4rem 0 0}
 .cta{display:flex;flex-wrap:wrap;align-items:center;gap:.8rem;margin-top:1.6rem}
 
+/* «Где читать» + play */
+.readwrap{position:relative;display:inline-flex}
 .playbtn{width:52px;height:52px;border-radius:50%;border:0;cursor:pointer;display:grid;place-items:center;color:#fff;
   background:radial-gradient(circle at 35% 30%,#ff6a45,#ff2a1f 70%);
   box-shadow:0 12px 30px -10px rgba(255,50,30,.75),inset 0 1px 0 rgba(255,255,255,.25);
@@ -296,7 +299,7 @@ details[open]>.more::before{content:"\2013"}
 
 /* games */
 .rows{margin-top:2.6rem;border-top:1px solid var(--line)}
-.row{position:relative;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:1.2rem 3rem;padding:2.2rem 0;border-bottom:1px solid var(--line)}
+.row{position:relative;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:1.2rem 3rem;padding:2.2rem 0;border-bottom:1px solid var(--line);text-decoration:none;color:inherit}
 .row::before{content:"";position:absolute;inset:0 -1rem;border-radius:1rem;pointer-events:none;opacity:0;transition:opacity .3s;
   background:radial-gradient(420px circle at var(--mx,50%) var(--my,50%),color-mix(in srgb,var(--s2) 14%,transparent),transparent 70%)}
 .row:hover::before{opacity:1}
@@ -368,7 +371,7 @@ tr:last-child td{border-bottom:0}
 .post summary:hover h3,.post[open] h3{background-size:100% 3px}
 .post time,.post .tag{font:500 .76rem/1.3 var(--f-mono);letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
 .post .body{padding:0 0 1.9rem calc(10rem + 1.4rem);max-width:calc(62ch + 11.4rem)}
-.post .body p{margin:0}
+.post .body p{margin:0 0 1rem}
 @media (max-width:760px){
   .row,.tools{grid-template-columns:1fr}
   .post summary{grid-template-columns:1fr;gap:.9rem}
@@ -429,11 +432,11 @@ tr:last-child td{border-bottom:0}
 .fcol ul{list-style:none;margin:0;padding:0;display:grid;gap:.15rem}
 .fcol a{color:color-mix(in srgb,var(--fg) 84%,transparent);text-decoration:none;font-size:.95rem;line-height:1.5;padding:.22rem 0;display:inline-block}
 .fcol a:hover{color:var(--s3)}
-.fbtn{display:inline-flex;align-items:center;gap:.45rem;margin-top:.5rem;padding:.55rem 1rem;border-radius:999px;
-  border:1px solid transparent;font-weight:600!important;font-size:.85rem!important;color:var(--fg)!important;
+.fbtn{display:flex;align-items:center;justify-content:center;gap:.45rem;margin-top:.5rem;padding:.65rem 1rem;border-radius:999px;
+  border:1px solid transparent;font-weight:600!important;font-size:.9rem!important;color:var(--fg)!important;width:100%;
   background:linear-gradient(var(--bg),var(--bg)) padding-box,linear-gradient(100deg,var(--s1),var(--s3),var(--s5)) border-box}
 .fbtn .ic{width:16px;height:16px;color:var(--s2)}
-.socials{display:flex;gap:.5rem;margin-top:1.1rem}
+.socials{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.1rem}
 .socials a{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;color:var(--muted);
   transition:color .2s,border-color .2s,box-shadow .2s}
 .socials a:hover{color:var(--fg);border-color:color-mix(in srgb,var(--s3) 50%,transparent);box-shadow:0 0 20px -4px color-mix(in srgb,var(--s2) 35%,transparent)}
@@ -500,6 +503,8 @@ tr:last-child td{border-bottom:0}
     <a href="https://t.me/" target="_blank" rel="noopener" aria-label="Telegram"><svg class="ic" aria-hidden="true"><use href="#i-tg"/></svg></a>
     <a href="https://vk.com/" target="_blank" rel="noopener" aria-label="ВКонтакте"><svg class="ic" aria-hidden="true"><use href="#i-vk"/></svg></a>
     <a href="https://www.youtube.com/" target="_blank" rel="noopener" aria-label="YouTube"><svg class="ic" aria-hidden="true"><use href="#i-yt"/></svg></a>
+    <a href="https://www.tiktok.com/" target="_blank" rel="noopener" aria-label="TikTok"><svg class="ic" aria-hidden="true"><use href="#i-tiktok"/></svg></a>
+    <a href="https://boosty.to/" target="_blank" rel="noopener" aria-label="Boosty"><svg class="ic" aria-hidden="true"><use href="#i-boosty"/></svg></a>
   </div>
   <div class="promo-txt">
     <span class="p-full">Подпишись на новости: <button class="p-link p1" data-tab="r">читателям</button> и <button class="p-link p2" data-tab="w">писателям</button></span>
@@ -651,7 +656,7 @@ tr:last-child td{border-bottom:0}
       <p class="lede">Игры тоже про расчёт: ресурсы, задержки и выбор, после которого не вернуться. Ниже стоит приёмник, на нём можно поймать сигнал.</p>
 
       <div class="rows">
-        <article class="row spot">
+        <a href="#" class="row spot">
           <div class="game-head">
             <span class="game-ic" aria-hidden="true"><svg class="ic"><use href="#i-rocket"/></svg></span>
             <h3 class="g gb">Дальний рейс</h3>
@@ -660,8 +665,8 @@ tr:last-child td{border-bottom:0}
             <p>Вы диспетчер буксира. Каждый приказ долетает с задержкой, и к моменту исполнения ситуация уже другая.</p>
             <div class="chips"><span class="chip live">Вышла · 2023</span><span class="chip">Интерактивная новелла</span><span class="chip">Браузер</span><span class="chip">40 минут</span></div>
           </div>
-        </article>
-        <article class="row spot">
+        </a>
+        <a href="#" class="row spot">
           <div class="game-head">
             <span class="game-ic" aria-hidden="true"><svg class="ic"><use href="#i-dice"/></svg></span>
             <h3 class="g gg">Дельта-V</h3>
@@ -670,8 +675,8 @@ tr:last-child td{border-bottom:0}
             <p>Hard-SF без калькулятора. Топливо и время считаются на кубиках, а у каждого корабля есть секрет, который вскроется на третьей сессии.</p>
             <div class="chips"><span class="chip live">Вышла · 2025</span><span class="chip">Настольная ролевая система</span><span class="chip">64 стр.</span><span class="chip">2–5 игроков</span></div>
           </div>
-        </article>
-        <article class="row spot">
+        </a>
+        <a href="#" class="row spot">
           <div class="game-head">
             <span class="game-ic" aria-hidden="true"><svg class="ic"><use href="#i-snow"/></svg></span>
             <h3 class="g gw">Остывающая станция</h3>
@@ -680,7 +685,7 @@ tr:last-child td{border-bottom:0}
             <p>Одиночная игра о станции, которая теряет тепло. Закрывайте модули, чтобы сохранить жилые, и решайте, кто остаётся в холоде.</p>
             <div class="chips"><span class="chip">Прототип · 2026</span><span class="chip">ПК</span><span class="chip">Одиночная</span></div>
           </div>
-        </article>
+        </a>
       </div>
 
       <div class="panel rx spot" id="rx">
@@ -761,7 +766,10 @@ tr:last-child td{border-bottom:0}
               <h3>Тишина как персонаж</h3>
             </span>
           </summary>
-          <div class="body"><p>В вакууме нет звука, но в хорошей сцене он есть. Разбираю, чем заменить грохот: вибрацией корпуса, дыханием и паузами в эфире.</p></div>
+          <div class="body">
+            <p>В вакууме нет звука, но в хорошей сцене он есть. Разбираю, чем заменить грохот: вибрацией корпуса, дыханием и паузами в эфире.</p>
+            <a href="#" class="btn o s" style="margin-top:1rem">Читать далее</a>
+          </div>
         </details>
         <details class="post spot" name="post">
           <summary>
@@ -771,7 +779,10 @@ tr:last-child td{border-bottom:0}
               <h3>Сколько стоит гиперпрыжок</h3>
             </span>
           </summary>
-          <div class="body"><p>Считаю бюджет сюжета. Если перелёт стоит экипажу год жизни, каждая сцена на борту становится дорогой, и это можно использовать.</p></div>
+          <div class="body">
+            <p>Считаю бюджет сюжета. Если перелёт стоит экипажу год жизни, каждая сцена на борту становится дорогой, и это можно использовать.</p>
+            <a href="#" class="btn o s" style="margin-top:1rem">Читать далее</a>
+          </div>
         </details>
         <details class="post spot" name="post">
           <summary>
@@ -781,7 +792,10 @@ tr:last-child td{border-bottom:0}
               <h3>Как я слежу за Voyager вместо новостей</h3>
             </span>
           </summary>
-          <div class="body"><p>Сигнал идёт почти сутки, и это отличный тренажёр для писателя: вы всегда читаете прошлое и учитесь не путать его с настоящим.</p></div>
+          <div class="body">
+            <p>Сигнал идёт почти сутки, и это отличный тренажёр для писателя: вы всегда читаете прошлое и учитесь не путать его с настоящим.</p>
+            <a href="#" class="btn o s" style="margin-top:1rem">Читать далее</a>
+          </div>
         </details>
         <details class="post spot" name="post">
           <summary>
@@ -791,7 +805,10 @@ tr:last-child td{border-bottom:0}
               <h3>Три ошибки в сценах невесомости</h3>
             </span>
           </summary>
-          <div class="body"><p>Волосы, жидкости и пламя. Что чаще всего ломает достоверность и как это исправить, не превращая сцену в лекцию.</p></div>
+          <div class="body">
+            <p>Волосы, жидкости и пламя. Что чаще всего ломает достоверность и как это исправить, не превращая сцену в лекцию.</p>
+            <a href="#" class="btn o s" style="margin-top:1rem">Читать далее</a>
+          </div>
         </details>
         <details class="post spot" name="post">
           <summary>
@@ -801,7 +818,10 @@ tr:last-child td{border-bottom:0}
               <h3>Орбита буксира за один вечер</h3>
             </span>
           </summary>
-          <div class="body"><p>Короткий разбор: как с помощью электронной таблицы проверить, успеет ли экипаж к стыковке, и что делать, если не успевает.</p></div>
+          <div class="body">
+            <p>Короткий разбор: как с помощью электронной таблицы проверить, успеет ли экипаж к стыковке, и что делать, если не успевает.</p>
+            <a href="#" class="btn o s" style="margin-top:1rem">Читать далее</a>
+          </div>
         </details>
       </div>
     </div>
@@ -883,6 +903,9 @@ tr:last-child td{border-bottom:0}
             <code id="mail">author@example.com</code>
             <button class="btn o s" type="button" id="copymail">Копировать адрес</button>
           </div>
+          <div style="margin-top: 1.5rem;">
+            <a href="#" class="btn o">Подробнее</a>
+          </div>
         </div>
         <ol class="tl">
           <li><b class="g">2012</b><span>Первые рассказы в ночные смены</span></li>
@@ -935,6 +958,8 @@ tr:last-child td{border-bottom:0}
           <a href="https://t.me/" target="_blank" rel="noopener" aria-label="Telegram"><svg class="ic" aria-hidden="true"><use href="#i-tg"/></svg></a>
           <a href="https://vk.com/" target="_blank" rel="noopener" aria-label="ВКонтакте"><svg class="ic" aria-hidden="true"><use href="#i-vk"/></svg></a>
           <a href="https://www.youtube.com/" target="_blank" rel="noopener" aria-label="YouTube"><svg class="ic" aria-hidden="true"><use href="#i-yt"/></svg></a>
+          <a href="https://www.tiktok.com/" target="_blank" rel="noopener" aria-label="TikTok"><svg class="ic" aria-hidden="true"><use href="#i-tiktok"/></svg></a>
+          <a href="https://boosty.to/" target="_blank" rel="noopener" aria-label="Boosty"><svg class="ic" aria-hidden="true"><use href="#i-boosty"/></svg></a>
         </div>
       </div>
       <div class="fcol">
