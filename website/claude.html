@@ -125,7 +125,9 @@ main,footer{position:relative;z-index:1}
   padding:.42rem .85rem .42rem .5rem;border:1px solid var(--line);border-radius:999px;
   background:color-mix(in srgb,var(--bg) 74%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
   font:600 .8rem/1 var(--f-mono);letter-spacing:.06em;color:var(--fg);white-space:nowrap}
-.brand i{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--s1),var(--s3) 50%,var(--s5));flex:none}
+.brand i{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--s1),var(--s3) 50%,var(--s5));flex:none;cursor:pointer;transition:transform .2s}
+.brand i:hover{transform:scale(1.1)}
+.brand span{pointer-events:none}
 .brand:hover{color:var(--fg)}
 
 .nav{position:relative;display:flex;align-items:center;justify-content:center;gap:.15rem;padding:.3rem;
@@ -171,7 +173,9 @@ main,footer{position:relative;z-index:1}
 .drop-menu .ic{width:20px;height:20px;color:var(--s2)}
 .navdrop-menu{left:50%;transform:translateX(-50%)}
 .top-drop-menu{right:0}
-.readmenu{display:none;position:absolute;left:0;top:calc(100% + .7rem);z-index:100;min-width:15.5rem;padding:.45rem;
+
+/* «Где читать» вверх */
+.readmenu{display:none;position:absolute;left:0;bottom:calc(100% + .7rem);z-index:100;min-width:15.5rem;padding:.45rem;
   border:1px solid var(--line);border-radius:1rem;
   background:color-mix(in srgb,var(--bg) 92%,transparent);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
   box-shadow:0 24px 60px -24px rgba(0,0,0,.9);flex-direction:column;gap:.1rem}
@@ -432,10 +436,10 @@ tr:last-child td{border-bottom:0}
 .fcol ul{list-style:none;margin:0;padding:0;display:grid;gap:.15rem}
 .fcol a{color:color-mix(in srgb,var(--fg) 84%,transparent);text-decoration:none;font-size:.95rem;line-height:1.5;padding:.22rem 0;display:inline-block}
 .fcol a:hover{color:var(--s3)}
-.fbtn{display:flex;align-items:center;justify-content:center;gap:.45rem;margin-top:.5rem;padding:.65rem 1rem;border-radius:999px;
-  border:1px solid transparent;font-weight:600!important;font-size:.9rem!important;color:var(--fg)!important;width:100%;
+.fbtn{display:inline-flex !important;flex-direction:row !important;align-items:center;justify-content:center;gap:.5rem;margin-top:.5rem;padding:.65rem 1rem;border-radius:999px;
+  border:1px solid transparent;font-weight:600!important;font-size:.9rem!important;color:var(--fg)!important;width:100%;white-space:nowrap;
   background:linear-gradient(var(--bg),var(--bg)) padding-box,linear-gradient(100deg,var(--s1),var(--s3),var(--s5)) border-box}
-.fbtn .ic{width:16px;height:16px;color:var(--s2)}
+.fbtn .ic{width:16px;height:16px;color:var(--s2);flex:none;margin:0}
 .socials{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.1rem}
 .socials a{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;color:var(--muted);
   transition:color .2s,border-color .2s,box-shadow .2s}
@@ -485,6 +489,39 @@ tr:last-child td{border-bottom:0}
 .back-to-top.show{opacity:1;pointer-events:auto;transform:translateY(0)}
 .back-to-top:hover{color:var(--s3);border-color:var(--s3)}
 
+/* category modal */
+.cat-modal{position:fixed;inset:0;z-index:999;background:var(--bg);overflow:hidden;display:flex;flex-direction:column}
+.cat-close{position:absolute;top:20px;left:20px;z-index:10;width:56px;height:56px;border-radius:50%;
+  border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;
+  display:grid;place-items:center;cursor:pointer;backdrop-filter:blur(10px);transition:background .2s,transform .2s}
+.cat-close:hover{background:rgba(255,255,255,.2);transform:scale(1.05)}
+.cat-close .ic{width:24px;height:24px}
+.cat-grid{display:grid;grid-template-columns:repeat(5,1fr);height:100%;width:100%}
+.cat-item{position:relative;display:flex;align-items:center;justify-content:center;text-decoration:none;color:#fff;
+  background-size:cover;background-position:center;overflow:hidden;border-right:1px solid rgba(255,255,255,.05)}
+.cat-item:last-child{border-right:0}
+.cat-item::before{content:"";position:absolute;inset:0;background:rgba(7,10,18,.6);transition:background .3s}
+.cat-item:hover::before{background:rgba(7,10,18,.3)}
+.cat-content{position:relative;z-index:1;text-align:center;padding:20px;transform:translateY(10px);transition:transform .3s}
+.cat-item:hover .cat-content{transform:translateY(0)}
+.cat-content h2{font:800 clamp(1.5rem,3vw,3rem)/1 var(--f-display);text-transform:uppercase;margin:0 0 1rem;letter-spacing:-.02em}
+.cat-content p{font:400 1rem/1.4 var(--f-body);opacity:0.9;margin:0;max-width:22ch}
+/* backgrounds */
+.bg-space{background-image:url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=800&auto=format&fit=crop')}
+.bg-history{background-image:url('https://images.unsplash.com/photo-1461360370896-922624d12aa1?q=80&w=800&auto=format&fit=crop')}
+.bg-lit{background-image:url('https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=800&auto=format&fit=crop')}
+.bg-tech{background-image:url('https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800&auto=format&fit=crop')}
+.bg-tourism{background-image:url('https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?q=80&w=800&auto=format&fit=crop')}
+
+@media (max-width:900px){
+  .cat-grid{grid-template-columns:1fr;grid-template-rows:repeat(5,1fr)}
+  .cat-item{border-right:0;border-bottom:1px solid rgba(255,255,255,.05)}
+  .cat-item:last-child{border-bottom:0}
+  .cat-content{padding:10px}
+  .cat-content h2{font-size:1.8rem;margin-bottom:.4rem}
+  .cat-content p{display:none}
+}
+
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   .mega,.tws i,.hero h1,.nav::after{animation:none!important}
@@ -496,6 +533,45 @@ tr:last-child td{border-bottom:0}
 <div class="aura" aria-hidden="true"></div>
 <canvas class="sky" id="sky" aria-hidden="true"></canvas>
 <div class="tws" id="tws" aria-hidden="true"></div>
+
+<!-- CATEGORY MODAL -->
+<div class="cat-modal" id="catModal" hidden>
+  <button class="cat-close" id="closeCatBtn" aria-label="Закрыть меню">
+    <svg class="ic" aria-hidden="true"><use href="#i-close"/></svg>
+  </button>
+  <div class="cat-grid">
+    <a href="#top" class="cat-item bg-space">
+      <div class="cat-content">
+        <h2>Космос</h2>
+        <p>Далёкие миры, орбиты и тишина.</p>
+      </div>
+    </a>
+    <a href="#books" class="cat-item bg-history">
+      <div class="cat-content">
+        <h2>История</h2>
+        <p>Прошлое, которое формирует будущее.</p>
+      </div>
+    </a>
+    <a href="#books" class="cat-item bg-lit">
+      <div class="cat-content">
+        <h2>Литература</h2>
+        <p>Тексты, которые хочется перечитывать.</p>
+      </div>
+    </a>
+    <a href="#games" class="cat-item bg-tech">
+      <div class="cat-content">
+        <h2>Технологии</h2>
+        <p>Инструменты для новых открытий.</p>
+      </div>
+    </a>
+    <a href="#blog" class="cat-item bg-tourism">
+      <div class="cat-content">
+        <h2>Туризм</h2>
+        <p>Путешествия за пределы привычного.</p>
+      </div>
+    </a>
+  </div>
+</div>
 
 <!-- TOP PROMO BAR -->
 <div class="promo">
@@ -517,7 +593,10 @@ tr:last-child td{border-bottom:0}
 <header class="topbar">
   <div class="topbar-inner">
     <div class="left-menu">
-      <a class="brand" id="mark" href="#top" aria-label="Асахи Чанг, в начало страницы"><i aria-hidden="true"></i><span>Асахи Чанг</span></a>
+      <a class="brand" id="mark" href="#top" aria-label="Асахи Чанг, в начало страницы">
+        <i aria-hidden="true" id="brandCircle"></i>
+        <span>Асахи Чанг</span>
+      </a>
       <button class="menu-toggle" id="menuToggle" aria-label="Открыть меню">
         <svg class="ic" aria-hidden="true"><use href="#i-burger"/></svg>
       </button>
@@ -952,7 +1031,7 @@ tr:last-child td{border-bottom:0}
           <li><a href="#books">Книги</a></li>
           <li><a href="#blog">Блог</a></li>
           <li><a href="#">Пользовательское соглашение</a></li>
-          <li><a class="fbtn" href="#contacts"><svg class="ic" aria-hidden="true"><use href="#i-mail"/></svg> Контакты</a></li>
+          <li><a class="fbtn" href="#contacts"><svg class="ic" aria-hidden="true"><use href="#i-mail"/></svg> <span>Контакты</span></a></li>
         </ul>
         <div class="socials">
           <a href="https://t.me/" target="_blank" rel="noopener" aria-label="Telegram"><svg class="ic" aria-hidden="true"><use href="#i-tg"/></svg></a>
@@ -1126,7 +1205,9 @@ addEventListener('keydown', e => {
 /* EGG: 5 clicks on the logo swap the palette */
 (() => {
   let n = 0, t;
-  $('#mark').addEventListener('click', () => {
+  $('#mark').addEventListener('click', e => {
+    // Avoid triggering easter egg when clicking the circle (modal)
+    if (e.target.closest('#brandCircle')) return;
     n++; clearTimeout(t); t = setTimeout(() => n = 0, 1400);
     if (n >= 5){
       n = 0;
@@ -1215,7 +1296,7 @@ if (canHover){
       }
     });
   }
-  // hero read
+  // hero read (upward)
   const hWrap = $('#readwrap'), hBtn = $('#readBtn'), hMenu = $('#readmenu');
   if (hWrap && hBtn && hMenu) {
     hBtn.addEventListener('click', e => {
@@ -1244,6 +1325,35 @@ if (canHover){
       if (!wMenu.contains(e.target) && !wBtn.contains(e.target)) {
         wMenu.classList.remove('open');
         wBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+})();
+
+/* category modal */
+(() => {
+  const brandCircle = $('#brandCircle');
+  const catModal = $('#catModal');
+  const closeCatBtn = $('#closeCatBtn');
+
+  if (brandCircle && catModal) {
+    brandCircle.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      catModal.hidden = false;
+      document.body.style.overflow = 'hidden';
+    });
+
+    closeCatBtn.addEventListener('click', () => {
+      catModal.hidden = true;
+      document.body.style.overflow = '';
+    });
+
+    // Close on ESC
+    addEventListener('keydown', e => {
+      if (e.key === 'Escape' && !catModal.hidden) {
+        catModal.hidden = true;
+        document.body.style.overflow = '';
       }
     });
   }
