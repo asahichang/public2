@@ -231,7 +231,8 @@ details[open]>.more::before{content:"\2013"}
 .hero{position:relative;padding-block:clamp(3rem,8vw,6rem) clamp(2rem,5vw,4rem);overflow-x:clip}
 .hero::before{content:"";position:absolute;inset:0;pointer-events:none;
   background:radial-gradient(520px circle at var(--mx,72%) var(--my,28%),color-mix(in srgb,var(--s2) 16%,transparent),transparent 65%)}
-.hero-in{position:relative;z-index:1}
+.hero-in{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:center}
+.hero-text-col{min-width:0}
 .hero h1{font:800 clamp(2.2rem,8vw,5.5rem)/.9 var(--f-display);letter-spacing:-.025em;text-transform:uppercase;margin:0;padding-bottom:.08em;max-width:800px;
   --g:linear-gradient(100deg,var(--s1),var(--s2) 22%,var(--s3) 42%,var(--s4) 66%,var(--s5) 80%,var(--s1) 100%);
   background-size:220% 100%;background-position:var(--gx,60%) 50%;animation:sheen 2.4s cubic-bezier(.2,.7,.2,1) backwards}
@@ -264,6 +265,90 @@ details[open]>.more::before{content:"\2013"}
 .ticker>div{background:color-mix(in srgb,var(--bg) 86%,transparent);padding:1rem 1.2rem;min-width:0}
 .ticker dt{font:500 .7rem/1.35 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .ticker dd{margin:.4rem 0 0;font:700 clamp(1.05rem,2.2vw,1.4rem)/1.25 var(--f-display)}
+
+/* --- НОВЫЙ БЛОК: 3D КНИГА И КАРУСЕЛЬ --- */
+.hero-visual-col { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; min-width: 0;}
+.carousel-wrapper {position: relative; width: 100%; max-width: 320px; height: 360px; display: flex; align-items: center; justify-content: center;}
+.carousel-viewport {width: 100%; height: 100%; overflow: hidden; position: relative; display: flex; align-items: center; justify-content: center;}
+.carousel-track {display: flex; height: 100%; transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.3, 1); width: 100%;}
+.carousel-slide {min-width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; padding: 0;}
+
+/* Стрелки в стиле сайта */
+.carousel-arrow {position: absolute; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border-radius: 50%; 
+  background: color-mix(in srgb, var(--bg) 70%, transparent); border: 1px solid var(--line); color: var(--fg); 
+  display: flex; align-items: center; justify-content: center; z-index: 10; backdrop-filter: blur(5px); 
+  transition: all 0.3s ease; font-size: 1.2rem; cursor: pointer;}
+.carousel-arrow:hover {color: var(--s3); border-color: var(--s3); box-shadow: 0 0 20px color-mix(in srgb, var(--s2) 40%, transparent);}
+.carousel-arrow.left { left: -5px; }
+.carousel-arrow.right { right: -5px; }
+
+/* Иконки под каруселью */
+.thumbnails {display: flex; gap: 8px; margin-top: 25px; justify-content: center; flex-wrap: nowrap; z-index: 10; width: 100%;}
+.thumb {width: 38px; height: 38px; border-radius: 10px; background: rgba(255,255,255,0.03); border: 1px solid var(--line); 
+  display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; color: var(--muted); cursor: pointer;}
+.thumb.active {border-color: var(--s3); background: color-mix(in srgb, var(--s2) 15%, transparent); color: var(--s3); box-shadow: 0 0 15px color-mix(in srgb, var(--s2) 30%, transparent);}
+.thumb svg { width: 18px; height: 18px; fill: currentColor; }
+
+/* 3D Объекты */
+.book-scene {width: 180px; height: 270px; position: relative; transform-style: preserve-3d; animation: bookFloat 8s ease-in-out infinite; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.6));}
+.book {width: 100%; height: 100%; position: absolute; transform-style: preserve-3d; animation: spinBook 16s linear infinite; transform: rotateX(15deg) rotateY(0deg);}
+@keyframes spinBook {0% { transform: rotateX(15deg) rotateY(0deg); } 100% { transform: rotateX(15deg) rotateY(360deg); }}
+@keyframes bookFloat {0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); }}
+.book-face {position: absolute; left: 50%; top: 50%; backface-visibility: hidden;}
+
+/* Обложки */
+.book-front {width: 180px; height: 270px; transform: translate(-50%, -50%) translateZ(15px); background: var(--bg2); border: 1px solid var(--line); border-radius: 2px; overflow: hidden; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);}
+.book-front img {width: 100%; height: 100%; object-fit: cover;}
+
+/* Задняя обложка с текстом */
+.book-back {width: 180px; height: 270px; transform: translate(-50%, -50%) translateZ(-15px) rotateY(180deg); background: var(--bg2); border: 1px solid var(--line); border-radius: 2px; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);}
+.book-back-text {font: 700 1.1rem/1.3 var(--f-display); color: var(--fg); margin-bottom: 10px;}
+.book-back-year {font: 500 0.85rem/1 var(--f-mono); color: var(--muted);}
+
+/* Корешок и торцы */
+.book-spine {width: 30px; height: 270px; transform: translate(-50%, -50%) translateX(-90px) rotateY(-90deg); background: linear-gradient(to right, #060814, var(--bg2) 50%, #060814); border-left: 1px solid var(--line); border-right: 1px solid var(--line);}
+.book-pages-right {width: 30px; height: 270px; transform: translate(-50%, -50%) translateX(90px) rotateY(90deg); background: repeating-linear-gradient(90deg, #e0e0e0, #e0e0e0 1px, #b0b0b0 1px, #b0b0b0 2px); box-shadow: inset 10px 0 15px rgba(0,0,0,0.5);}
+.book-pages-top {width: 180px; height: 30px; transform: translate(-50%, -50%) translateY(-135px) rotateX(90deg); background: repeating-linear-gradient(0deg, #e0e0e0, #e0e0e0 1px, #b0b0b0 1px, #b0b0b0 2px); box-shadow: inset 0 -10px 15px rgba(0,0,0,0.5);}
+.book-pages-bottom {width: 180px; height: 30px; transform: translate(-50%, -50%) translateY(135px) rotateX(-90deg); background: repeating-linear-gradient(0deg, #e0e0e0, #e0e0e0 1px, #b0b0b0 1px, #b0b0b0 2px); box-shadow: inset 0 10px 15px rgba(0,0,0,0.5);}
+
+/* Мокапы игр (упрощенные под новый стиль) */
+.mock-game-app {width: 220px; height: 300px; background: var(--bg2); border: 1px solid var(--line); border-radius: 20px; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; overflow: hidden; box-shadow: 0 0 30px rgba(0,0,0,0.5);}
+.mock-game-app::before {content: ""; position: absolute; inset: 0; background: radial-gradient(circle at center, color-mix(in srgb, var(--s1) 20%, transparent), transparent 70%);}
+.badge {position: absolute; top: 16px; left: 16px; background: linear-gradient(90deg, var(--s1), var(--s2)); color: #000; padding: 4px 12px; border-radius: 20px; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; z-index: 2;}
+.game-icon {width: 70px; height: 70px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; color: var(--fg); font-size: 2rem; margin-bottom: 20px; box-shadow: 0 0 20px color-mix(in srgb, var(--s2) 30%, transparent); z-index: 1;}
+.game-title-mock {font-family: "Unbounded", sans-serif; font-size: 1.1rem; color: var(--fg); z-index: 1;}
+.game-sub {color: var(--s4); font-size: 0.75rem; margin-top: 8px; z-index: 1; font-family: var(--f-mono);}
+
+.mock-cards {position: relative; width: 180px; height: 270px; display: flex; justify-content: center; align-items: center;}
+.mock-card {position: absolute; width: 100px; height: 160px; border-radius: 10px; background: var(--bg2); border: 1px solid var(--line); box-shadow: 0 10px 20px rgba(0,0,0,0.5); display: flex; flex-direction: column; justify-content: center; align-items: center;}
+.mock-card::after {content: "★"; font-size: 2rem; color: var(--s3);}
+.mock-card:first-child {transform: rotate(-15deg) translateX(-30px);}
+.mock-card:last-child {transform: rotate(15deg) translateX(30px); border-color: var(--s1);}
+.mock-card:last-child::after {color: var(--s1);}
+.badge-cards {position: absolute; top: -20px; left: 50%; transform: translateX(-50%); background: linear-gradient(90deg, var(--s4), var(--s5)); color: #000; padding: 4px 12px; border-radius: 20px; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; white-space: nowrap; z-index: 2;}
+
+.mock-desktop-app {width: 280px; height: 180px; background: var(--bg2); border: 1px solid var(--line); border-radius: 12px; backdrop-filter: blur(10px); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.8); display: flex; flex-direction: column; overflow: hidden;}
+.mac-header {height: 30px; background: rgba(0,0,0,0.4); display: flex; align-items: center; padding: 0 12px; gap: 8px; border-bottom: 1px solid rgba(255,255,255,0.05);}
+.mac-dot {width: 8px; height: 8px; border-radius: 50%;}
+.mac-dot.red {background: #ff5f56;} .mac-dot.yellow {background: #ffbd2e;} .mac-dot.green {background: #27c93f;}
+.mac-content {flex: 1; padding: 16px; display: flex; flex-direction: column; gap: 10px;}
+.mac-line {height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; width: 100%;}
+.mac-line.short {width: 60%;} .mac-line.color {background: linear-gradient(90deg, var(--s1), var(--s2)); width: 40%;}
+
+.mock-phone {width: 140px; height: 280px; background: #000; border: 6px solid #222; border-radius: 24px; position: relative; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.8), inset 0 0 10px rgba(255,255,255,0.1); display: flex; flex-direction: column; overflow: hidden;}
+.phone-notch {position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 60px; height: 16px; background: #222; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; z-index: 2;}
+.phone-screen {flex: 1; margin-top: 16px; display: flex; flex-direction: column; padding: 12px; gap: 10px;}
+.phone-game-header {height: 40px; background: rgba(255,255,255,0.05); border-radius: 8px; display: flex; align-items: center; padding: 0 10px; font-size: 0.7rem; color: var(--s3);}
+.phone-game-btn {height: 80px; background: linear-gradient(135deg, color-mix(in srgb, var(--s1) 20%, transparent), color-mix(in srgb, var(--s5) 20%, transparent)); border: 1px solid var(--s3); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--fg); font-size: 0.8rem; font-weight: bold;}
+
+@media (max-width: 860px) {
+  .hero-in { grid-template-columns: 1fr; gap: 3rem; }
+  .hero-visual-col { order: 2; margin-top: 1rem; }
+  .hero-text-col { order: 1; }
+  .carousel-wrapper { max-width: 100%; }
+  .carousel-arrow.left { left: 0; }
+  .carousel-arrow.right { right: 0; }
+}
 
 /* shelf (books, videos) */
 .shelf{position:relative;margin-top:2.6rem}
@@ -640,32 +725,156 @@ tr:last-child td{border-bottom:0}
   <section class="hero spot" id="top">
     <div class="planet" id="planet" aria-hidden="true"></div>
     <button class="anomaly" id="anomaly" type="button" aria-label="Необычный источник сигнала"></button>
+    
     <div class="wrap hero-in">
-      <p class="eyebrow">Научная фантастика · 4 книги · 3 игры</p>
-      <h1 class="g"><span>Асахи</span><span>Чанг</span></h1>
-      <p class="lead">Пишу о людях, которые улетели далеко от дома, и о счёте, который им за это выставляют.</p>
-      <div class="cta">
-        <a class="btn p" href="#books">Читать книги</a>
-        <div class="readwrap" id="readwrap">
-          <button class="btn o read-btn" id="readBtn" type="button" aria-expanded="false">
-            Где читать <svg class="ic ic-xs" aria-hidden="true"><use href="#i-arrow"/></svg>
-          </button>
-          <div class="readmenu" id="readmenu">
-            <a href="https://author.today" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-at"/></svg> Author Today</a>
-            <a href="https://www.litres.ru" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-litres"/></svg> Литрес</a>
-            <a href="https://litnet.com" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-litnet"/></svg> Литнет</a>
-            <a href="https://libautor.ru" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-libautor"/></svg> ЛибАвтор</a>
+      <div class="hero-text-col">
+        <p class="eyebrow">Научная фантастика · 4 книги · 3 игры</p>
+        <h1 class="g"><span>Асахи</span><span>Чанг</span></h1>
+        <p class="lead">Пишу о людях, которые улетели далеко от дома, и о счёте, который им за это выставляют.</p>
+        <div class="cta">
+          <a class="btn p" href="#books">Читать книги</a>
+          <div class="readwrap" id="readwrap">
+            <button class="btn o read-btn" id="readBtn" type="button" aria-expanded="false">
+              Где читать <svg class="ic ic-xs" aria-hidden="true"><use href="#i-arrow"/></svg>
+            </button>
+            <div class="readmenu" id="readmenu">
+              <a href="https://author.today" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-at"/></svg> Author Today</a>
+              <a href="https://www.litres.ru" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-litres"/></svg> Литрес</a>
+              <a href="https://litnet.com" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-litnet"/></svg> Литнет</a>
+              <a href="https://libautor.ru" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-libautor"/></svg> ЛибАвтор</a>
+            </div>
           </div>
+          <button class="playbtn" id="heroPlay" type="button" data-video="aqz-KE-bpKQ" aria-label="Смотреть видео">
+            <svg class="ic" aria-hidden="true"><use href="#i-play"/></svg>
+          </button>
         </div>
-        <button class="playbtn" id="heroPlay" type="button" data-video="aqz-KE-bpKQ" aria-label="Смотреть видео">
-          <svg class="ic" aria-hidden="true"><use href="#i-play"/></svg>
-        </button>
+        <dl class="ticker">
+          <div><dt>Voyager 1 пересечёт отметку «1 световой день»</dt><dd id="vg">18 ноября 2026</dd></div>
+          <div><dt>Свет идёт до Марса</dt><dd>3–22 мин</dd></div>
+          <div><dt>Слов в моих книгах</dt><dd>1,24 млн</dd></div>
+        </dl>
       </div>
-      <dl class="ticker">
-        <div><dt>Voyager 1 пересечёт отметку «1 световой день»</dt><dd id="vg">18 ноября 2026</dd></div>
-        <div><dt>Свет идёт до Марса</dt><dd>3–22 мин</dd></div>
-        <div><dt>Слов в моих книгах</dt><dd>1,24 млн</dd></div>
-      </dl>
+
+      <!-- ВНЕДРЕННЫЙ БЛОК: 3D КАРУСЕЛЬ -->
+      <div class="hero-visual-col">
+        <div class="carousel-wrapper">
+          <button class="carousel-arrow left" id="prevBtn" aria-label="Предыдущий слайд">←</button>
+          <div class="carousel-viewport">
+            <div class="carousel-track" id="carouselTrack">
+              
+              <!-- Слайд 1: Синяя книга -->
+              <div class="carousel-slide">
+                <div class="book-scene">
+                  <div class="book">
+                    <div class="book-face book-back">
+                      <div class="book-back-text">Скоро новинка от Асахи Чанга!</div>
+                      <div class="book-back-year">2026</div>
+                    </div>
+                    <div class="book-face book-spine"></div>
+                    <div class="book-face book-pages-right"></div>
+                    <div class="book-face book-pages-top"></div>
+                    <div class="book-face book-pages-bottom"></div>
+                    <div class="book-face book-front">
+                      <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=400&auto=format&fit=crop" alt="Обложка">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Слайд 2: Красная книга -->
+              <div class="carousel-slide">
+                <div class="book-scene">
+                  <div class="book">
+                    <div class="book-face book-back">
+                      <div class="book-back-text">Скоро новинка от Асахи Чанга!</div>
+                      <div class="book-back-year">2026</div>
+                    </div>
+                    <div class="book-face book-spine"></div>
+                    <div class="book-face book-pages-right"></div>
+                    <div class="book-face book-pages-top"></div>
+                    <div class="book-face book-pages-bottom"></div>
+                    <div class="book-face book-front">
+                      <img src="https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?q=80&w=400&auto=format&fit=crop" alt="Обложка">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Слайд 3: Игра-онлайн -->
+              <div class="carousel-slide">
+                <div class="mock-game-app">
+                  <div class="badge">Игра-онлайн</div>
+                  <div class="game-icon">▶</div>
+                  <div class="game-title-mock">Орбита</div>
+                  <div class="game-sub">Нарративная стратегия</div>
+                </div>
+              </div>
+
+              <!-- Слайд 4: Карточная игра -->
+              <div class="carousel-slide">
+                <div class="mock-cards">
+                  <div class="badge-cards">Карточная игра</div>
+                  <div class="mock-card"></div>
+                  <div class="mock-card"></div>
+                </div>
+              </div>
+
+              <!-- Слайд 5: Десктоп приложение -->
+              <div class="carousel-slide">
+                <div class="mock-desktop-app">
+                  <div class="mac-header">
+                    <div class="mac-dot red"></div>
+                    <div class="mac-dot yellow"></div>
+                    <div class="mac-dot green"></div>
+                  </div>
+                  <div class="mac-content">
+                    <div class="mac-line color"></div>
+                    <div class="mac-line"></div>
+                    <div class="mac-line short"></div>
+                    <div class="mac-line"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Слайд 6: Мобильный телефон -->
+              <div class="carousel-slide">
+                <div class="mock-phone">
+                  <div class="phone-notch"></div>
+                  <div class="phone-screen">
+                    <div class="phone-game-header">Игровое приложение</div>
+                    <div class="phone-game-btn">Играть</div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+          <button class="carousel-arrow right" id="nextBtn" aria-label="Следующий слайд">→</button>
+        </div>
+
+        <div class="thumbnails" id="thumbnails">
+          <button class="thumb active" data-index="0">
+            <svg viewBox="0 0 24 24"><path d="M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.1C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.1.25.1.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1zm0 13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5v11.5z"/></svg>
+          </button>
+          <button class="thumb" data-index="1">
+            <svg viewBox="0 0 24 24"><path d="M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.1C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.1.25.1.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1zm0 13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5v11.5z"/></svg>
+          </button>
+          <button class="thumb" data-index="2">
+            <svg viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 10H3V8h18v8zM6 15h2v-2H6v2zm4 0h2v-2h-2v2zm4 0h2v-2h-2v2z"/></svg>
+          </button>
+          <button class="thumb" data-index="3">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM7 10h2v7H7zm4-3h2v10h-2zm4-3h2v13h-2z"/></svg>
+          </button>
+          <button class="thumb" data-index="4">
+            <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12zM6 10h2v2H6zm0 4h8v2H6zm10 0h2v2h-2zm-6-4h8v2h-8z"/></svg>
+          </button>
+          <button class="thumb" data-index="5">
+            <svg viewBox="0 0 24 24"><path d="M17 1H7c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2zm0 18H7V5h10v14zm-5-1c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z"/></svg>
+          </button>
+        </div>
+      </div>
+      <!-- /ВНЕДРЕННЫЙ БЛОК -->
+
     </div>
   </section>
 
@@ -1206,7 +1415,6 @@ addEventListener('keydown', e => {
 (() => {
   let n = 0, t;
   $('#mark').addEventListener('click', e => {
-    // Avoid triggering easter egg when clicking the circle (modal)
     if (e.target.closest('#brandCircle')) return;
     n++; clearTimeout(t); t = setTimeout(() => n = 0, 1400);
     if (n >= 5){
@@ -1525,6 +1733,42 @@ if (canHover){
   if (locked){ unlock(); f.value = TARGET.toFixed(2); stat.classList.add('ok'); stat.textContent = 'Сигнал уже пойман. Расшифровка: «Мы тоже слушали». Рукопись ждёт в разделе «Книги».'; }
   sync(); render(0);
   new IntersectionObserver(es => { visible = es[0].isIntersecting; if (visible && !running && !reduce()){ running = true; requestAnimationFrame(loop); } }).observe($('#rx'));
+})();
+
+/* КАРУСЕЛЬ (НОВЫЙ БЛОК) */
+(() => {
+  const track = document.getElementById('carouselTrack');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const thumbs = document.querySelectorAll('.thumb');
+  let currentIndex = 0;
+  const totalSlides = 6;
+
+  if (!track || !prevBtn || !nextBtn) return;
+
+  function updateCarousel() {
+    track.style.transform = `translateX(-${currentIndex * 100}%)`;
+    thumbs.forEach(function(thumb, i) {
+      thumb.classList.toggle('active', i === currentIndex);
+    });
+  }
+
+  prevBtn.addEventListener('click', function() {
+    currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+    updateCarousel();
+  });
+
+  nextBtn.addEventListener('click', function() {
+    currentIndex = (currentIndex + 1) % totalSlides;
+    updateCarousel();
+  });
+
+  thumbs.forEach(function(thumb) {
+    thumb.addEventListener('click', function() {
+      currentIndex = parseInt(this.getAttribute('data-index'), 10);
+      updateCarousel();
+    });
+  });
 })();
 })();
 </script>
