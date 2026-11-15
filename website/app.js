@@ -360,10 +360,13 @@ if (canHover){
 })();
 
 /* ---------- подписка + промо-ссылки ---------- */
+/* ---------- подписка + промо-ссылки ---------- */
 (() => {
-  const form = $('#subForm'), seg = $('#subSeg');
+  const inlineForm = $('#subForm');
+  const inlineSeg = $('#subSeg');
+  const inlineEmail = $('#email');
 
-  const setTab = (val) => {
+  const setTabOn = (seg, val) => {
     if (!seg) return;
     seg.querySelectorAll('.seg-btn').forEach(x => {
       const on = x.dataset.val === val;
@@ -372,33 +375,119 @@ if (canHover){
     });
   };
 
-  if (seg) {
-    seg.addEventListener('click', e => {
+  /* --- форма на самой странице (главная) --- */
+  if (inlineSeg) {
+    inlineSeg.addEventListener('click', e => {
       const b = e.target.closest('.seg-btn');
       if (!b) return;
-      setTab(b.dataset.val);
+      setTabOn(inlineSeg, b.dataset.val);
     });
   }
-
-  if (form) {
-    form.addEventListener('submit', e => {
+  if (inlineForm) {
+    inlineForm.addEventListener('submit', e => {
       e.preventDefault();
-      const em = $('#email');
-      if (!em.value || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em.value)) {
+      if (!inlineEmail.value || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(inlineEmail.value)) {
         toast('Проверьте адрес почты.');
-        em.focus();
+        inlineEmail.focus();
         return;
       }
       toast('Готово. Первое письмо придёт с ближайшим запуском.');
-      form.reset();
+      inlineForm.reset();
     });
   }
 
+  /* --- модальное окно подписки --- */
+  let modal = null, modalForm, modalSeg, modalEmail, modalLastFocus = null;
+
+  function buildModal() {
+    if (modal) return modal;
+    modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.id = 'subModal';
+    modal.hidden = true;
+    modal.innerHTML =
+      '<div class="modal-back" data-close></div>' +
+      '<div class="modal-box" role="dialog" aria-modal="true" aria-label="Подписка" style="max-width:520px">' +
+        '<button class="modal-x" type="button" data-close aria-label="Закрыть">' +
+          '<svg class="ic" aria-hidden="true"><use href="#i-close"/></svg>' +
+        '</button>' +
+        '<form class="panel news-f" novalidate>' +
+          '<div>' +
+            '<p class="eyebrow" style="margin-bottom:.4rem">Рассылка · раз в две недели</p>' +
+            '<h2 class="news-h g ga" style="font-size:clamp(1.4rem,4vw,2rem);margin:0">Подпишись на&nbsp;новости</h2>' +
+          '</div>' +
+          '<label class="sr-only" for="subModalEmail">Email</label>' +
+          '<input id="subModalEmail" type="email" name="email" placeholder="you@example.com" autocomplete="email" required>' +
+          '<div class="seg" role="group" aria-label="Кому подписаться">' +
+            '<button type="button" class="seg-btn" data-val="r" aria-pressed="false">Читателям</button>' +
+            '<button type="button" class="seg-btn" data-val="w" aria-pressed="false">Писателям</button>' +
+          '</div>' +
+          '<button class="btn p" type="submit">Подписаться</button>' +
+          '<p class="news-note mono">Никакого спама. Отписаться можно в один клик.</p>' +
+        '</form>' +
+      '</div>';
+    document.body.appendChild(modal);
+
+    modalForm = modal.querySelector('form');
+    modalSeg = modal.querySelector('.seg');
+    modalEmail = modal.querySelector('input[type=email]');
+
+    modalSeg.addEventListener('click', e => {
+      const b = e.target.closest('.seg-btn');
+      if (!b) return;
+      setTabOn(modalSeg, b.dataset.val);
+    });
+
+    modalForm.addEventListener('submit', e => {
+      e.preventDefault();
+      if (!modalSeg.querySelector('.seg-btn.on')) {
+        toast('Выберите, кому подписаться: читателям или писателям.');
+        return;
+      }
+      if (!modalEmail.value || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(modalEmail.value)) {
+        toast('Проверьте адрес почты.');
+        modalEmail.focus();
+        return;
+      }
+      toast('Готово. Первое письмо придёт с ближайшим запуском.');
+      modalForm.reset();
+      setTabOn(modalSeg, null);
+      closeModal();
+    });
+
+    modal.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', closeModal));
+    addEventListener('keydown', e => { if (e.key === 'Escape' && !modal.hidden) closeModal(); });
+    return modal;
+  }
+
+  function openModal(tab) {
+    buildModal();
+    setTabOn(modalSeg, tab || null);
+    modalLastFocus = document.activeElement;
+    modal.hidden = false;
+    document.body.style.overflow = 'hidden';
+    const x = modal.querySelector('.modal-x');
+    if (x) x.focus();
+  }
+
+  function closeModal() {
+    if (!modal || modal.hidden) return;
+    modal.hidden = true;
+    document.body.style.overflow = '';
+    if (modalLastFocus && modalLastFocus.focus) modalLastFocus.focus();
+  }
+
+  /* --- промо-кнопки --- */
   $$('.p-link').forEach(btn => {
     btn.addEventListener('click', () => {
-      if (btn.dataset.tab) setTab(btn.dataset.tab);
-      const el = $('#subscribe');
-      if (el) el.scrollIntoView({behavior: reduce() ? 'auto' : 'smooth', block: 'center'});
+      if (inlineForm) {
+        if (btn.dataset.tab && inlineSeg) setTabOn(inlineSeg, btn.dataset.tab);
+        const el = $('#subscribe');
+        if (el) el.scrollIntoView({behavior: reduce() ? 'auto' : 'smooth', block: 'center'});
+      } else {
+        const isMobile = btn.classList.contains('p-mob');
+        openModal(isMobile ? null : (btn.dataset.tab || null));
+      }
     });
   });
 })();
@@ -585,6 +674,162 @@ if (canHover){
     });
   });
 })();
+
+/* ---------- лайтбокс для картинок ---------- */
+(() => {
+  const items = $$('[data-lightbox]');
+  if (!items.length) return;
+
+  const modal = document.createElement('div');
+  modal.className = 'modal';
+  modal.id = 'imgModal';
+  modal.hidden = true;
+  modal.innerHTML = `
+    <div class="modal-back" data-close></div>
+    <div class="modal-box" role="dialog" aria-modal="true" aria-label="Просмотр фото">
+      <button class="modal-x" type="button" data-close aria-label="Закрыть">
+        <svg class="ic" aria-hidden="true"><use href="#i-close"/></svg>
+      </button>
+      <button class="modal-arrow prev" type="button" aria-label="Предыдущее фото">←</button>
+      <button class="modal-arrow next" type="button" aria-label="Следующее фото">→</button>
+      <figure class="modal-frame">
+        <img id="imgModalSrc" src="" alt="">
+        <figcaption id="imgModalCap"></figcaption>
+      </figure>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  const imgEl = modal.querySelector('#imgModalSrc');
+  const capEl = modal.querySelector('#imgModalCap');
+  const prevBtn = modal.querySelector('.modal-arrow.prev');
+  const nextBtn = modal.querySelector('.modal-arrow.next');
+  let lastFocus = null;
+  let currentIndex = 0;
+
+  const update = (index) => {
+    currentIndex = (index + items.length) % items.length;
+    const btn = items[currentIndex];
+    const src = btn.dataset.lightbox;
+    const cap = btn.dataset.caption;
+    const img = btn.querySelector('img');
+    imgEl.src = src;
+    imgEl.alt = img ? img.alt : (cap || '');
+    if (cap) {
+      capEl.textContent = cap;
+      capEl.hidden = false;
+    } else {
+      capEl.hidden = true;
+    }
+  };
+
+  const open = (index) => {
+    lastFocus = document.activeElement;
+    update(index);
+    modal.hidden = false;
+    document.body.style.overflow = 'hidden';
+    modal.querySelector('.modal-x').focus();
+  };
+
+  const close = () => {
+    modal.hidden = true;
+    imgEl.src = '';
+    document.body.style.overflow = '';
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  };
+
+  items.forEach((btn, i) => {
+    btn.addEventListener('click', () => open(i));
+  });
+
+  prevBtn.addEventListener('click', (e) => { e.stopPropagation(); update(currentIndex - 1); });
+  nextBtn.addEventListener('click', (e) => { e.stopPropagation(); update(currentIndex + 1); });
+
+  // Клик по фону, пустой области контейнера или рамке (не по фото/подписи) закрывает окно
+  modal.addEventListener('click', e => {
+    if (
+      e.target === modal || 
+      e.target.classList.contains('modal-back') || 
+      e.target.classList.contains('modal-frame') ||
+      e.target.classList.contains('modal-box')
+    ) {
+      close();
+    }
+  });
+
+  modal.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', close));
+
+  addEventListener('keydown', e => {
+    if (modal.hidden) return;
+    if (e.key === 'Escape') close();
+    if (e.key === 'ArrowLeft') update(currentIndex - 1);
+    if (e.key === 'ArrowRight') update(currentIndex + 1);
+  });
+})();
+
+
+/* ---------- тематический фон (слайдшоу и статика) ---------- */
+(() => {
+  const containers = $$('.theme-bg-container');
+  if (!containers.length) return;
+
+  // Вешаем класс на body, чтобы скрыть дефолтные звезды
+  document.body.classList.add('theme-bg');
+
+  containers.forEach(container => {
+    // Если это статичный фон (нет data-images), JS дальше не нужен
+    if (!container.dataset.images) return;
+
+    const duration = parseInt(container.dataset.duration || 10000, 10);
+    const images = container.dataset.images.split(',').map(s => s.trim()).filter(Boolean);
+    if (!images.length) return;
+
+    // Создаем два слоя для перекрестного затухания
+    const layer1 = document.createElement('div');
+    const layer2 = document.createElement('div');
+    layer1.className = 'theme-bg-layer active';
+    layer2.className = 'theme-bg-layer';
+    layer1.style.backgroundImage = `url('${images[0]}')`;
+    container.appendChild(layer1);
+    container.appendChild(layer2);
+
+    let current = 0;
+    let isLayer1 = true;
+
+    function nextSlide() {
+      const currentLayer = isLayer1 ? layer1 : layer2;
+      const nextLayer = isLayer1 ? layer2 : layer1;
+      current = (current + 1) % images.length;
+
+      nextLayer.style.backgroundImage = `url('${images[current]}')`;
+      
+      // Сброс анимации зума для нового слоя
+      nextLayer.classList.remove('zoomed', 'active');
+      void nextLayer.offsetWidth; // принудительный рефлоу
+      
+      nextLayer.classList.add('active');
+      currentLayer.classList.remove('active');
+      isLayer1 = !isLayer1;
+
+      // Начинаем медленный зум на 7-й секунде (70% от duration)
+      setTimeout(() => {
+        nextLayer.classList.add('zoomed');
+      }, duration * 0.7);
+    }
+
+    // Первый запуск зума
+    setTimeout(() => {
+      layer1.classList.add('zoomed');
+    }, duration * 0.7);
+
+    // Запуск интервала переключения
+    if (images.length > 1) {
+      setInterval(nextSlide, duration);
+    }
+  });
+})();
+
+/* всегда в конце */
 
 try { console.log('%c Сигнал принят ', 'background:#ffb23f;color:#07090f;font:700 14px monospace;padding:4px 8px', '\nЕсли вы читаете код, привет, коллега.'); } catch (e) {}
 })();
