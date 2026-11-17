@@ -675,7 +675,7 @@ if (canHover){
   });
 })();
 
-/* ---------- лайтбокс для картинок ---------- */
+/* ---------- лайтбокс для картинок 2 ---------- */
 (() => {
   const items = $$('[data-lightbox]');
   if (!items.length) return;
@@ -684,14 +684,20 @@ if (canHover){
   modal.className = 'modal';
   modal.id = 'imgModal';
   modal.hidden = true;
+  
+  // Стрелки создаются только если картинок больше одной
+  const arrowsHTML = items.length > 1 ? `
+      <button class="modal-arrow prev" type="button" aria-label="Предыдущее фото">←</button>
+      <button class="modal-arrow next" type="button" aria-label="Следующее фото">→</button>
+  ` : '';
+
   modal.innerHTML = `
     <div class="modal-back" data-close></div>
     <div class="modal-box" role="dialog" aria-modal="true" aria-label="Просмотр фото">
       <button class="modal-x" type="button" data-close aria-label="Закрыть">
         <svg class="ic" aria-hidden="true"><use href="#i-close"/></svg>
       </button>
-      <button class="modal-arrow prev" type="button" aria-label="Предыдущее фото">←</button>
-      <button class="modal-arrow next" type="button" aria-label="Следующее фото">→</button>
+      ${arrowsHTML}
       <figure class="modal-frame">
         <img id="imgModalSrc" src="" alt="">
         <figcaption id="imgModalCap"></figcaption>
@@ -742,10 +748,11 @@ if (canHover){
     btn.addEventListener('click', () => open(i));
   });
 
-  prevBtn.addEventListener('click', (e) => { e.stopPropagation(); update(currentIndex - 1); });
-  nextBtn.addEventListener('click', (e) => { e.stopPropagation(); update(currentIndex + 1); });
+  if (prevBtn && nextBtn) {
+    prevBtn.addEventListener('click', (e) => { e.stopPropagation(); update(currentIndex - 1); });
+    nextBtn.addEventListener('click', (e) => { e.stopPropagation(); update(currentIndex + 1); });
+  }
 
-  // Клик по фону, пустой области контейнера или рамке (не по фото/подписи) закрывает окно
   modal.addEventListener('click', e => {
     if (
       e.target === modal || 
@@ -762,8 +769,8 @@ if (canHover){
   addEventListener('keydown', e => {
     if (modal.hidden) return;
     if (e.key === 'Escape') close();
-    if (e.key === 'ArrowLeft') update(currentIndex - 1);
-    if (e.key === 'ArrowRight') update(currentIndex + 1);
+    if (e.key === 'ArrowLeft' && items.length > 1) update(currentIndex - 1);
+    if (e.key === 'ArrowRight' && items.length > 1) update(currentIndex + 1);
   });
 })();
 
@@ -826,6 +833,76 @@ if (canHover){
     if (images.length > 1) {
       setInterval(nextSlide, duration);
     }
+  });
+})();
+
+(function initSvgPlayer() {
+  const obj      = document.getElementById('svgPlayerObj');
+  const playBtn  = document.getElementById('svgPlayBtn');
+  const pauseBtn = document.getElementById('svgPauseBtn');
+
+  let svgDoc = null;
+  let svgRoot = null;
+  let loaded = false;
+
+  // Ставит все анимации (SMIL + CSS) на паузу. reset=true — на кадр 0
+  function pauseAll(reset) {
+    // SMIL (<animate>, <animateTransform>)
+    if (svgRoot) {
+      try { svgRoot.pauseAnimations(); } catch (e) {}
+      if (reset) { try { svgRoot.setCurrentTime(0); } catch (e) {} }
+    }
+    // CSS-анимации внутри SVG (Web Animations API)
+    if (svgDoc && typeof svgDoc.getAnimations === 'function') {
+      try {
+        svgDoc.getAnimations().forEach(a => {
+          a.pause();
+          if (reset) a.currentTime = 0;
+        });
+      } catch (e) {}
+    }
+  }
+
+  // Продолжает все анимации
+  function playAll() {
+    if (svgRoot) {
+      try { svgRoot.unpauseAnimations(); } catch (e) {}
+    }
+    if (svgDoc && typeof svgDoc.getAnimations === 'function') {
+      try { svgDoc.getAnimations().forEach(a => a.play()); } catch (e) {}
+    }
+  }
+
+  obj.addEventListener('load', () => {
+    try {
+      svgDoc  = obj.contentDocument;
+      svgRoot = svgDoc && svgDoc.documentElement;
+      if (!svgRoot) {
+        console.warn('[svg-player] Нет доступа к содержимому SVG (cross-origin?). ' +
+                     'Play/Pause работать не будет — положи SVG рядом с HTML.');
+        return;
+      }
+      loaded = true;
+      // Останавливаем и сбрасываем на первый кадр
+      pauseAll(true);
+      // Повторно через 50 мс — на случай, если анимации инициализировались позже
+      setTimeout(() => pauseAll(true), 50);
+    } catch (e) {
+      console.warn('[svg-player] Ошибка доступа к SVG:', e);
+    }
+  });
+
+  playBtn.addEventListener('click', () => {
+    if (!loaded) return;
+    playAll();
+    playBtn.classList.add('hidden');
+    pauseBtn.classList.remove('hidden');
+  });
+
+  pauseBtn.addEventListener('click', () => {
+    pauseAll(false); // пауза, но НЕ сброс — продолжит с того же места
+    pauseBtn.classList.add('hidden');
+    playBtn.classList.remove('hidden');
   });
 })();
 
