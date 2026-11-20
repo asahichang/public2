@@ -3530,3 +3530,24 @@ body.theme-bg .sky, body.theme-bg .tws, body.theme-bg .aura {
   #vmodal .modal-box{width:100%}
   .vmodal-empty{padding:1rem;font-size:.82rem}
 }
+
+/* ============================================================
+   VER v0.01 (2026-11-20 16:05): центрирование книги и размер модалки
+   ============================================================ */
+
+/* «По одному»: книга по центру, стрелки по бокам блока */
+.books-one-shelf{max-width:1040px;margin:1.4rem auto 0}
+.one-book{grid-template-columns:minmax(0,170px) minmax(0,760px);justify-content:center}
+.one-actions{align-self:center;justify-content:center}
+@media (max-width:1000px){
+  .one-book{grid-template-columns:150px minmax(0,1fr);justify-content:stretch}
+}
+@media (max-width:760px){
+  .one-book{grid-template-columns:1fr}
+}
+
+/* Модалка видео: не шире 900px и не выше экрана с запасом на вкладки */
+.vmodal-box{width:min(92vw, 900px, calc((100vh - 160px) * 16 / 9))}
+@supports (height:100dvh){
+  .vmodal-box{width:min(92vw, 900px, calc((100dvh - 160px) * 16 / 9))}
+}
