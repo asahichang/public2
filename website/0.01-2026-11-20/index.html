@@ -1,0 +1,899 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Асахи Чанг</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500..900&family=Onest:wght@400..700&family=JetBrains+Mono:wght@400..700&display=swap">
+<link rel="stylesheet" href="styles.css?date=11172026">
+<link rel="stylesheet" href="hand_styles.css">
+</head>
+<body>
+
+<!-- SVG-ИКОНКИ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></symbol>
+<symbol id="i-arrow" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-arrow-r" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+<symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m4 7 8 6 8-6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-burger" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+<symbol id="i-book" viewBox="0 0 24 24"><path d="M4 6a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2V6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 20a2 2 0 0 1 2-2h13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+<symbol id="i-cart" viewBox="0 0 24 24"><circle cx="9" cy="20" r="1.5" fill="currentColor"/><circle cx="18" cy="20" r="1.5" fill="currentColor"/><path d="M2 3h3l2.5 12h12.5l2-9H6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-up" viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-tg" viewBox="0 0 24 24"><path d="M21.9 4.3 18.6 20c-.2 1-.9 1.2-1.7.8l-4.4-3.3-2.1 2c-.2.2-.4.4-.9.4l.3-4.5 8.2-7.4c.4-.3-.1-.5-.6-.2L7.2 13.5 3 12.2c-1-.3-1-1 .2-1.4L20.6 3.5c.8-.3 1.5.2 1.3.8Z" fill="currentColor"/></symbol>
+<symbol id="i-vk" viewBox="0 0 24 24"><text x="12" y="17" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="13" fill="currentColor">VK</text></symbol>
+<symbol id="i-yt" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M10 9l5 3-5 3z" fill="currentColor"/></symbol>
+<symbol id="i-tiktok" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" fill="currentColor"/></symbol>
+<symbol id="i-boosty" viewBox="0 0 24 24">
+  <g transform="translate(-3.86, -3.0) scale(0.099)" fill="currentColor">
+    <path d="M44.3 164.5L76.9 51.6H127l-10.1 35c-0.1 0.2-0.2 0.4-0.3 0.6L90 179.6h24.8c-10.4 25.9-18.5 46.2-24.3 60.9 c-45.8-0.5-58.6-33.3-47.4-72.1 M90.7 240.6l60.4-86.9h-25.6l22.3-55.7c38.2 4 56.2 34.1 45.6 70.5 c-11.3 39.1-57.1 72.1-101.7 72.1C91.3 240.6 91 240.6 90.7 240.6z"/>
+  </g>
+</symbol>
+<symbol id="i-at" viewBox="0 0 24 24">
+  <g transform="translate(-9.5, 32.5) scale(0.013, -0.013)" fill="currentColor">
+    <path d="M1004 2409 c-12 -24 -17 -60 -18 -129 -1 -143 32 -204 169 -305 84 -62 106 -91 150 -190 l31 -73 18 62 c48 163 57 209 66 311 6 61 13 125 16 142 5 32 4 33 -21 23 -64 -24 -125 0 -125 49 0 36 15 42 67 28 38 -10 44 -8 145 46 113 61 173 73 214 42 12 -9 43 -14 90 -15 69 0 134 -14 134 -29 0 -4 -17 -15 -37 -25 -122 -57 -173 -117 -173 -203 0 -23 20 -101 44 -175 24 -73 50 -159 57 -191 7 -32 16 -60 19 -62 4 -3 20 23 35 58 37 87 62 116 181 214 86 71 109 96 134 146 44 88 42 143 -11 242 -38 72 -39 76 -17 70 85 -26 169 -108 222 -220 69 -143 55 -210 -61 -292 -101 -71 -133 -105 -133 -142 0 -60 87 -67 151 -13 45 37 108 138 115 184 9 53 19 55 38 8 20 -49 21 -139 2 -183 -12 -29 -82 -102 -132 -137 -60 -43 -70 -120 -15 -120 55 0 125 67 178 168 l24 47 -6 -57 c-12 -126 -62 -203 -155 -237 -64 -24 -96 -59 -73 -82 15 -15 100 24 166 74 52 41 55 38 28 -25 -28 -64 -61 -94 -156 -139 -46 -22 -87 -45 -91 -50 -9 -15 105 -10 136 6 35 18 36 16 11 -33 -30 -59 -53 -73 -129 -82 -77 -8 -112 -23 -112 -47 0 -13 8 -15 43 -10 23 2 51 8 62 12 l20 8 -20 -21 c-50 -51 -179 -131 -252 -157 -207 -72 -234 -88 -287 -162 -17 -24 -32 -40 -34 -35 -7 23 43 126 85 172 51 56 51 53 -19 90 -77 41 -121 13 -149 -97 l-16 -67 -17 57 c-21 73 -67 127 -107 127 -16 0 -53 -12 -81 -26 l-52 -26 30 -21 c61 -45 103 -102 135 -184 8 -22 2 -19 -33 19 -51 54 -79 69 -180 97 -133 36 -259 89 -330 137 -98 68 -101 74 -34 67 31 -3 56 -3 56 0 0 17 -48 47 -74 47 -59 0 -103 20 -150 67 -48 49 -59 71 -28 54 10 -5 48 -9 85 -9 65 1 66 2 50 20 -9 10 -40 32 -68 48 -71 41 -103 75 -136 145 -29 61 -42 125 -16 78 25 -45 134 -123 172 -123 36 0 10 47 -66 117 -32 30 -67 74 -79 97 -20 42 -53 176 -45 184 2 2 13 -17 24 -42 53 -116 211 -229 211 -151 0 39 -29 88 -67 115 -115 80 -144 138 -123 250 6 36 17 76 25 90 13 24 13 24 25 -20 35 -132 184 -290 273 -290 61 0 51 63 -19 117 -113 88 -152 126 -179 174 -55 102 -33 210 67 315 54 58 128 118 135 110 3 -2 -3 -19 -13 -37z"/>
+              <path d="M1622 2356 c-32 -23 -32 -24 -10 -30 41 -10 55 -7 66 19 7 14 12 28 12 30 0 13 -39 1 -68 -19z"/>
+              <path d="M1420 1671 c-36 -11 -90 -26 -120 -35 -30 -9 -105 -19 -167 -23 l-111 -6 13 -46 c7 -25 28 -111 45 -191 18 -80 37 -152 42 -160 13 -21 0 159 -18 245 -22 109 -28 102 84 107 75 4 116 12 181 37 113 42 144 41 187 -5 19 -19 34 -41 34 -47 0 -7 9 2 19 19 21 34 75 64 115 64 15 0 75 -16 135 -35 88 -28 123 -35 191 -35 80 0 82 -1 77 -22 -15 -62 -38 -240 -35 -270 2 -24 14 9 42 122 22 85 45 171 52 191 l12 36 -131 6 c-111 4 -148 10 -231 36 -143 45 -202 39 -227 -21 l-12 -30 -13 31 c-13 30 -48 52 -82 50 -9 0 -46 -8 -82 -18z"/>
+              <path d="M1666 1519 c-38 -33 -51 -134 -38 -294 9 -102 8 -120 -6 -146 -10 -16 -20 -29 -24 -29 -23 0 -32 55 -34 195 -3 215 -23 285 -83 285 -14 0 -57 -11 -96 -24 -38 -14 -97 -28 -132 -32 l-62 -6 7 -52 c4 -28 7 -145 7 -259 l0 -209 30 6 c17 3 71 26 120 51 111 56 153 59 212 15 l40 -30 19 22 c28 31 81 50 118 42 17 -3 56 -22 86 -40 59 -36 109 -54 151 -54 26 0 26 1 17 48 -15 74 -12 328 4 399 l15 63 -23 -6 c-32 -8 -111 10 -179 41 -84 39 -116 42 -149 14z"/>
+  </g>
+</symbol>
+<symbol id="i-at" viewBox="0 0 24 24"><path d="M5 4.5h11a3 3 0 0 1 3 3V19H8a3 3 0 0 1-3-3V4.5Z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 9h8M8 13h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+<symbol id="i-litres" viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" fill="currentColor"/></symbol>
+<symbol id="i-litnet" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 9.5h17M3.5 14.5h17M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18" fill="none" stroke="currentColor" stroke-width="1.3"/></symbol>
+<symbol id="i-libautor" viewBox="0 0 24 24"><path d="M20 4c-6 1-10 4-12 9l-1 4 4-1c5-2 8-6 9-12Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M6 18c1-3 3-5 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+<symbol id="i-rocket" viewBox="0 0 24 24"><path d="M12 2.5c2.8 2 4.5 5.3 4.5 9l-2.2 2.2h-4.6L7.5 11.5c0-3.7 1.7-7 4.5-9Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9.8 13.7 7 19l4-1.2M14.2 13.7 17 19l-4-1.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="9" r="1.6" fill="currentColor"/></symbol>
+<symbol id="i-dice" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="4" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="8.5" cy="8.5" r="1.2" fill="currentColor"/><circle cx="15.5" cy="8.5" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/><circle cx="8.5" cy="15.5" r="1.2" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.2" fill="currentColor"/></symbol>
+<symbol id="i-snow" viewBox="0 0 24 24"><path d="M12 2.5v19M3.8 7.2l16.4 9.6M20.2 7.2 3.8 16.8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+<!-- VER v0.01 (2026-11-20 15:06): новая иконка Story board -->
+<symbol id="i-storyboard" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M8.2 4v16M15.8 4v16" stroke="currentColor" stroke-width="1.4"/><rect x="5" y="7" width="1.6" height="3" rx=".5" fill="currentColor"/><rect x="9.7" y="7" width="3.6" height="3" rx=".5" fill="currentColor"/><rect x="17.2" y="7" width="1.6" height="3" rx=".5" fill="currentColor"/><rect x="5" y="12" width="3.6" height="3" rx=".5" fill="currentColor"/><rect x="17.2" y="12" width="1.6" height="3" rx=".5" fill="currentColor"/></symbol>
+<symbol id="i-tag" viewBox="0 0 24 24"><path d="M3 12V5a2 2 0 0 1 2-2h7l9 9-9 9-9-9Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="8" cy="8" r="1.6" fill="currentColor"/></symbol>
+<symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+<symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18" fill="none" stroke="currentColor" stroke-width="1.3"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+</defs></svg>
+
+<div class="aura" aria-hidden="true"></div>
+<canvas class="sky" id="sky" aria-hidden="true"></canvas>
+<div class="tws" id="tws" aria-hidden="true"></div>
+
+<!-- PROMO -->
+<div class="promo">
+  <div class="promo-soc">
+    <a href="https://t.me/asahichang" target="_blank" rel="noopener" aria-label="Telegram (личный паблик)" title="Telegram (личный паблик)"><svg class="ic" aria-hidden="true"><use href="#i-tg"/></svg></a>
+<a href="https://vk.ru/asahichang" target="_blank" rel="noopener" aria-label="ВКонтакте (Страница автора)" title="ВКонтакте (Страница автора)"><svg class="ic" aria-hidden="true"><use href="#i-vk"/></svg></a>
+<a href="https://www.youtube.com/@Asahi_Chang/videos" target="_blank" rel="noopener" aria-label="YouTube канал" title="YouTube канал"><svg class="ic" aria-hidden="true"><use href="#i-yt"/></svg></a>
+<a href="https://www.tiktok.com/@asahi.chang" target="_blank" rel="noopener" aria-label="TikTok" title="TikTok"><svg class="ic" aria-hidden="true"><use href="#i-tiktok"/></svg></a>
+<a href="https://author.today/u/asahi_chang" target="_blank" rel="noopener" aria-label="Читать книги на Автор Тудей" title="Читать книги на Автор Тудей"><svg class="ic" aria-hidden="true"><use href="#i-at"/></svg></a>
+<a href="https://boosty.to/asahichang" target="_blank" rel="noopener" aria-label="Поддержать на Boosty" title="Поддержать на Boosty"><svg class="ic" aria-hidden="true"><use href="#i-boosty"/></svg></a>
+  </div>
+  <div class="promo-txt">
+    <span class="p-full">Подпишись на новости: <button class="p-link p1" data-tab="r">читателям</button> и <button class="p-link p2" data-tab="w">писателям</button></span>
+    <button class="p-link p-mob" data-tab="r">Подпишись</button>
+  </div>
+  <div class="promo-lang" id="promoLang" role="group" aria-label="Язык сайта">
+  <button type="button" class="lang-btn on" data-lang="ru" aria-pressed="true">РУС</button>
+  <button type="button" class="lang-btn" data-lang="en" aria-pressed="false">EN</button>
+</div>
+</div>
+
+<!-- HEADER -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="left-menu">
+      <a class="brand" title="Сайт писателя фантастики, фэнтези, космос Асахи Чанга: открыть темы или перейти на главную" href="index.html" aria-label="Сайт писателя Асахи Чанга, перейти на главную">
+        <i aria-hidden="true"></i><span>Асахи Чанг</span>
+      </a>
+      <button class="menu-toggle" id="menuToggle" aria-label="Открыть меню">
+        <svg class="ic" aria-hidden="true"><use href="#i-burger"/></svg>
+      </button>
+    </div>
+
+    <nav class="nav" id="mainNav" aria-label="Разделы сайта">
+      <a href="#books" data-s="books">Книги</a>
+      <a href="#games" data-s="games">Игры</a>
+      <div style="position:relative">
+        <button class="navdrop-btn" id="wdBtn" type="button" aria-expanded="false">Писателям <svg class="ic ic-xs" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+        <div class="drop-menu navdrop-menu" id="wdMenu">
+          <a href="marathon.html">Писательский марафон</a>
+          <a href="wiki-article.html">Статьи</a>
+          <a href="encyclopedia.html">Энциклопедия</a>
+        </div>
+      </div>
+      <a href="#blog" data-s="blog">Блог</a>
+      <a href="#about" data-s="about">Обо мне</a>
+      <a href="help.html" class="nav-help" title="Писательские марафоны, создание обложек и видео, игры к книгам, поиск специалистов" aria-label="Нужна помощь">
+        <span>Нужна помощь?</span>
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="stroke:#ff2a1f; stroke-width:2; fill:none;">
+          <circle cx="12" cy="12" r="10"></circle>
+          <circle cx="12" cy="12" r="4"></circle>
+          <line x1="4.93" y1="4.93" x2="9.17" y2="9.17"></line>
+          <line x1="14.83" y1="14.83" x2="19.07" y2="19.07"></line>
+          <line x1="14.83" y1="9.17" x2="19.07" y2="4.93"></line>
+          <line x1="9.17" y1="14.83" x2="4.93" y2="19.07"></line>
+        </svg>
+      </a>
+    </nav>
+
+    <div class="right-menu">
+      <div style="position:relative">
+        <button class="icon-btn" id="topReadBtn" aria-label="Где читать" aria-expanded="false">
+          <svg class="ic" aria-hidden="true"><use href="#i-book"/></svg>
+        </button>
+        <div class="drop-menu top-drop-menu" id="topReadMenu">
+          <a href="https://author.today/u/asahi_chang" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-at"/></svg> Author Today</a>
+          <a href="https://www.litres.ru/author/asahi-chang/" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-litres"/></svg> Литрес</a>
+          <!-- <a href="https://litnet.com" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-litnet"/></svg> Литнет</a> -->
+          <a href="https://libauthor.ru/asahichang" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-libautor"/></svg> ЛибАвтор</a>
+        </div>
+      </div>
+      <a class="icon-btn cart" href="#" target="_blank" rel="noopener" aria-label="Корзина">
+        <svg class="ic" aria-hidden="true"><use href="#i-cart"/></svg>
+      </a>
+    </div>
+  </div>
+</header>
+
+
+
+
+
+
+<!-- PAGE CONTENT -->
+
+<main>
+  <section class="hero spot" id="top">
+    <div class="planet" id="planet" aria-hidden="true"></div>
+    <button class="anomaly" id="anomaly" type="button" aria-label="Необычный источник сигнала"></button>
+
+    <div class="wrap hero-in">
+      <div class="hero-text-col" >
+        <p class="eyebrow">Фантастика · Космос · Наука · Игры</p>
+        <h1 class="g"><span>Асахи</span><span>Чанг</span></h1>
+        <p class="lead">Добро пожаловать на мой сайт. Тут вы найдёте фантастику, заметки о науке и космосе и как я помогают писательскому сообществу</p>
+        <div class="cta">
+          <a class="btn p" href="book.html">Читать книги</a>
+          <div class="readwrap" id="readwrap">
+            <button class="btn o read-btn" id="readBtn" type="button" aria-expanded="false">
+              Где читать <svg class="ic ic-xs" aria-hidden="true"><use href="#i-arrow"/></svg>
+            </button>
+            <div class="readmenu" id="readmenu">
+              <a href="https://author.today/u/asahi_chang" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-at"/></svg> Author Today</a>
+              <a href="https://www.litres.ru/author/asahi-chang/" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-litres"/></svg> Литрес</a>
+              <!-- <a href="https://litnet.com" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-litnet"/></svg> Литнет</a> -->
+              <a href="https://libauthor.ru/asahichang" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-libautor"/></svg> ЛибАвтор</a>
+            </div>
+          </div>
+          <button class="playbtn" id="heroPlay" type="button" data-video="aqz-KE-bpKQ" aria-label="Смотреть видео">
+            <svg class="ic" aria-hidden="true"><use href="#i-play"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="hc-visual-col">
+        <div class="hc-carousel-wrapper">
+          <button class="hc-carousel-arrow left" id="hc-prevBtn" aria-label="Предыдущий слайд">←</button>
+          <div class="hc-carousel-viewport">
+            <div class="hc-carousel-track" id="hc-carouselTrack">
+              <!-- VER v0.01 (2026-11-20 15:07): новый первый слайд «3D тур» -->
+              <div class="hc-carousel-slide">
+                <a class="hc-slide-link hc-tour" href="/voyager-1-3d" data-tip="3D-тур «Вояджер-1»" title="3D-тур «Вояджер-1»" aria-label="Открыть 3D-тур «Вояджер-1»">
+                  <div class="hc-mock-game-app hc-tour-card">
+                    <!-- Подложка 3D-тура: сюда вставить картинку, например style="--tour-cover:url('images/voyager-1-3d.jpg')" -->
+                    <div class="hc-tour-bg" aria-hidden="true"></div>
+                    <div class="hc-badge">3D тур</div>
+                    <div class="hc-game-icon">▶</div>
+                    <div class="hc-game-title-mock">Вояджер-1</div>
+                    <div class="hc-game-sub">50 лет полета в одном интерактивном 3D видео</div>
+                  </div>
+                </a>
+              </div>
+              <div class="hc-carousel-slide">
+                <div class="hc-book-scene">
+                  <div class="hc-book">
+                    <div class="hc-book-face hc-book-back">
+                      <div class="hc-book-back-text">Скоро новинка от Асахи Чанга!</div>
+                      <div class="hc-book-back-year">2026</div>
+                    </div>
+                    <div class="hc-book-face hc-book-spine"></div>
+                    <div class="hc-book-face hc-book-pages-right"></div>
+                    <div class="hc-book-face hc-book-pages-top"></div>
+                    <div class="hc-book-face hc-book-pages-bottom"></div>
+                    <div class="hc-book-face hc-book-front">
+                      <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=400&auto=format&fit=crop" alt="Обложка">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- VER v0.01 (2026-11-20 15:08): вторая книга временно закомментирована -->
+              <!--
+              <div class="hc-carousel-slide">
+                <div class="hc-book-scene">
+                  <div class="hc-book">
+                    <div class="hc-book-face hc-book-back">
+                      <div class="hc-book-back-text">Скоро новинка от Асахи Чанга!</div>
+                      <div class="hc-book-back-year">2026</div>
+                    </div>
+                    <div class="hc-book-face hc-book-spine"></div>
+                    <div class="hc-book-face hc-book-pages-right"></div>
+                    <div class="hc-book-face hc-book-pages-top"></div>
+                    <div class="hc-book-face hc-book-pages-bottom"></div>
+                    <div class="hc-book-face hc-book-front">
+                      <img src="https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?q=80&w=400&auto=format&fit=crop" alt="Обложка">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              -->
+              <div class="hc-carousel-slide">
+                <div class="hc-mock-game-app">
+                  <div class="hc-badge">Игра-онлайн</div>
+                  <div class="hc-game-icon">▶</div>
+                  <div class="hc-game-title-mock">Орбита</div>
+                  <div class="hc-game-sub">Нарративная стратегия</div>
+                </div>
+              </div>
+              <div class="hc-carousel-slide">
+                <div class="hc-mock-cards">
+                  <div class="hc-badge-cards">Карточная игра</div>
+                  <div class="hc-mock-card"></div>
+                  <div class="hc-mock-card"></div>
+                </div>
+              </div>
+              <div class="hc-carousel-slide">
+                <div class="hc-mock-desktop-app">
+                  <div class="hc-mac-header">
+                    <div class="hc-mac-dot red"></div>
+                    <div class="hc-mac-dot yellow"></div>
+                    <div class="hc-mac-dot green"></div>
+                  </div>
+                  <div class="hc-mac-content">
+                    <div class="hc-mac-line color"></div>
+                    <div class="hc-mac-line"></div>
+                    <div class="hc-mac-line short"></div>
+                    <div class="hc-mac-line"></div>
+                  </div>
+                </div>
+              </div>
+              <!-- VER v0.01 (2026-11-20 15:08): мобильное приложение временно закомментировано -->
+              <!--
+              <div class="hc-carousel-slide">
+                <div class="hc-mock-phone">
+                  <div class="hc-phone-notch"></div>
+                  <div class="hc-phone-screen">
+                    <div class="hc-phone-game-header">Игровое приложение</div>
+                    <div class="hc-phone-game-btn">Играть</div>
+                  </div>
+                </div>
+              </div>
+              -->
+            </div>
+          </div>
+          <button class="hc-carousel-arrow right" id="hc-nextBtn" aria-label="Следующий слайд">→</button>
+        </div>
+
+        <!-- VER v0.01 (2026-11-20 15:09): миниатюры под новое число слайдов -->
+        <div class="hc-thumbnails" id="hc-thumbnails">
+          <button class="hc-thumb active" data-index="0" aria-label="Слайд 1: 3D тур"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M20 3v5h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.5 9.5v5l4-2.5z" fill="currentColor"/></svg></button>
+          <button class="hc-thumb" data-index="1" aria-label="Слайд 2: книга"><svg viewBox="0 0 24 24"><path d="M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.1C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.1.25.1.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1zm0 13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5v11.5z"/></svg></button>
+          <button class="hc-thumb" data-index="2" aria-label="Слайд 3: игра"><svg viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 10H3V8h18v8zM6 15h2v-2H6v2zm4 0h2v-2h-2v2zm4 0h2v-2h-2v2z"/></svg></button>
+          <button class="hc-thumb" data-index="3" aria-label="Слайд 4: карточная игра"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM7 10h2v7H7zm4-3h2v10h-2zm4-3h2v13h-2z"/></svg></button>
+          <button class="hc-thumb" data-index="4" aria-label="Слайд 5: приложение"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12zM6 10h2v2H6zm0 4h8v2H6zm10 0h2v2h-2zm-6-4h8v2h-8z"/></svg></button>
+        </div>
+      </div>
+
+      <dl class="ticker">
+        <div><dt>«Вояджер-1» пересёк отметку «1 световой день»</dt><dd>18 ноября 2026 (открыть 3D-модель полёта)</dd></div>
+        <div><dt>Свет идёт до Марса</dt><dd>3–22 мин</dd></div>
+        <div><dt>Вы не стоите на месте</dt><dd>Вы летите на скорости 200 км/сек. вокруг центра галактики Млечный Путь</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="sec" id="books">
+    <div class="wrap">
+      <p class="eyebrow">Библиотека · 2018–2024</p>
+      <h2 class="mega g gb">Книги</h2>
+      <p class="lede">Раздел обновляется, тут скоро будет кое-что новенькое. </p>
+      <p class="lede"><span class="p-full">Подпишись на новости: <button class="p-link p1" data-tab="r">читателям</button> и <button class="p-link p2" data-tab="w">писателям</button></span></p>
+      <p class="lede">Скоро новинка:</p>
+
+      <!-- VER v0.01 (2026-11-20 15:10): переключатель «Полка / По одному» -->
+      <div class="books-view" id="booksView" role="tablist" aria-label="Вид книг">
+        <button class="bv-btn on" type="button" role="tab" aria-selected="true" data-view="shelf">Полка</button>
+        <button class="bv-btn" type="button" role="tab" aria-selected="false" data-view="one">По одному</button>
+      </div>
+      <div class="shelf" id="booksShelf" hidden>
+        <button class="shelf-btn prev" type="button" data-shelf="booksTrack" data-dir="-1" aria-label="Предыдущие книги"><svg class="ic" aria-hidden="true"><use href="#i-arrow-r"/></svg></button>
+        <div class="books" id="booksTrack">
+          <article class="book">
+            <div class="cover"><img src="https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?q=80&w=400&auto=format&fit=crop" alt="Обложка: Тихий апогей"></div>
+            <div class="meta">
+              <p class="k">Цикл · Научная фантастика</p>
+              <p class="b">В Солнечной системе нашли микро-чёрную дыру и направили к ней «Вояджер-6» с командой искусственных интеллектов. По пути они выполняют задания Земли и первую «остановку» они сделают на Фобосе, спутнике Марса, где роботы сходят с ума из-за аномалии.</p>
+              <details><summary class="more">Эпиграф</summary><p class="excerpt">«Главная трагедия человечества — у нас эмоции из каменного века, институты из Средневековья и технологии богов» (Эдвард Уилсон)
+</p></details>
+            </div>
+          </article>
+          <article class="book">
+            <div class="cover"><img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=400&auto=format&fit=crop" alt="Обложка: Свет после нас"></div>
+            <div class="meta">
+              <p class="k">Роман · 536 стр.</p>
+              <p class="b">Ковчег идёт к звезде, которая, судя по свежим данным, уже погасла. Шестое поколение решает, говорить ли об этом остальным.</p>
+              <details><summary class="more">Первые строки</summary><p class="excerpt">Когда долетим, нас будут помнить по расписанию вахт, сказал Дэв. Для начала это немало.</p></details>
+            </div>
+          </article>
+          <!-- VER v0.01 (2026-11-20 15:22): заменил нерабочую обложку -->
+          <article class="book">
+            <div class="cover"><img src="https://images.unsplash.com/photo-1454789548928-9efd52dc4031?q=80&w=400&auto=format&fit=crop" alt="Обложка: Нулевой дрейф"></div>
+            <div class="meta">
+              <p class="k">Сборник · девять рассказов</p>
+              <p class="b">Ремонт, усталость, радиосвязь и маленькие решения, от которых зависит воздух.</p>
+              <details><summary class="more">Первые строки</summary><p class="excerpt">Лёгкие предметы в невесомости не падают. Тяжёлые решения тоже: они висят рядом и ждут, пока на них посмотрят.</p></details>
+            </div>
+          </article>
+          <article class="book">
+            <div class="cover"><img src="https://images.unsplash.com/photo-1543722530-d2c3201371e7?q=80&w=400&auto=format&fit=crop" alt="Обложка: Протокол Лета"></div>
+            <div class="meta">
+              <p class="k">Роман · 368 стр.</p>
+              <p class="b">Первым контактом занимаются не герои, а переводчики-юристы. Каждое слово в договоре с чужими имеет цену, и платить придётся людям.</p>
+              <details><summary class="more">Первые строки</summary><p class="excerpt">Статья четвёртая. Стороны признают, что слово «мир» занимает в их языках разные места на шкале риска.</p></details>
+            </div>
+          </article>
+          <!-- VER v0.01 (2026-11-20 15:11): скрытая книга временно закомментирована, логика #secret в app.js сохранена -->
+          <!--
+          <article class="book" id="secret" hidden>
+            <div class="cover c5">
+              <span class="cv-a">Рукопись · найдена</span>
+              <svg viewBox="0 0 100 20" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,10 18,10.4 30,9.6 42,10.2 47,3 50,17 53,5 58,10.3 72,9.7 84,10.2 100,10" fill="none" stroke="#8ff0e6" stroke-width="1.2" vector-effect="non-scaling-stroke"/></svg>
+              <h3 class="cv-t">Водородная линия</h3><span class="cv-a">А. Чанг</span>
+            </div>
+            <div class="meta">
+              <p class="k">Рукопись · не издана</p>
+              <p class="b">Принято на 1420,40. Повтор каждые 71 секунду. Автор пока не уверен, что хочет знать, кто это отправил.</p>
+              <details><summary class="more">Первые строки</summary><p class="excerpt">Сигнал был слишком правильным, чтобы быть шумом, и слишком усталым, чтобы быть приказом.</p></details>
+            </div>
+          </article>
+          -->
+        </div>
+        <button class="shelf-btn next" type="button" data-shelf="booksTrack" data-dir="1" aria-label="Следующие книги"><svg class="ic" aria-hidden="true"><use href="#i-arrow-r"/></svg></button>
+      </div>
+
+      <!-- VER v0.01 (2026-11-20 15:12): вид «По одному», ссылки на буктрейлеры — заглушки -->
+      <div class="shelf books-one-shelf" id="booksOneShelf" hidden>
+        <button class="shelf-btn prev" type="button" data-shelf="booksOneTrack" data-dir="-1" aria-label="Предыдущая книга"><svg class="ic" aria-hidden="true"><use href="#i-arrow-r"/></svg></button>
+        <div class="one-track" id="booksOneTrack">
+          <article class="one-book">
+            <a class="one-cover" href="book.html" aria-label="Открыть книгу «Тихий апогей»">
+              <img src="https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?q=80&w=400&auto=format&fit=crop" alt="Обложка: Тихий апогей">
+            </a>
+            <div class="one-body">
+              <h3 class="one-title"><a href="book.html">Тихий апогей</a></h3>
+              <ul class="one-genres"><li>Научная фантастика</li><li>Космоопера</li><li>Триллер</li></ul>
+              <p class="one-ann">В Солнечной системе нашли микро-чёрную дыру и направили к ней «Вояджер-6» с командой искусственных интеллектов. По пути они выполняют задания Земли и первую «остановку» они сделают на Фобосе, спутнике Марса, где роботы сходят с ума из-за аномалии.</p>
+              <div class="one-actions">
+                <a class="btn p s" href="book.html">Открыть</a>
+                <button class="btn o s" type="button" data-yt="aqz-KE-bpKQ">Буктрейлер</button>
+              </div>
+              <details class="one-more"><summary>Эпиграф</summary><p>«Главная трагедия человечества — у нас эмоции из каменного века, институты из Средневековья и технологии богов» (Эдвард Уилсон)</p></details>
+            </div>
+          </article>
+          <article class="one-book">
+            <a class="one-cover" href="book.html" aria-label="Открыть книгу «Свет после нас»">
+              <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=400&auto=format&fit=crop" alt="Обложка: Свет после нас">
+            </a>
+            <div class="one-body">
+              <h3 class="one-title"><a href="book.html">Свет после нас</a></h3>
+              <ul class="one-genres"><li>Научная фантастика</li><li>Драма</li><li>Антиутопия</li></ul>
+              <p class="one-ann">Ковчег идёт к звезде, которая, судя по свежим данным, уже погасла. Шестое поколение решает, говорить ли об этом остальным.</p>
+              <div class="one-actions">
+                <a class="btn p s" href="book.html">Открыть</a>
+                <button class="btn o s" type="button" data-yt="M7lc1UVf-VE">Буктрейлер</button>
+              </div>
+              <details class="one-more"><summary>Первые строки</summary><p>Когда долетим, нас будут помнить по расписанию вахт, сказал Дэв. Для начала это немало.</p></details>
+            </div>
+          </article>
+          <article class="one-book">
+            <!-- VER v0.01 (2026-11-20 15:22): заменил нерабочую обложку -->
+            <a class="one-cover" href="book.html" aria-label="Открыть книгу «Нулевой дрейф»">
+              <img src="https://images.unsplash.com/photo-1454789548928-9efd52dc4031?q=80&w=400&auto=format&fit=crop" alt="Обложка: Нулевой дрейф">
+            </a>
+            <div class="one-body">
+              <h3 class="one-title"><a href="book.html">Нулевой дрейф</a></h3>
+              <ul class="one-genres"><li>Научная фантастика</li><li>Рассказы</li><li>Хард-SF</li></ul>
+              <p class="one-ann">Ремонт, усталость, радиосвязь и маленькие решения, от которых зависит воздух.</p>
+              <div class="one-actions">
+                <a class="btn p s" href="book.html">Открыть</a>
+                <button class="btn o s" type="button" data-yt="aqz-KE-bpKQ">Буктрейлер</button>
+              </div>
+              <details class="one-more"><summary>Первые строки</summary><p>Лёгкие предметы в невесомости не падают. Тяжёлые решения тоже: они висят рядом и ждут, пока на них посмотрят.</p></details>
+            </div>
+          </article>
+          <article class="one-book">
+            <a class="one-cover" href="book.html" aria-label="Открыть книгу «Протокол Лета»">
+              <img src="https://images.unsplash.com/photo-1543722530-d2c3201371e7?q=80&w=400&auto=format&fit=crop" alt="Обложка: Протокол Лета">
+            </a>
+            <div class="one-body">
+              <h3 class="one-title"><a href="book.html">Протокол Лета</a></h3>
+              <ul class="one-genres"><li>Научная фантастика</li><li>Первый контакт</li><li>Политика</li></ul>
+              <p class="one-ann">Первым контактом занимаются не герои, а переводчики-юристы. Каждое слово в договоре с чужими имеет цену, и платить придётся людям.</p>
+              <div class="one-actions">
+                <a class="btn p s" href="book.html">Открыть</a>
+                <button class="btn o s" type="button" data-yt="M7lc1UVf-VE">Буктрейлер</button>
+              </div>
+              <details class="one-more"><summary>Первые строки</summary><p>Статья четвёртая. Стороны признают, что слово «мир» занимает в их языках разные места на шкале риска.</p></details>
+            </div>
+          </article>
+        </div>
+        <button class="shelf-btn next" type="button" data-shelf="booksOneTrack" data-dir="1" aria-label="Следующая книга"><svg class="ic" aria-hidden="true"><use href="#i-arrow-r"/></svg></button>
+      </div>
+    </div>
+  </section>
+
+
+  
+
+  <section class="sec" id="games">
+    <div class="wrap">
+      <p class="eyebrow">Три проекта в работе · 2026</p>
+      <h2 class="mega l2 g gg">Игры и приложения</h2>
+      <p class="lede">Вместе с новой книгой выйдет серия игр и приложений. Приложение для писателей Storyboard выйдет в ближайшее время.</p>
+
+      <div class="rows">
+        <a href="/" class="row spot">
+          <div class="game-head">
+            <span class="game-ic" aria-hidden="true"><svg class="ic"><use href="#i-rocket"/></svg></span>
+            <h3 class="g gb">Фобос</h3>
+          </div>
+          <div>
+            <p>2097 год. На Фобосе построен космический лифт. Исследуйте базы, почувствуйте себя марсонавтом. Hard-SF в 3D.</p>
+            <div class="chips"><span class="chip live">ноябрь · 2026</span><span class="chip live">3D</span><span class="chip">Браузер</span><span class="chip">Похоже на Stationery</span></div>
+          </div>
+        </a>
+        <a href="game.html" class="row spot">
+          <div class="game-head">
+            <span class="game-ic" aria-hidden="true"><svg class="ic"><use href="#i-dice"/></svg></span>
+            <h3 class="g gg">Резонансы</h3>
+          </div>
+          <div>
+            <p>Любимая игра команды «Вояджера-6» доступна всем! Это карточная настолка, которая познакомит вас с таким явлением как <i>резонансы</i> в космосе. Она увлекательна, хотя придётся немного поразбираться. Можно играть против ИИ или с друзьями.</p>
+            <div class="chips"><span class="chip live">декабрь · 2026</span><span class="chip live">Настольная игра</span><span class="chip">Бразуер, Android</span><span class="chip">1–4 игроков</span></div>
+          </div>
+        </a>
+        <a href="game.html" class="row spot">
+          <div class="game-head">
+            <span class="game-ic" aria-hidden="true"><svg class="ic"><use href="#i-snow"/></svg></span>
+            <h3 class="g gw">Криолинк</h3>
+          </div>
+          <div>
+            <p>Вы техник станции «Криолинк», которую надо обслуживать. Каждый приказ приходит с задержкой, и к моменту исполнения ситуация уже другая. Одиночная игра об управлении ледяными волноводами в холодном и таинственном мире Фобоса. Какую тайну хранит станция?</p>
+            <div class="chips"><span class="chip live">декабрь · 2026</span><span class="chip live">3D</span><span class="chip">браузер</span><span class="chip">Одиночная</span></div>
+          </div>
+        </a>
+        <a href="game.html" class="row spot">
+          <div class="game-head">
+            <!-- VER v0.01 (2026-11-20 15:13): новая иконка Story board -->
+            <span class="game-ic" aria-hidden="true"><svg class="ic"><use href="#i-storyboard"/></svg></span>
+            <h3 class="g gw">Story board</h3>
+            <p class="g gw">Онлайн-доска для создания историй</p>
+          </div>
+          <div>
+            <p>Визуализируйте свой сюжет, расследование, схему глав с помощью гибкого веб-приложения без регистрации и полным контролем над своими данными</p>
+            <div class="chips"><span class="chip live">скоро · 2026</span><span class="chip live">Приложение для писателей</span><span class="chip">браузер</span><span class="chip">Доска</span></div>
+          </div>
+        </a>
+      </div>
+
+      <div class="panel rx spot" id="rx">
+        <div class="rx-h">
+          <h3 class="g gg">Приёмник</h3>
+          <span class="chip">Диапазон 1415–1426 МГц</span>
+        </div>
+        <div class="spec" id="spec" aria-hidden="true"></div>
+        <div class="fout"><span id="fout">1417,30</span><small>МГц</small></div>
+        <div class="tune">
+          <button class="step" type="button" data-step="-0.01" aria-label="Частота на 0,01 МГц ниже">−</button>
+          <input type="range" id="freq" min="1415" max="1426" step="0.01" value="1417.3" aria-label="Частота приёмника, МГц">
+          <button class="step" type="button" data-step="0.01" aria-label="Частота на 0,01 МГц выше">+</button>
+        </div>
+        <div>
+          <div class="meter" aria-hidden="true"><span id="mfill"></span></div>
+          <p class="mono" style="margin:.5rem 0 0;font-size:.8rem;color:var(--muted)" id="mtxt">Уровень сигнала: 0%</p>
+        </div>
+        <p class="rxs" id="rxstat" aria-live="polite">Двигайте частоту и следите за уровнем. Подсказка спрятана в самом начале.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="writers">
+    <div class="wrap">
+      <p class="eyebrow">Мастерская · 2 инструмента и 3 правила</p>
+      <h2 class="mega l2 g gw">Наука для<br>писателей</h2>
+      <p class="lede">Вселенная умеет удивлять. Я пишу познавательную фантастику: двойная выгода - интересные истории, основанные на реальной науке.</p>
+
+      <div class="tools">
+        <div class="panel spot">
+          <h3 class="g gw">Генератор идей</h3>
+          <dl class="seed" id="seed" aria-live="polite"></dl>
+          <div class="btns">
+            <button class="btn p s" type="button" id="gen">Новая вводная</button>
+            <button class="btn o s" type="button" id="copyseed">Копировать</button>
+          </div>
+        </div>
+        <div>
+          <div class="tw">
+            <table>
+              <caption class="eyebrow" style="text-align:left;padding:1rem 1rem 0">Сколько идёт сигнал от Земли</caption>
+              <thead><tr><th>Куда</th><th>Время</th><th>Что это даёт сюжету</th></tr></thead>
+              <tbody>
+                <tr><td>Луна</td><td>1,3 с</td><td>Разговор почти без пауз</td></tr>
+                <tr><td>Солнце</td><td>8 мин 20 с</td><td>Вспышку видят с опозданием</td></tr>
+                <tr><td>Марс</td><td>3–22 мин</td><td>Диалог превращается в обмен письмами</td></tr>
+                <tr><td>Юпитер</td><td>33–54 мин</td><td>Вопрос и ответ занимают вахту</td></tr>
+                <tr><td>Нептун</td><td>около 4 ч</td><td>Приказ за обедом, ответ к ужину</td></tr>
+                <tr><td>Voyager 1</td><td>≈ 1 сутки</td><td>Двое суток от вопроса до ответа</td></tr>
+                <tr><td>Проксима Центавра</td><td>4,24 года</td><td>Любое сообщение становится письмом потомкам</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="rules">
+        <div><h3>Сначала цена, потом сцена</h3><p>Посчитайте delta-v и запас кислорода до того, как приступить к погоне.</p></div>
+        <div><h3>За всё надо платить</h3><p>Если технология делает невозможное, она что-то забирает: время, память, людей.</p></div>
+        <div><h3>Задержка связи это сюжет</h3><p>Пока вопрос летит к Земле, герои успевают сделать три ошибки.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="blog">
+    <div class="wrap">
+      <p class="eyebrow">Заметки · Всегда что-то интересное</p>
+      <h2 class="mega g gl">Блог</h2>
+      <p class="lede">Пишу про книги, науку, мои путешествия и ещё много чего.</p>
+
+      <div class="posts">
+        <details class="post spot" name="post" open>
+          <summary>
+            <!-- VER v0.01 (2026-11-20 15:14): картинка-превью статьи -->
+            <span class="thumb t1" aria-hidden="true"><img src="https://images.unsplash.com/photo-1444703686981-a3abbc4d4fe3?q=80&w=400&auto=format&fit=crop" alt=""></span>
+            <span class="pbody">
+              <span class="pmeta"><time datetime="2026-10-28">28 окт 2026</time><span class="tag">ремесло · 6 мин</span></span>
+              <h3>Тишина как персонаж</h3>
+            </span>
+          </summary>
+          <div class="body">
+            <p>В вакууме нет звука, но в хорошей сцене он есть. Разбираю, чем заменить грохот.</p>
+            <a href="article.html" class="btn o s" style="margin-top:1rem">Читать далее</a>
+          </div>
+        </details>
+        <details class="post spot" name="post">
+          <summary>
+            <!-- VER v0.01 (2026-11-20 15:14): картинка-превью статьи -->
+            <span class="thumb t2" aria-hidden="true"><img src="https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=400&auto=format&fit=crop" alt=""></span>
+            <span class="pbody">
+              <span class="pmeta"><time datetime="2026-10-02">2 окт 2026</time><span class="tag">миры · 8 мин</span></span>
+              <h3>Сколько стоит гиперпрыжок</h3>
+            </span>
+          </summary>
+          <div class="body">
+            <p>Считаю бюджет сюжета. Если перелёт стоит экипажу год жизни, каждая сцена становится дорогой.</p>
+            <a href="article.html" class="btn o s" style="margin-top:1rem">Читать далее</a>
+          </div>
+        </details>
+        <details class="post spot" name="post">
+          <summary>
+            <!-- VER v0.01 (2026-11-20 15:14): картинка-превью статьи -->
+            <span class="thumb t3" aria-hidden="true"><img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=400&auto=format&fit=crop" alt=""></span>
+            <span class="pbody">
+              <span class="pmeta"><time datetime="2026-09-14">14 сен 2026</time><span class="tag">наука · 5 мин</span></span>
+              <h3>Как я слежу за Voyager вместо новостей</h3>
+            </span>
+          </summary>
+          <div class="body">
+            <p>Сигнал идёт почти сутки, и это отличный тренажёр для писателя.</p>
+            <a href="article.html" class="btn o s" style="margin-top:1rem">Читать далее</a>
+          </div>
+        </details>
+        <details class="post spot" name="post">
+          <summary>
+            <!-- VER v0.01 (2026-11-20 15:14): картинка-превью статьи -->
+            <span class="thumb t4" aria-hidden="true"><img src="https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?q=80&w=400&auto=format&fit=crop" alt=""></span>
+            <span class="pbody">
+              <span class="pmeta"><time datetime="2026-08-21">21 авг 2026</time><span class="tag">ремесло · 7 мин</span></span>
+              <h3>Три ошибки в сценах невесомости</h3>
+            </span>
+          </summary>
+          <div class="body">
+            <p>Волосы, жидкости и пламя. Что чаще всего ломает достоверность.</p>
+            <a href="article.html" class="btn o s" style="margin-top:1rem">Читать далее</a>
+          </div>
+        </details>
+        <details class="post spot" name="post">
+          <summary>
+            <!-- VER v0.01 (2026-11-20 15:14): картинка-превью статьи -->
+            <span class="thumb t5" aria-hidden="true"><img src="https://images.unsplash.com/photo-1454789548928-9efd52dc4031?q=80&w=400&auto=format&fit=crop" alt=""></span>
+            <span class="pbody">
+              <span class="pmeta"><time datetime="2026-07-30">30 июл 2026</time><span class="tag">лаборатория · 9 мин</span></span>
+              <h3>Орбита буксира за один вечер</h3>
+            </span>
+          </summary>
+          <div class="body">
+            <p>Короткий разбор: как проверить, успеет ли экипаж к стыковке.</p>
+            <a href="article.html" class="btn o s" style="margin-top:1rem">Читать далее</a>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="video">
+    <div class="wrap">
+      <p class="eyebrow">Видео · Записи созвонов</p>
+      <h2 class="mega g gl">Видео</h2>
+      <p class="lede">Мои созвоны с писателями и другие видео.</p>
+
+      <!-- VER v0.01 (2026-11-20 15:15): фильтр видео по тегам -->
+      <div class="video-tags" id="videoTags" role="group" aria-label="Фильтр видео">
+        <button class="vt-btn on" type="button" data-filter="all" aria-pressed="true">Все</button>
+        <button class="vt-btn" type="button" data-filter="calls" aria-pressed="false">Созвоны с писателями</button>
+        <button class="vt-btn" type="button" data-filter="useful" aria-pressed="false">Полезное писателю</button>
+        <button class="vt-btn" type="button" data-filter="books" aria-pressed="false">Мои книги</button>
+      </div>
+
+      <div class="shelf">
+        <button class="shelf-btn prev" type="button" data-shelf="videosTrack" data-dir="-1" aria-label="Предыдущие видео"><svg class="ic" aria-hidden="true"><use href="#i-arrow-r"/></svg></button>
+        <div class="videos" id="videosTrack">
+          <!-- VER v0.01 (2026-11-20 15:16): новое видео с превью и названием -->
+          <article class="vcard" data-tag="calls">
+            <button class="vthumb" type="button" data-yt="o2Nlkjxu7II" data-vk="https://vkvideo.ru/video-235953301_456239146" aria-label="Смотреть видео: Разговор с Катей Тюхай: нейронки и писательство">
+              <img class="vthumb-img" src="https://i.ytimg.com/vi/o2Nlkjxu7II/hqdefault.jpg" alt="">
+              <span class="vplay"><svg class="ic" aria-hidden="true"><use href="#i-play"/></svg></span>
+            </button>
+            <h3 class="vtitle"><button class="vtitle-btn" type="button" data-yt="o2Nlkjxu7II" data-vk="https://vkvideo.ru/video-235953301_456239146">Разговор с Катей Тюхай: нейронки и писательство</button></h3>
+            <p class="vmeta"><span class="vtag">Созвоны с писателями</span></p>
+          </article>
+          <article class="vcard" data-tag="useful">
+            <button class="vthumb v1" type="button" data-yt="aqz-KE-bpKQ" aria-label="Смотреть видео: Как считать delta-v без паники">
+              <span class="vplay"><svg class="ic" aria-hidden="true"><use href="#i-play"/></svg></span>
+            </button>
+            <h3 class="vtitle"><button class="vtitle-btn" type="button" data-yt="aqz-KE-bpKQ">Как считать delta-v без паники</button></h3>
+            <p class="vmeta"><span class="vtag">Полезное писателю</span></p>
+          </article>
+          <article class="vcard" data-tag="books">
+            <button class="vthumb v2" type="button" data-yt="M7lc1UVf-VE" aria-label="Смотреть видео: Читаем «Водородную линию»">
+              <span class="vplay"><svg class="ic" aria-hidden="true"><use href="#i-play"/></svg></span>
+            </button>
+            <h3 class="vtitle"><button class="vtitle-btn" type="button" data-yt="M7lc1UVf-VE">Читаем «Водородную линию»</button></h3>
+            <p class="vmeta"><span class="vtag">Мои книги</span></p>
+          </article>
+          <article class="vcard" data-tag="useful">
+            <button class="vthumb v3" type="button" data-yt="aqz-KE-bpKQ" aria-label="Смотреть видео: Три ошибки в сценах невесомости">
+              <span class="vplay"><svg class="ic" aria-hidden="true"><use href="#i-play"/></svg></span>
+            </button>
+            <h3 class="vtitle"><button class="vtitle-btn" type="button" data-yt="aqz-KE-bpKQ">Три ошибки в сценах невесомости</button></h3>
+            <p class="vmeta"><span class="vtag">Полезное писателю</span></p>
+          </article>
+          <article class="vcard" data-tag="useful">
+            <button class="vthumb v4" type="button" data-yt="M7lc1UVf-VE" aria-label="Смотреть видео: Орбита буксира за один вечер">
+              <span class="vplay"><svg class="ic" aria-hidden="true"><use href="#i-play"/></svg></span>
+            </button>
+            <h3 class="vtitle"><button class="vtitle-btn" type="button" data-yt="M7lc1UVf-VE">Орбита буксира за один вечер</button></h3>
+            <p class="vmeta"><span class="vtag">Полезное писателю</span></p>
+          </article>
+          <article class="vcard" data-tag="useful">
+            <button class="vthumb v5" type="button" data-yt="aqz-KE-bpKQ" aria-label="Смотреть видео: Как я проверяю физику в книгах">
+              <span class="vplay"><svg class="ic" aria-hidden="true"><use href="#i-play"/></svg></span>
+            </button>
+            <h3 class="vtitle"><button class="vtitle-btn" type="button" data-yt="aqz-KE-bpKQ">Как я проверяю физику в книгах</button></h3>
+            <p class="vmeta"><span class="vtag">Полезное писателю</span></p>
+          </article>
+          <article class="vcard" data-tag="books">
+            <button class="vthumb v6" type="button" data-yt="M7lc1UVf-VE" aria-label="Смотреть видео: Анонс нового романа">
+              <span class="vplay"><svg class="ic" aria-hidden="true"><use href="#i-play"/></svg></span>
+            </button>
+            <h3 class="vtitle"><button class="vtitle-btn" type="button" data-yt="M7lc1UVf-VE">Анонс нового романа</button></h3>
+            <p class="vmeta"><span class="vtag">Мои книги</span></p>
+          </article>
+        </div>
+        <button class="shelf-btn next" type="button" data-shelf="videosTrack" data-dir="1" aria-label="Следующие видео"><svg class="ic" aria-hidden="true"><use href="#i-arrow-r"/></svg></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="about">
+    <div class="wrap">
+      <p class="eyebrow">Автор · инженер по образованию</p>
+      <h2 class="mega l2 g ga">Обо мне</h2>
+      <div class="about">
+        <div>
+          <p class="statement">Десять лет я <span class="hl">считал орбиты</span> для спутников связи. Теперь считаю, <span class="hl2">сколько стоит одиночество</span> на борту.</p>
+          <p class="bio">Первые рассказы я написал в ночные смены. Сейчас пишу научную фантастику и веду мастерскую.</p>
+          <div class="mail">
+            <span class="eyebrow" style="margin:0">Для переводов, интервью и игр</span>
+            <code id="mail">author@example.com</code>
+            <button class="btn o s" type="button" id="copymail">Копировать адрес</button>
+          </div>
+          <div style="margin-top:1.5rem">
+            <a href="about.html" class="btn o">Подробнее</a>
+          </div>
+        </div>
+        <ol class="tl">
+          <li><b class="g">2012</b><span>Первые рассказы в ночные смены</span></li>
+          <li><b class="g">2018</b><span>Роман «Протокол Лета»</span></li>
+          <li><b class="g">2020</b><span>Сборник «Нулевой дрейф»</span></li>
+          <li><b class="g">2022</b><span>Роман «Свет после нас»</span></li>
+          <li><b class="g">2023</b><span>Первая игра, «Дальний рейс»</span></li>
+          <li><b class="g">2024</b><span>Роман «Тихий апогей»</span></li>
+          <li><b class="g">2026</b><span>Работаю над новым романом</span></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="subscribe">
+    <div class="wrap">
+      <div class="news panel spot">
+        <div>
+          <p class="eyebrow">Рассылка · раз в две недели</p>
+          <h2 class="news-h g ga">Подпишись на&nbsp;новости</h2>
+          <p class="lede" style="margin-top:.9rem">Получай свежие главы, разборы и анонсы первым</p>
+        </div>
+        <form class="news-f" id="subForm" novalidate>
+          <label class="sr-only" for="email">Email</label>
+          <input id="email" type="email" name="email" placeholder="you@example.com" autocomplete="email" required>
+          <div class="seg" id="subSeg" role="group" aria-label="Кому подписаться">
+            <button type="button" class="seg-btn on" data-val="r" aria-pressed="true">Читателям</button>
+            <button type="button" class="seg-btn" data-val="w" aria-pressed="false">Писателям</button>
+          </div>
+          <button class="btn p" type="submit">Подписаться</button>
+          <p class="news-note mono">Никакого спама. Отписаться можно в один клик.</p>
+        </form>
+      </div>
+      <p id="coda" hidden>Вы дочитали до конца, а значит, вы из тех, кто интеерсуется и слушает. Я уверен таких людей Вселенная слышит - давайте объединяться. В архиве трансморфа я обнаружил послание: «Пароль, что открывает дверь скрыт в страхе открывающего».</p>
+      <div id="end" style="height:2px"></div>
+    </div>
+  </section>
+</main>
+
+<!-- Модалка категорий (только на главной) -->
+<div class="cat-modal" id="catModal" hidden>
+  <button class="cat-close" id="closeCatBtn" aria-label="Закрыть меню">
+    <svg class="ic" aria-hidden="true"><use href="#i-close"/></svg>
+  </button>
+  <div class="cat-grid">
+    <a href="space.html" class="cat-item bg-space">
+      <div class="cat-content">
+        <h2>Космос</h2>
+        <p>Далёкие миры, иные материи и одиночество в ночи</p>
+      </div>
+    </a>
+    <a href="encyclopedia.html" class="cat-item bg-history">
+      <div class="cat-content">
+        <h2>История</h2>
+        <p>Время дышит в затылок и управляет будущим</p>
+      </div>
+    </a>
+    <a href="wiki-article.html" class="cat-item bg-lit">
+      <div class="cat-content">
+        <h2>Литература</h2>
+        <p>Про буквы, слова, предложения, тексты и смыслы</p>
+      </div>
+    </a>
+    <a href="game.html" class="cat-item bg-tech">
+      <div class="cat-content">
+        <h2>Технологии</h2>
+        <p>IT, стартапы и остальное</p>
+      </div>
+    </a>
+    <a href="travel.html" class="cat-item bg-tourism">
+      <div class="cat-content">
+        <h2>Туризм</h2>
+        <p>Мои путешествия по пределам привычного и непривычного</p>
+      </div>
+    </a>
+  </div>
+</div>
+
+
+
+<!-- FOOTER NAV -->
+<nav class="footnav" aria-label="Навигация в подвале">
+  <div class="wrap">
+    <div class="footcols">
+      <div class="fcol">
+        <h4>Читателям</h4>
+        <ul>
+          <li><a href="book.html">Книги</a></li>
+          <li><a href="blog.html">Блог</a></li>
+          <li><a href="encyclopedia.html">Энциклопедия</a></li>
+          <li><a class="fbtn" href="contacts.html"><svg class="ic" aria-hidden="true"><use href="#i-mail"/></svg> <span>Контакты</span></a></li>
+        </ul>
+        <div class="socials">
+          <a href="https://t.me/asahichang" target="_blank" rel="noopener" aria-label="Telegram (личный паблик)" title="Telegram (личный паблик)"><svg class="ic" aria-hidden="true"><use href="#i-tg"/></svg></a>
+<a href="https://t.me/PRwriters" target="_blank" rel="noopener" aria-label="Telegram (Чат продвижения книг)" title="Telegram (Чат продвижения книг)" style="color:#FFDB8B"><svg class="ic" aria-hidden="true"><use href="#i-tg"/></svg></a>
+<a href="https://vk.ru/asahichang" target="_blank" rel="noopener" aria-label="ВКонтакте (Страница автора)" title="ВКонтакте (Страница автора)"><svg class="ic" aria-hidden="true"><use href="#i-vk"/></svg></a>
+<a href="https://vk.ru/lit_worlds" target="_blank" rel="noopener" aria-label="ВКонтакте (Литературное общество)" title="ВКонтакте (Литературное общество)" style="color:#FFDB8B"><svg class="ic" aria-hidden="true"><use href="#i-vk"/></svg></a>
+<a href="https://www.youtube.com/@Asahi_Chang/videos" target="_blank" rel="noopener" aria-label="YouTube канал" title="YouTube канал"><svg class="ic" aria-hidden="true"><use href="#i-yt"/></svg></a>
+<a href="https://www.tiktok.com/@asahi.chang" target="_blank" rel="noopener" aria-label="TikTok" title="TikTok"><svg class="ic" aria-hidden="true"><use href="#i-tiktok"/></svg></a>
+<a href="https://author.today/u/asahi_chang" target="_blank" rel="noopener" aria-label="Читать книги на Автор Тудей" title="Читать книги на Автор Тудей"><svg class="ic" aria-hidden="true"><use href="#i-at"/></svg></a>
+<a href="https://boosty.to/asahichang" target="_blank" rel="noopener" aria-label="Поддержать на Boosty" title="Поддержать на Boosty"><svg class="ic" aria-hidden="true"><use href="#i-boosty"/></svg></a>
+        </div>
+      </div>
+      <div class="fcol">
+        <h4>Писателям</h4>
+        <ul>
+          <li><a href="marathon.html">Писательский марафон</a></li>
+          <li><a href="wiki-article.html">Статьи</a></li>
+          <li><a href="game.html">Приложения</a></li>
+        </ul>
+      </div>
+      <div class="fcol">
+        <h4>Миры</h4>
+        <ul>
+          <li><a href="space.html">Космос</a></li>
+          <li><a href="travel.html">Путешествия</a></li>
+          <li><a href="character.html">Персонажи</a></li>
+          <li><a href="about.html">Планы автора</a></li>
+        </ul>
+      </div>
+      <div class="fcol">
+        <h4>Разделы</h4>
+        <ul>
+          <li><a href="space.html">Космос</a></li>
+          <li><a href="travel.html">Путешествия</a></li>
+          <li><a href="encyclopedia.html">Энциклопедия</a></li>
+          <li><a href="article.html">Статья</a></li>
+        </ul>
+      </div>
+      <div class="fcol">
+        <h4>Читать</h4>
+        <ul>
+          <li><a href="https://author.today/u/asahi_chang" target="_blank" rel="noopener">Author Today</a></li>
+          <li><a href="https://www.litres.ru/author/asahi-chang/" target="_blank" rel="noopener">Литрес</a></li>
+          <!-- <li><a href="https://litnet.com" target="_blank" rel="noopener">Литнет</a></li> -->
+          <li><a href="https://libauthor.ru/asahichang" target="_blank" rel="noopener">ЛибАвтор</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<footer class="foot">
+  <div class="wrap">
+    <p>© 2026 Асахи Чанг. Сайт отправлен с Земли, ответ с Марса придёт через 6–44 минуты.</p>
+  </div>
+</footer>
+
+<button class="back-to-top" id="backToTop" aria-label="Наверх">
+  <svg class="ic" aria-hidden="true"><use href="#i-up"/></svg>
+</button>
+
+<!-- VIDEO MODAL -->
+<!-- VER v0.01 (2026-11-20 15:20): модалка видео с вкладками Вконтакте/YouTube -->
+<div class="modal" id="vmodal" hidden>
+  <div class="modal-back" data-close></div>
+  <div class="modal-box vmodal-box" role="dialog" aria-modal="true" aria-label="Видео">
+    <div class="vmodal-head">
+      <div class="vmodal-tabs" role="tablist" aria-label="Платформа">
+        <button class="vtab on" type="button" role="tab" aria-selected="true" aria-controls="vframe" data-platform="vk">Вконтакте</button>
+        <button class="vtab" type="button" role="tab" aria-selected="false" aria-controls="vframe" data-platform="yt">YouTube</button>
+      </div>
+      <button class="modal-x" type="button" data-close aria-label="Закрыть"><svg class="ic" aria-hidden="true"><use href="#i-close"/></svg></button>
+    </div>
+    <div class="modal-frame">
+      <iframe id="vframe" title="Видео" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; clipboard-write" allowfullscreen></iframe>
+      <p class="vmodal-empty" id="vempty" hidden>Для этого видео пока нет ссылки на выбранной платформе.</p>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="app.js?date=11172026"></script>
+</body>
+</html>

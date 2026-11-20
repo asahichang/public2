@@ -1,0 +1,18 @@
+/* Мои правки */
+
+.mega.md{font-size:clamp(2.3rem,10vw,8.4rem);letter-spacing:-.015em;line-height:1.05}
+
+figcaption{
+  margin:1rem;
+  text-align:center;
+  font-style:italic;
+  font-size:.85rem;
+  line-height:1.45;
+  color:var(--muted);
+}
+
+figure.fit{
+  width:fit-content;
+  max-width:100%;
+  margin-inline:auto;   /* центрирование; или margin:1.4rem 0 для левого края */
+}
